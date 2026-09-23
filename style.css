@@ -1,0 +1,44 @@
+*{box-sizing:border-box}html,body{margin:0;background:#17120d;color:#f5ead5;font-family:system-ui,-apple-system,Segoe UI,sans-serif}body{min-height:100vh;background:radial-gradient(circle at top,#3b2818,#17120d 55%)}main{width:min(100%,620px);margin:auto;padding:12px 12px 28px}header,.status{display:flex;align-items:center;justify-content:space-between;gap:12px}h1{font-family:Georgia,serif;letter-spacing:.14em;margin:0;color:#e8c477;font-size:28px}header p{margin:0;color:#bda98a;font-size:13px}.status{margin:10px 0;background:#241a12;border:1px solid #59432c;padding:9px 12px;border-radius:10px;font-size:13px}.status span:first-child{font-weight:800;color:#e8c477}.table-wrap{width:100%;display:block;overflow:visible}.table-wrap canvas{display:block;width:100%;height:auto;max-width:100%;aspect-ratio:1780/980;touch-action:none;border-radius:14px;box-shadow:0 12px 35px #0008}
+.controls{margin-top:13px;background:#241a12;border:1px solid #59432c;padding:13px;border-radius:12px}.controls label{display:flex;justify-content:space-between;font-size:13px;font-weight:800;letter-spacing:.05em}.controls input{width:100%;height:44px;accent-color:#c9963c}.controls button,#reset,.dev button{border:0;border-radius:9px;min-height:46px;font-weight:900;cursor:pointer}.controls button{width:100%;background:#c9963c;color:#17120d;font-size:17px;letter-spacing:.06em}.controls button:disabled{opacity:.45}.hint,footer{color:#aa9b87;font-size:12px;text-align:center}.hint{margin:9px 0 0}#reset,.dev button{background:#3a2a1c;color:#f5ead5;border:1px solid #6b5033;padding:0 13px}details{margin-top:12px;color:#bfae95;font-size:13px}.dev{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}footer{margin-top:15px}@media(max-height:700px){.controls{margin-top:8px;padding:9px}.controls input{height:36px}.fine-aim button{min-height:38px}.hint{display:none}}@media(min-width:700px){main{max-width:760px}}
+
+.fine-aim{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:-2px 0 10px}.fine-aim button{min-height:44px;background:#3a2a1c;color:#f5ead5;border:1px solid #6b5033;border-radius:9px;font-weight:800}.controls label:not(:first-child){margin-top:5px}
+
+/* V0.1.8: fixed two-line status HUD to prevent layout jumping */
+.status{align-items:stretch;min-height:58px}
+.status span{display:flex;align-items:center;min-height:38px;line-height:19px}
+.status span:first-child{flex:0 0 34%;min-width:108px}
+.status span:last-child{flex:1 1 66%;min-width:0}
+@media(max-width:420px){.status span:first-child{flex-basis:38%;min-width:112px}}
+.rules-hud{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:6px;margin:0 0 10px;text-align:center}.rules-hud>div{background:#241a12;border:1px solid #59432c;border-radius:9px;padding:7px 4px;min-width:0}.rules-hud b,.rules-hud small{display:block}.rules-hud b{font-size:12px;color:#e8c477}.rules-hud small{font-size:10px;color:#aa9b87;margin-top:2px}.choice{background:#352514;border:1px solid #c9963c;border-radius:10px;padding:10px;margin-bottom:10px;text-align:center}.choice p{margin:0 0 8px;font-size:13px}.choice div{display:grid;grid-template-columns:1fr 1fr;gap:8px}.choice button{min-height:44px;border:0;border-radius:8px;background:#c9963c;color:#17120d;font-weight:900}
+
+
+/* V0.2.4: stable turn announcement overlay */
+.table-wrap{position:relative}
+.turn-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;pointer-events:none;text-align:center;font-family:Georgia,serif;font-weight:900;font-size:clamp(20px,5vw,38px);letter-spacing:.02em;color:#fff;text-shadow:0 2px 8px #000,0 0 18px #000;background:#0000;opacity:0;transform:scale(1);z-index:4}
+.turn-overlay.show{animation:turnAnnouncement 3s ease-out both}
+@keyframes turnAnnouncement{0%{opacity:0;transform:scale(1.16)}12%{opacity:1;transform:scale(1.06)}58%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.72)}}
+@media(prefers-reduced-motion:reduce){.turn-overlay.show{animation:turnAnnouncementReduced 3s linear both}@keyframes turnAnnouncementReduced{0%,70%{opacity:1;transform:none}100%{opacity:0;transform:none}}}
+
+/* V0.2.7: rules summary row is always a stable two-line HUD */
+.rules-hud>div{display:grid;grid-template-rows:16px 14px;align-content:center;min-height:45px}
+.rules-hud b,.rules-hud small{line-height:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* V0.2.8: break scoring explainer */
+.break-help{display:block;margin:-3px auto 10px;border:1px solid #6b5033;background:#2c2016;color:#e8c477;border-radius:8px;min-height:38px;padding:6px 12px;font-weight:800;cursor:pointer}
+.rules-modal[hidden]{display:none}.rules-modal{position:fixed;inset:0;z-index:20;background:#000b;display:flex;align-items:center;justify-content:center;padding:18px}.rules-modal-card{position:relative;width:min(100%,480px);background:#241a12;border:1px solid #c9963c;border-radius:14px;padding:20px;color:#f5ead5;box-shadow:0 16px 45px #000}.rules-modal-card h2{margin:0 34px 10px 0;color:#e8c477;font-family:Georgia,serif;font-size:22px}.rules-modal-card p{font-size:14px;line-height:1.5;margin:9px 0}.modal-close{position:absolute;right:9px;top:7px;width:40px;height:40px;border:0;background:transparent;color:#f5ead5;font-size:28px;cursor:pointer}
+
+/* V0.2.9: restore visibly two-line rules HUD; finger-friendly break help dialog */
+.rules-hud>div{grid-template-rows:minmax(16px,auto) minmax(16px,auto);min-height:54px;padding-top:8px;padding-bottom:8px}
+.rules-hud b,.rules-hud small{min-height:16px;line-height:16px}
+.rules-modal-card h2{margin-right:0}
+.modal-close{display:none}
+.modal-gotit{display:block;width:100%;min-height:52px;margin-top:16px;border:0;border-radius:10px;background:#c9963c;color:#17120d;font-size:17px;font-weight:900;cursor:pointer}
+
+/* V0.3.0: end-of-frame celebration and prototype menu notice */
+.win-card{text-align:center}.win-card h2{font-size:clamp(26px,7vw,38px);margin-bottom:8px}.win-actions{display:grid;gap:10px;margin-top:16px}.win-actions .modal-gotit{margin-top:0}.modal-secondary{display:block;width:100%;min-height:52px;border:1px solid #8a6a45;border-radius:10px;background:#3a2a1c;color:#f5ead5;font-size:16px;font-weight:900;cursor:pointer}
+
+/* V0.3.2 developer QA tools */
+.dev-log-wrap{margin-top:10px;background:#120e0a;border:1px solid #59432c;border-radius:9px;padding:9px}.dev-log-wrap>b{color:#e8c477}.dev-log-wrap pre{margin:7px 0 0;max-height:260px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;color:#d8cbb8;font:11px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace}.dev button{padding:6px 8px}
+
+/* V0.3.4 player names, game log and touch-friendly startup */
+.player-form label{display:block;text-align:left;margin:12px 0;font-weight:800;color:#e8c477}.player-form input{box-sizing:border-box;width:100%;min-height:48px;margin-top:6px;border:1px solid #8a6a45;border-radius:9px;background:#120e0a;color:#f5ead5;padding:10px 12px;font-size:17px}.game-log-card{text-align:left}.game-log-card pre{max-height:52vh;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#120e0a;border:1px solid #59432c;border-radius:9px;padding:10px;color:#d8cbb8;font:11px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace}
