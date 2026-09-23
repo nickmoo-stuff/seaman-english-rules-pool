@@ -59,3 +59,14 @@ html{scrollbar-width:auto;scrollbar-color:#c9963c #241a12}
 .rules-hud small{width:100%;min-height:48px;line-height:16px;margin-top:4px;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;display:flex;align-items:flex-start;justify-content:center;text-align:center}
 .rules-hud .centre small{align-items:flex-start}
 @media(max-width:420px){::-webkit-scrollbar{width:16px}.fine-aim button,.power-buttons button{font-size:13px;padding:3px}.rules-hud{grid-template-columns:1fr 1.2fr 1fr}.rules-hud>div{min-height:82px}}
+
+
+/* V0.3.6 mobile QA refinements */
+.break-help[hidden]{display:none!important}
+.rules-hud b{white-space:normal}
+.rules-hud small{white-space:pre-line!important}
+.fine-aim.angle-buttons{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);overflow:visible}
+.fine-aim.angle-buttons button{width:100%;aspect-ratio:1.45/1;min-height:0;padding:4px 2px;white-space:nowrap;font-size:clamp(11px,3.4vw,14px)}
+.browser-warning{margin:7px 0 0;max-width:440px;padding:8px 10px;border:1px solid #c9963c;border-radius:8px;background:#352514;color:#f5ead5;font-size:12px;line-height:1.35}
+.browser-warning[hidden]{display:none!important}
+@media(max-width:420px){.fine-aim.angle-buttons{gap:5px}.fine-aim.angle-buttons button{font-size:12px}}

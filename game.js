@@ -30,7 +30,7 @@ function tone(freq,dur=.05,gain=.06,type='sine',when=0){const ac=audioReady();if
 function soundShot(power){tone(105+power*55,.055,.09,'triangle');tone(62,.07,.035,'sine',.008);}
 function soundBall(speed=300){const now=performance.now();if(now-lastBallSound<28)return;lastBallSound=now;tone(330+Math.min(speed,900)*.12,.025,.025,'square');}
 function soundCushion(speed=250){const now=performance.now();if(now-lastCushionSound<35)return;lastCushionSound=now;tone(145+Math.min(speed,800)*.06,.035,.035,'triangle');}
-function soundPot(){tone(120,.09,.07,'sine');tone(75,.13,.045,'triangle',.035);}
+function soundPot(){/* Deep, satisfying synthetic 'ker-ching': low pocket thump + short metallic cash-register chime. */tone(82,.13,.09,'sine');tone(116,.10,.055,'triangle',.018);tone(740,.075,.045,'square',.055);tone(1110,.10,.035,'triangle',.105);tone(1480,.16,.025,'sine',.15);}
 function soundVictory(){[523,659,784,1047].forEach((f,i)=>tone(f,.18,.07,'triangle',i*.11));tone(1319,.35,.08,'sine',.45);}
 function ball(x,y,type,id){return{x,y,vx:0,vy:0,type,id,potted:false,crossedCentre:false};}
 function newState(breaker=1){return{player:breaker,breaker,groups:{1:null,2:null},breakShot:true,frameOver:false,winner:null};}
@@ -134,6 +134,15 @@ prototypeGotIt.onclick=()=>{prototypeModal.hidden=true;winModal.hidden=false;};
 showGameLog.onclick=()=>{gameLogModalText.textContent=playHistory.length?playHistory.join('\n\n'):'No shots recorded yet.';winModal.hidden=true;gameLogModal.hidden=false;};
 closeGameLog.onclick=()=>{gameLogModal.hidden=true;winModal.hidden=false;};
 playersForm.addEventListener('submit',e=>{e.preventDefault();playerNames={1:player1Name.value.trim()||'Player 1',2:player2Name.value.trim()||'Player 2'};audioReady();playersModal.hidden=true;newFrame(1);});
+function detectUnsupportedBrowser(){
+  const ua=navigator.userAgent||'';
+  const embedded=/FBAN|FBAV|FB_IAB|Instagram|Messenger|Line\/|; wv\)|\bwv\b/i.test(ua);
+  const obsolete=/MSIE|Trident\/|Edge\/[0-9]+/i.test(ua);
+  const missing=!('PointerEvent' in window)||!document.createElement('canvas').getContext||!('requestAnimationFrame' in window);
+  const warning=document.getElementById('browserWarning');
+  if(warning) warning.hidden=!(embedded||obsolete||missing);
+}
+detectUnsupportedBrowser();
 syncAngleUI();newFrame(1);requestAnimationFrame(loop);
 
 // V0.2.8: contextual break-scoring help.
