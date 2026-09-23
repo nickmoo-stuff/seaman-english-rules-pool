@@ -1,4 +1,4 @@
-Seamen English Rules Pool V0.3.7
+Seamen English Rules Pool V0.3.8
 
 Changes from V0.2.9:
 - Break-points help is now strictly contextual: visible only before a break shot is taken. It hides while the break is in motion, after a legal break, during an illegal-break decision/re-rack choice, and during normal play.
@@ -9,17 +9,20 @@ Changes from V0.2.9:
 
 Rules target: EPA International Eightball v2d (2026).
 
-V0.3.7: hardened first-contact trace; numbered per-shot bug log; optional projected object-ball angle guide; developer cue-ball pickup.
+V0.3.8: hardened first-contact trace; numbered per-shot bug log; optional projected object-ball angle guide; developer cue-ball pickup.
 
 
-V0.3.7
+V0.3.8
 - Fixes final-group-ball transition bug: shot legality is evaluated against the ball/group that was ON at the start of the shot, so potting the last group ball cannot retroactively make that same shot require first contact with black.
 - Adds synthesized cue-strike, ball collision, cushion, pot and victory sounds (no external audio assets required).
 - Adds Who's playing? startup form and propagates entered names throughout the HUD, turn overlays, logs and victory flow.
 - Adds Show game log button to the victory overlay, including the winning shot trace.
 
-V0.3.7: Mobile controls: holdable ±5° and ±0.1° aim buttons, holdable ±45%/±5% power buttons, non-selectable adjustment buttons, chunky page scrollbar, table moved above rules HUD, player group moved to its own line, and rules HUD expanded/wrapped to a stable three-line display.
+V0.3.8: Mobile controls: holdable ±5° and ±0.1° aim buttons, holdable ±45%/±5% power buttons, non-selectable adjustment buttons, chunky page scrollbar, table moved above rules HUD, player group moved to its own line, and rules HUD expanded/wrapped to a stable three-line display.
 
-V0.3.7: break-help visibility fix; mobile HUD line separation; single-row square-ish aim buttons; deeper ker-ching pot sound; conservative embedded/unsupported-browser warning.
+V0.3.8: break-help visibility fix; mobile HUD line separation; single-row square-ish aim buttons; deeper ker-ching pot sound; conservative embedded/unsupported-browser warning.
 
-V0.3.7: result-aware pot audio, descending foul-pot cue, rising legal-pot streak chime; Clear play log button hidden from developer UI while log internals remain.
+V0.3.8: result-aware pot audio, descending foul-pot cue, rising legal-pot streak chime; Clear play log button hidden from developer UI while log internals remain.
+
+V0.3.8
+- Frame-ending victory wording updated to use '[winner] beat off [loser]!' in the result explanation.
