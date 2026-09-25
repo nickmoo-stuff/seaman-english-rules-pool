@@ -116,3 +116,10 @@ V0.7.11
 V0.7.12
 - Added game-wide developer keyboard shortcut J to unlock all five standard pirates plus Ol' Cyclops and Darth Vaper for the current session.
 - Existing progression remains unchanged unless the developer shortcut/control is used.
+
+
+V0.7.13
+- iOS/Safari interaction hardening: game controls, buttons and canvas suppress long-press text selection, touch callouts and accidental dragging more aggressively.
+- Holdable aim/power/cue controls use protected touch behaviour while ordinary page scrolling remains available away from controls.
+- Form fields and the end-of-frame game log remain intentionally selectable/copyable, including the Select all and copy feature.
+- AI, rules and physics behaviour unchanged from V0.7.12.

@@ -8,6 +8,20 @@ let gameMode='local',aiPlayer=null,aiTimer=null,aiWatchdogTimer=null,aiThinking=
 const PIRATES=[null,{name:'Deckhand Dave',role:'Deckhand'},{name:'Salty Steve',role:'Old salt'},{name:'Bosun Barry',role:'Bosun'},{name:'First Mate Mick',role:'First mate'},{name:'Captain Blackball',role:'Captain'},{name:"Ol' Cyclops",role:'DEV • 100% power'},{name:'Darth Vaper',role:'DEV • Perfect'}];
 let devPiratesUnlocked=false,devScenariosUnlocked=false,currentScenario=null;
 let fiveFrameTestActive=false,fiveFrameTestCompleted=0,pendingFiveFrameCelebration=null;
+// V0.7.13: harden touch/hold controls against iOS Safari text selection/callouts without blocking page scrolling or game-log copying.
+document.body.classList.add('game-interaction-hardened');
+const interactionControlSelector='button, canvas, .fine-aim, .power-buttons, .cue-nudge-grid, .controls, .cue-placement-controls';
+function isProtectedInteractionTarget(target){
+  if(!(target instanceof Element))return false;
+  if(target.closest('#gameLogModalText,input,textarea,select'))return false;
+  return !!target.closest(interactionControlSelector);
+}
+document.addEventListener('selectstart',e=>{if(isProtectedInteractionTarget(e.target))e.preventDefault();});
+document.addEventListener('dragstart',e=>{if(isProtectedInteractionTarget(e.target))e.preventDefault();});
+document.addEventListener('contextmenu',e=>{if(isProtectedInteractionTarget(e.target))e.preventDefault();});
+// Safari may synthesize selection/callout gestures during a sustained touch. Prevent them only on controls.
+document.addEventListener('touchstart',e=>{if(isProtectedInteractionTarget(e.target))e.preventDefault();},{passive:false});
+
 function getUnlockedPirateLevel(){try{return clamp(Number(localStorage.getItem('seamenPirateUnlocked')||1),1,5)}catch(e){return 1}}
 function setUnlockedPirateLevel(level){try{localStorage.setItem('seamenPirateUnlocked',String(clamp(level,1,5)))}catch(e){}}
 function refreshPirateButtons(){const unlocked=getUnlockedPirateLevel();document.querySelectorAll('.pirate-choice[data-level]').forEach(btn=>{const level=Number(btn.dataset.level),isDev=level>=6,open=isDev?devPiratesUnlocked:level<=unlocked;btn.disabled=!open;btn.classList.toggle('unlocked',open);const small=btn.querySelector('small');if(small)small.textContent=isDev?`DEV opponent • ${open?PIRATES[level].role:'Locked 🔒'}`:`Difficulty ${level} • ${open?PIRATES[level].role:'Locked 🔒'}`;});}
