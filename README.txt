@@ -85,4 +85,34 @@ V0.7.5: Darth Vaper discipline + Perfect-shot calibration. Vaper now physics-tes
 
 V0.7.6: Perfect Escape / Deadlock Solver. Darth Vaper now gets an additional physics-validated escape search after normal safety and one/two/three-cushion routes are exhausted. It first searches dense legal-contact windows around valid targets, then performs a wider table search whose candidates may naturally use banks/caroms. A route is accepted only when the silent real-physics copy confirms a legal first contact, cue-ball survival, and no premature black loss. The old emergency foul-tolerant deadlock guard remains as the absolute final safety net so an AI turn can never freeze.
 
-V0.7.7: Final-colour attack override. Darth Vaper no longer abandons a sound final-colour direct pot solely because the extra harsh robustness perturbation probes fail. If the intended shot itself is reproduced successfully at both 60 Hz and 120 Hz dry-run physics, makes the correct first contact, pots the intended final colour and keeps the cue ball safe, the attack is protected from the later safety hard-veto. Premature-black-loss checks remain absolute. New ENDGAME OVERRIDE diagnostics identify when this protection is used.
+V0.7.9: Final-colour attack override. Darth Vaper no longer abandons a sound final-colour direct pot solely because the extra harsh robustness perturbation probes fail. If the intended shot itself is reproduced successfully at both 60 Hz and 120 Hz dry-run physics, makes the correct first contact, pots the intended final colour and keeps the cue ball safe, the attack is protected from the later safety hard-veto. Premature-black-loss checks remain absolute. New ENDGAME OVERRIDE diagnostics identify when this protection is used.
+
+
+V0.7.9
+- Added a 'Select all and copy' button to the end-of-frame Game log screen.
+- Copies the complete displayed game log to the clipboard and shows a clear 'Copied! ✓' confirmation.
+- Includes a fallback that selects the complete log if browser clipboard permissions block automatic copying.
+
+
+V0.7.9
+- Added locked developer Test scenario: 5-frame AI testing run.
+- Automatically runs five normal-speed Captain Blackball vs Darth Vaper frames back-to-back using the standard physics/AI timing.
+- Keeps one cumulative numbered play log across all five frames and adds frame boundary markers.
+- Shows the normal result screen only after frame five and plays five bell dings on completion.
+- Unlocks with the existing Unlock test scenarios control or H shortcut.
+
+
+V0.7.10
+- Black Ball Intelligence: Captain Blackball and Darth Vaper now run a dedicated frame-ball physics confidence check before committing to a direct black. A robust black pot gets a WIN NOW lock and cannot be talked out of by the ordinary safety comparison; an unproven direct black is compared against safety instead. The check requires correct first contact, the black actually potted, and cue-ball survival across 60/120 Hz plus narrow aim/power probes.
+- Five-frame QA logging fix: the decisive winning/losing shot is now recorded before the FRAME COMPLETE / next-frame headings, removing the previous one-shot frame-boundary offset.
+
+
+V0.7.11
+- Darth Vaper frame-ball personality refinement: 100% black confidence remains WIN NOW LOCK. At 83%+ (5/6 probes), Vaper may now invoke FRAME KILL instead of automatically preferring safety, provided every confidence probe still predicts correct black first contact and cue-ball survival. This preserves real physics and allows an occasional dramatic miss without permitting a forecast foul or black+white loss.
+- Captain Blackball remains unchanged and still requires 100% confidence for WIN NOW LOCK; sub-100% black attacks continue through his conservative safety comparison.
+- AI diagnostics now label Vaper's protected high-confidence black attack as FRAME KILL and record the probe confidence plus aggression override.
+
+
+V0.7.12
+- Added game-wide developer keyboard shortcut J to unlock all five standard pirates plus Ol' Cyclops and Darth Vaper for the current session.
+- Existing progression remains unchanged unless the developer shortcut/control is used.

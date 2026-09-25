@@ -96,3 +96,7 @@ html{scrollbar-width:auto;scrollbar-color:#c9963c #241a12}
 /* V0.4.4: sequential pirate difficulty progression */
 .pirate-choice.unlocked{opacity:1}
 .pirate-choice:disabled{cursor:not-allowed}
+
+
+/* V0.7.8 game-log copy helper */
+.game-log-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.game-log-heading h2{margin:0}.copy-game-log{width:auto;min-height:40px;padding:7px 12px;white-space:nowrap}.copy-game-log.copied{border-color:#e8c477;background:#5a4325}.copy-game-log-status{min-height:20px;margin:7px 0 5px;color:#e8c477;font-size:13px;font-weight:800;text-align:right}@media(max-width:560px){.game-log-heading{align-items:stretch;flex-direction:column}.copy-game-log{width:100%}.copy-game-log-status{text-align:left}}
