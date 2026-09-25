@@ -131,8 +131,13 @@ V0.7.14
 - Game-log/form selection remains available; AI, rules and physics are unchanged.
 
 
-V0.7.15
+V0.7.16
 - Reworked iOS/WebKit hold controls so anti-selection protection no longer globally cancels touchstart/touchend events.
 - Unified aim, power and cue nudge press-and-hold handling around Pointer Events with a touch/mouse fallback for older browsers.
 - Keeps Safari text/callout suppression while restoring reliable button activation in iOS Chrome and other WebKit browsers.
 - AI, rules and physics unchanged.
+
+
+V0.7.16
+- Hardened iOS rapid double-tap-then-hold controls against WebKit text selection without reintroducing the touch cancellation that broke Chrome taps.
+- Added a short protected selection guard around hold controls plus double-click suppression; normal game-log selection/copy remains available.

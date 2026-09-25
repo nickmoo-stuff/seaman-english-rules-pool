@@ -8,7 +8,7 @@ let gameMode='local',aiPlayer=null,aiTimer=null,aiWatchdogTimer=null,aiThinking=
 const PIRATES=[null,{name:'Deckhand Dave',role:'Deckhand'},{name:'Salty Steve',role:'Old salt'},{name:'Bosun Barry',role:'Bosun'},{name:'First Mate Mick',role:'First mate'},{name:'Captain Blackball',role:'Captain'},{name:"Ol' Cyclops",role:'DEV • 100% power'},{name:'Darth Vaper',role:'DEV • Perfect'}];
 let devPiratesUnlocked=false,devScenariosUnlocked=false,currentScenario=null;
 let fiveFrameTestActive=false,fiveFrameTestCompleted=0,pendingFiveFrameCelebration=null;
-// V0.7.15: iOS/WebKit interaction hardening without cancelling ordinary button taps.
+// V0.7.16: iOS/WebKit rapid multi-tap + hold selection hardening without cancelling ordinary button taps.
 document.body.classList.add('game-interaction-hardened');
 const interactionControlSelector='button, canvas, .fine-aim, .power-buttons, .cue-nudge-grid, .controls, .cue-placement-controls';
 function isProtectedInteractionTarget(target){
@@ -20,11 +20,18 @@ document.addEventListener('selectstart',e=>{if(isProtectedInteractionTarget(e.ta
 document.addEventListener('dragstart',e=>{if(isProtectedInteractionTarget(e.target))e.preventDefault();});
 document.addEventListener('contextmenu',e=>{if(isProtectedInteractionTarget(e.target))e.preventDefault();});
 const holdControlSelector='.fine-aim button,.power-buttons button,.cue-nudge-grid button,#shoot';
+// iOS can synthesize a selection just after a rapid double-tap followed by a hold.
+// Keep a short selection-suppression window around protected controls, rather than
+// cancelling touchstart globally (which previously broke taps in iOS Chrome).
+let protectedSelectionUntil=0;
+function armProtectedSelectionGuard(ms=900){protectedSelectionUntil=Math.max(protectedSelectionUntil,performance.now()+ms);const sel=window.getSelection?.();if(sel&&!sel.isCollapsed)sel.removeAllRanges();}
 document.addEventListener('selectionchange',()=>{
   const sel=window.getSelection?.();if(!sel||sel.isCollapsed)return;
-  const node=sel.anchorNode?.nodeType===1?sel.anchorNode:sel.anchorNode?.parentElement;
-  if(node instanceof Element&&node.closest(holdControlSelector))sel.removeAllRanges();
+  const anchor=sel.anchorNode?.nodeType===1?sel.anchorNode:sel.anchorNode?.parentElement;
+  const focus=sel.focusNode?.nodeType===1?sel.focusNode:sel.focusNode?.parentElement;
+  if(performance.now()<protectedSelectionUntil||(anchor instanceof Element&&anchor.closest(holdControlSelector))||(focus instanceof Element&&focus.closest(holdControlSelector)))sel.removeAllRanges();
 });
+document.addEventListener('dblclick',e=>{if(e.target instanceof Element&&e.target.closest(holdControlSelector)){e.preventDefault();armProtectedSelectionGuard(1000);}});
 
 function getUnlockedPirateLevel(){try{return clamp(Number(localStorage.getItem('seamenPirateUnlocked')||1),1,5)}catch(e){return 1}}
 function setUnlockedPirateLevel(level){try{localStorage.setItem('seamenPirateUnlocked',String(clamp(level,1,5)))}catch(e){}}
@@ -104,7 +111,7 @@ function aimAt(e){if(moving||state.frameOver||cue().potted||pendingChoice)return
 function validCuePosition(x,y){if(x<L+ballR||x>R-ballR||y<T+ballR||y>B-ballR)return false;if(placementMode==='baulk'&&x<BAULK_X-ballR*.5)return false;return balls.slice(1).filter(b=>!b.potted).every(b=>Math.hypot(b.x-x,b.y-y)>=ballR*2.02);}
 function placeCueAt(e){if(placementMode==='none'||moving)return;const p=canvasPoint(e),c=cue();let x=clamp(p.x,L+ballR,R-ballR),y=clamp(p.y,T+ballR,B-ballR);if(placementMode==='baulk')x=clamp(x,BAULK_X-ballR*.5,R-ballR);if(validCuePosition(x,y)){c.x=x;c.y=y;updatePlacementUI();}}
 function nudgeCue(dx,dy){if(placementMode==='none'||moving||state.frameOver||pendingChoice)return;const c=cue(),step=ballR*.55;let x=clamp(c.x+dx*step,L+ballR,R-ballR),y=clamp(c.y+dy*step,T+ballR,B-ballR);if(placementMode==='baulk')x=clamp(x,BAULK_X-ballR*.5,R-ballR);if(validCuePosition(x,y)){c.x=x;c.y=y;updatePlacementUI();}}
-function addPressHold(el,action,repeatMs){let delay=null,repeat=null,active=false;const clear=()=>{clearTimeout(delay);clearInterval(repeat);delay=repeat=null;active=false;};const start=e=>{if(active)return;active=true;if(e.cancelable)e.preventDefault();const sel=window.getSelection?.();if(sel&&!sel.isCollapsed)sel.removeAllRanges();action();delay=setTimeout(()=>{repeat=setInterval(action,repeatMs)},350);};if(window.PointerEvent){el.addEventListener('pointerdown',e=>{try{el.setPointerCapture?.(e.pointerId)}catch(_){}start(e)});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,clear));}else{el.addEventListener('touchstart',start,{passive:false});['touchend','touchcancel'].forEach(ev=>el.addEventListener(ev,clear,{passive:true}));el.addEventListener('mousedown',start);['mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev,clear));}el.addEventListener('contextmenu',e=>e.preventDefault());}
+function addPressHold(el,action,repeatMs){let delay=null,repeat=null,active=false;const clear=()=>{clearTimeout(delay);clearInterval(repeat);delay=repeat=null;active=false;armProtectedSelectionGuard(450);};const start=e=>{if(active)return;active=true;armProtectedSelectionGuard(1100);if(e.cancelable)e.preventDefault();action();delay=setTimeout(()=>{armProtectedSelectionGuard(1100);repeat=setInterval(()=>{armProtectedSelectionGuard(500);action();},repeatMs)},350);};if(window.PointerEvent){el.addEventListener('pointerdown',e=>{try{el.setPointerCapture?.(e.pointerId)}catch(_){}start(e)});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,clear));}else{el.addEventListener('touchstart',start,{passive:false});['touchend','touchcancel'].forEach(ev=>el.addEventListener(ev,clear,{passive:true}));el.addEventListener('mousedown',start);['mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev,clear));}el.addEventListener('contextmenu',e=>e.preventDefault());}
 function addCueNudge(id,dx,dy){const el=document.getElementById(id);addPressHold(el,()=>nudgeCue(dx,dy),70);}
 addCueNudge('cueUp',0,-1);addCueNudge('cueLeft',-1,0);addCueNudge('cueDown',0,1);addCueNudge('cueRight',1,0);
 canvas.addEventListener('pointerdown',e=>{if(moving||state.frameOver||pendingChoice||cue().potted)return;canvas.setPointerCapture(e.pointerId);if(placementMode!=='none'){e.preventDefault();draggingCue=true;placeCueAt(e);return;}draggingCue=false;aimAt(e);});
