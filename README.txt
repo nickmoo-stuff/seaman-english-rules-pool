@@ -44,3 +44,45 @@ V0.4.6: Five AI difficulty profiles now play differently. Higher pirates have pr
 V0.4.6 changes: G toggles developer angle guide; result button renamed Rematch!; smarter level 4/5 ball-in-hand placement; shot-quality scoring (cut/route/in-off risk); richer AI trace; corrected BLACK loss-of-turn wording.
 
 V0.4.7: Captain Blackball now adds simple one-ball-ahead positional scoring to direct-pot selection, preferring pots estimated to leave the cue ball nearer another legal target. Added AI QA trace comparing each AI plan's intended target with the actual first-contact ball, making physics/execution mismatches immediately visible. Existing difficulty 1-4 behaviour retained.
+
+
+V0.5.0: Advanced AI safety-play framework. Difficulty 4, 5 and developer-perfect AI can choose an intentional defensive legal hit when no worthwhile direct pot is available. Diagnostic trace records estimated opponent direct-pot opportunities before/after the safety. AI uses the same physics and rules as human players.
+
+
+V0.6.3
+- Darth Vaper now has a three-cushion escape solver as a last resort after direct, one-cushion and two-cushion legal routes fail.
+- Three-cushion routes use the same table geometry and shared physics as human shots; Vaper receives no physics advantage.
+- Developer trace reports all three cushions, bounce points, route score and planned legal target.
+- Mick remains capped at one-cushion escapes; Captain Blackball remains capped at two-cushion escapes.
+- Existing H test-scenario unlock shortcut retained.
+
+
+V0.6.3 additions
+- Captain-level endgame clearance scoring when 1-3 group balls remain.
+- Final-colour shots explicitly value predicted position on the black.
+- Safety candidates are rejected if straight-ray validation predicts the wrong first contact.
+- Fallback plans log a first-contact legality check/warning for QA.
+- Combination/cannon planner retained unchanged apart from version labelling.
+
+V0.6.4: Captain/Vaper hard-veto any shot rejected by legality/cue-ball physics forecasting, try alternate attacks before safety/escapes, and apply stricter final-black cue-ball robustness checks. PLAY SHOT moved above Aim Angle.
+
+V0.6.5: Cue-ball forecast hardening. Captain/Vaper validate attack plans at both 60 Hz and 120 Hz dry-run timing and probe tiny aim/power variations on all attacks, not just the final black, to catch rare pocket-mouth false-negative in-offs.
+
+
+V0.7.1: AI personality framework. Difficulty still controls execution accuracy; personality now biases legal shot selection via aggression, safety preference, flair and positional priority. Physics, rules and shot execution are unchanged. AI PLAN logs now show personality values and the influence on selected plans.
+
+V0.7.1: AI deadlock guard. If all normal pot/safety/cushion/final-validation routes are exhausted, the AI now always commits an emergency physical shot instead of leaving the turn frozen. It first searches for any legal straight first contact; if none exists, it plays a least-bad contact attempt which may legitimately foul. AI PLAN diagnostics explicitly identify emergency fallback use and its reason. Normal personality and shot-selection behaviour is unchanged.
+
+
+V0.7.3: AI anti-freeze reliability patch. Adds an independent turn watchdog, catches planner exceptions, preserves the v0.7.1 emergency legal-contact fallback, and guarantees a physical fallback attempt if normal planning fails. Diagnostic logs now distinguish planner failure from watchdog intervention. Normal AI personality, rules and physics are unchanged.
+
+V0.7.3: Black-ball risk and frame diagnostics. Difficulty 4+ AI now dry-runs attacking plans for foreseeable premature black pots and rejects them before play when colours remain. Frame logs now distinguish legal black wins from illegal black losses and state the reason/winner for faster QA.
+
+
+V0.7.4: Final-colour black-position hardening. Difficulty 5+ now compares all viable final-colour pot routes by whether their cue-ball forecast leaves a direct black. When at least one route creates a black, routes that leave no direct black receive a strong penalty; Blackball weights this most heavily while Vaper retains slightly more flair freedom. AI logs now state the number of final-colour candidate routes, how many produce a direct black, and whether black position determined the selection.
+
+V0.7.5: Darth Vaper discipline + Perfect-shot calibration. Vaper now physics-tests the best direct routes before flair selection; a reliable simple pot receives SIMPLE POT LOCK and cannot be displaced by a cannon/combination merely for style. Difficulty 7 attack robustness now requires the intended direct/combination pot to be reproduced across the silent physics forecasts and small angle/power probes, not just legal first contact and cue-ball safety.
+
+V0.7.6: Perfect Escape / Deadlock Solver. Darth Vaper now gets an additional physics-validated escape search after normal safety and one/two/three-cushion routes are exhausted. It first searches dense legal-contact windows around valid targets, then performs a wider table search whose candidates may naturally use banks/caroms. A route is accepted only when the silent real-physics copy confirms a legal first contact, cue-ball survival, and no premature black loss. The old emergency foul-tolerant deadlock guard remains as the absolute final safety net so an AI turn can never freeze.
+
+V0.7.7: Final-colour attack override. Darth Vaper no longer abandons a sound final-colour direct pot solely because the extra harsh robustness perturbation probes fail. If the intended shot itself is reproduced successfully at both 60 Hz and 120 Hz dry-run physics, makes the correct first contact, pots the intended final colour and keeps the cue ball safe, the attack is protected from the later safety hard-veto. Premature-black-loss checks remain absolute. New ENDGAME OVERRIDE diagnostics identify when this protection is used.
