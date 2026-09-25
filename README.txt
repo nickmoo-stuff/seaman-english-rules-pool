@@ -123,3 +123,16 @@ V0.7.13
 - Holdable aim/power/cue controls use protected touch behaviour while ordinary page scrolling remains available away from controls.
 - Form fields and the end-of-frame game log remain intentionally selectable/copyable, including the Select all and copy feature.
 - AI, rules and physics behaviour unchanged from V0.7.12.
+
+
+V0.7.14
+- Stronger iOS Safari sustained-press protection for the holdable aim, power and cue-position controls.
+- Applies non-selection rules directly to controls and descendants, cancels native sustained touch gestures during hold/release, and clears any selection Safari attempts to synthesize.
+- Game-log/form selection remains available; AI, rules and physics are unchanged.
+
+
+V0.7.15
+- Reworked iOS/WebKit hold controls so anti-selection protection no longer globally cancels touchstart/touchend events.
+- Unified aim, power and cue nudge press-and-hold handling around Pointer Events with a touch/mouse fallback for older browsers.
+- Keeps Safari text/callout suppression while restoring reliable button activation in iOS Chrome and other WebKit browsers.
+- AI, rules and physics unchanged.

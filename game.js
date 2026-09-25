@@ -8,7 +8,7 @@ let gameMode='local',aiPlayer=null,aiTimer=null,aiWatchdogTimer=null,aiThinking=
 const PIRATES=[null,{name:'Deckhand Dave',role:'Deckhand'},{name:'Salty Steve',role:'Old salt'},{name:'Bosun Barry',role:'Bosun'},{name:'First Mate Mick',role:'First mate'},{name:'Captain Blackball',role:'Captain'},{name:"Ol' Cyclops",role:'DEV • 100% power'},{name:'Darth Vaper',role:'DEV • Perfect'}];
 let devPiratesUnlocked=false,devScenariosUnlocked=false,currentScenario=null;
 let fiveFrameTestActive=false,fiveFrameTestCompleted=0,pendingFiveFrameCelebration=null;
-// V0.7.13: harden touch/hold controls against iOS Safari text selection/callouts without blocking page scrolling or game-log copying.
+// V0.7.15: iOS/WebKit interaction hardening without cancelling ordinary button taps.
 document.body.classList.add('game-interaction-hardened');
 const interactionControlSelector='button, canvas, .fine-aim, .power-buttons, .cue-nudge-grid, .controls, .cue-placement-controls';
 function isProtectedInteractionTarget(target){
@@ -19,8 +19,12 @@ function isProtectedInteractionTarget(target){
 document.addEventListener('selectstart',e=>{if(isProtectedInteractionTarget(e.target))e.preventDefault();});
 document.addEventListener('dragstart',e=>{if(isProtectedInteractionTarget(e.target))e.preventDefault();});
 document.addEventListener('contextmenu',e=>{if(isProtectedInteractionTarget(e.target))e.preventDefault();});
-// Safari may synthesize selection/callout gestures during a sustained touch. Prevent them only on controls.
-document.addEventListener('touchstart',e=>{if(isProtectedInteractionTarget(e.target))e.preventDefault();},{passive:false});
+const holdControlSelector='.fine-aim button,.power-buttons button,.cue-nudge-grid button,#shoot';
+document.addEventListener('selectionchange',()=>{
+  const sel=window.getSelection?.();if(!sel||sel.isCollapsed)return;
+  const node=sel.anchorNode?.nodeType===1?sel.anchorNode:sel.anchorNode?.parentElement;
+  if(node instanceof Element&&node.closest(holdControlSelector))sel.removeAllRanges();
+});
 
 function getUnlockedPirateLevel(){try{return clamp(Number(localStorage.getItem('seamenPirateUnlocked')||1),1,5)}catch(e){return 1}}
 function setUnlockedPirateLevel(level){try{localStorage.setItem('seamenPirateUnlocked',String(clamp(level,1,5)))}catch(e){}}
@@ -100,14 +104,15 @@ function aimAt(e){if(moving||state.frameOver||cue().potted||pendingChoice)return
 function validCuePosition(x,y){if(x<L+ballR||x>R-ballR||y<T+ballR||y>B-ballR)return false;if(placementMode==='baulk'&&x<BAULK_X-ballR*.5)return false;return balls.slice(1).filter(b=>!b.potted).every(b=>Math.hypot(b.x-x,b.y-y)>=ballR*2.02);}
 function placeCueAt(e){if(placementMode==='none'||moving)return;const p=canvasPoint(e),c=cue();let x=clamp(p.x,L+ballR,R-ballR),y=clamp(p.y,T+ballR,B-ballR);if(placementMode==='baulk')x=clamp(x,BAULK_X-ballR*.5,R-ballR);if(validCuePosition(x,y)){c.x=x;c.y=y;updatePlacementUI();}}
 function nudgeCue(dx,dy){if(placementMode==='none'||moving||state.frameOver||pendingChoice)return;const c=cue(),step=ballR*.55;let x=clamp(c.x+dx*step,L+ballR,R-ballR),y=clamp(c.y+dy*step,T+ballR,B-ballR);if(placementMode==='baulk')x=clamp(x,BAULK_X-ballR*.5,R-ballR);if(validCuePosition(x,y)){c.x=x;c.y=y;updatePlacementUI();}}
-function addCueNudge(id,dx,dy){const el=document.getElementById(id);let delay=null,repeat=null;const stop=()=>{clearTimeout(delay);clearInterval(repeat);delay=repeat=null};el.addEventListener('pointerdown',e=>{e.preventDefault();nudgeCue(dx,dy);delay=setTimeout(()=>repeat=setInterval(()=>nudgeCue(dx,dy),70),350)});['pointerup','pointercancel','pointerleave'].forEach(ev=>el.addEventListener(ev,stop));el.addEventListener('contextmenu',e=>e.preventDefault());}
+function addPressHold(el,action,repeatMs){let delay=null,repeat=null,active=false;const clear=()=>{clearTimeout(delay);clearInterval(repeat);delay=repeat=null;active=false;};const start=e=>{if(active)return;active=true;if(e.cancelable)e.preventDefault();const sel=window.getSelection?.();if(sel&&!sel.isCollapsed)sel.removeAllRanges();action();delay=setTimeout(()=>{repeat=setInterval(action,repeatMs)},350);};if(window.PointerEvent){el.addEventListener('pointerdown',e=>{try{el.setPointerCapture?.(e.pointerId)}catch(_){}start(e)});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,clear));}else{el.addEventListener('touchstart',start,{passive:false});['touchend','touchcancel'].forEach(ev=>el.addEventListener(ev,clear,{passive:true}));el.addEventListener('mousedown',start);['mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev,clear));}el.addEventListener('contextmenu',e=>e.preventDefault());}
+function addCueNudge(id,dx,dy){const el=document.getElementById(id);addPressHold(el,()=>nudgeCue(dx,dy),70);}
 addCueNudge('cueUp',0,-1);addCueNudge('cueLeft',-1,0);addCueNudge('cueDown',0,1);addCueNudge('cueRight',1,0);
 canvas.addEventListener('pointerdown',e=>{if(moving||state.frameOver||pendingChoice||cue().potted)return;canvas.setPointerCapture(e.pointerId);if(placementMode!=='none'){e.preventDefault();draggingCue=true;placeCueAt(e);return;}draggingCue=false;aimAt(e);});
 canvas.addEventListener('pointermove',e=>{if(!canvas.hasPointerCapture(e.pointerId))return;if(draggingCue)placeCueAt(e);else aimAt(e)});canvas.addEventListener('pointerup',()=>draggingCue=false);canvas.addEventListener('pointercancel',()=>draggingCue=false);
 powerEl.addEventListener('input',()=>powerText.textContent=powerEl.value+'%');angleEl.addEventListener('input',()=>setAngleDeg(Number(angleEl.value)/10));function nudgeAngle(delta){if(!moving&&!state.frameOver&&!pendingChoice)setAngleDeg(angle*180/Math.PI+delta)}
-function addHoldNudge(id,delta){const el=document.getElementById(id);let delay=null,repeat=null;const stop=()=>{clearTimeout(delay);clearInterval(repeat);delay=repeat=null};el.addEventListener('pointerdown',e=>{e.preventDefault();nudgeAngle(delta);delay=setTimeout(()=>repeat=setInterval(()=>nudgeAngle(delta),45),350)});['pointerup','pointercancel','pointerleave'].forEach(ev=>el.addEventListener(ev,stop));el.addEventListener('contextmenu',e=>e.preventDefault())}addHoldNudge('angleMinus5',-5);addHoldNudge('angleMinus',-.1);addHoldNudge('anglePlus',.1);addHoldNudge('anglePlus5',5);
+function addHoldNudge(id,delta){const el=document.getElementById(id);addPressHold(el,()=>nudgeAngle(delta),45);}addHoldNudge('angleMinus5',-5);addHoldNudge('angleMinus',-.1);addHoldNudge('anglePlus',.1);addHoldNudge('anglePlus5',5);
 function nudgePower(delta){if(moving||state.frameOver||pendingChoice)return;powerEl.value=clamp(Number(powerEl.value)+delta,Number(powerEl.min),Number(powerEl.max));powerText.textContent=powerEl.value+'%';}
-function addHoldPower(id,delta){const el=document.getElementById(id);let delay=null,repeat=null;const stop=()=>{clearTimeout(delay);clearInterval(repeat);delay=repeat=null};el.addEventListener('pointerdown',e=>{e.preventDefault();nudgePower(delta);delay=setTimeout(()=>repeat=setInterval(()=>nudgePower(delta),90),350)});['pointerup','pointercancel','pointerleave'].forEach(ev=>el.addEventListener(ev,stop));el.addEventListener('contextmenu',e=>e.preventDefault())}
+function addHoldPower(id,delta){const el=document.getElementById(id);addPressHold(el,()=>nudgePower(delta),90);}
 addHoldPower('powerMinus45',-45);addHoldPower('powerMinus5',-5);addHoldPower('powerPlus5',5);addHoldPower('powerPlus45',45);
 function beginShot(){clearTimeout(aiWatchdogTimer);aiWatchdogTimer=null;if(moving||state.frameOver||pendingChoice||cue().potted||placementMode!=='none')return;const p=Number(powerEl.value)/100,speed=150+5800*Math.pow(p,1.35),c=cue();shot={number:++shotNumber,player:state.player,isBreak:state.breakShot,startOn:onType(state.player),firstContact:null,firstContactId:null,pots:[],cuePotted:false,cushionAfterContact:false,objectCushions:new Set(),breakCrossers:new Set(),aiPlan:pendingAIPlan};pendingAIPlan=null;placementMode='none';draggingCue=false;c.vx=Math.cos(angle)*speed;c.vy=Math.sin(angle)*speed;soundShot(p);moving=true;shootBtn.disabled=true;breakHelp.hidden=true;breakRules.hidden=true;msg.textContent='Balls in motion…';}
 shootBtn.addEventListener('click',beginShot);

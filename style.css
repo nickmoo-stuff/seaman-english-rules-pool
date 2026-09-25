@@ -101,3 +101,39 @@ html{scrollbar-width:auto;scrollbar-color:#c9963c #241a12}
 /* V0.7.8 game-log copy helper */
 .game-log-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.game-log-heading h2{margin:0}.copy-game-log{width:auto;min-height:40px;padding:7px 12px;white-space:nowrap}.copy-game-log.copied{border-color:#e8c477;background:#5a4325}.copy-game-log-status{min-height:20px;margin:7px 0 5px;color:#e8c477;font-size:13px;font-weight:800;text-align:right}@media(max-width:560px){.game-log-heading{align-items:stretch;flex-direction:column}.copy-game-log{width:100%}.copy-game-log-status{text-align:left}}
 \n\n/* V0.7.13: iOS/Safari interaction hardening.\n   Game chrome is deliberately non-selectable; form fields and the game-log text remain selectable. */\nbody.game-interaction-hardened main,\nbody.game-interaction-hardened main button,\nbody.game-interaction-hardened main canvas,\nbody.game-interaction-hardened main label,\nbody.game-interaction-hardened main .status,\nbody.game-interaction-hardened main .rules-hud,\nbody.game-interaction-hardened main .hint,\nbody.game-interaction-hardened main summary {\n  -webkit-user-select:none; user-select:none;\n  -webkit-touch-callout:none;\n}\nbody.game-interaction-hardened button,\nbody.game-interaction-hardened canvas {\n  -webkit-user-drag:none;\n}\nbody.game-interaction-hardened button {\n  touch-action:manipulation;\n}\nbody.game-interaction-hardened .fine-aim button,\nbody.game-interaction-hardened .power-buttons button,\nbody.game-interaction-hardened .cue-nudge-grid button,\nbody.game-interaction-hardened #shoot {\n  touch-action:none;\n}\n/* Keep normal page scrolling on non-control UI, and preserve intentional selection/copy areas. */\nbody.game-interaction-hardened input,\nbody.game-interaction-hardened textarea,\nbody.game-interaction-hardened select,\nbody.game-interaction-hardened #gameLogModalText,\nbody.game-interaction-hardened #gameLogModalText * {\n  -webkit-user-select:text; user-select:text;\n  -webkit-touch-callout:default;\n}\n
+
+/* V0.7.14: iOS Safari sustained-press selection fix.
+   Safari can ignore inherited user-select on native buttons while a touch is held,
+   so protect the button itself AND every rendered descendant with !important. */
+body.game-interaction-hardened .fine-aim button,
+body.game-interaction-hardened .fine-aim button *,
+body.game-interaction-hardened .power-buttons button,
+body.game-interaction-hardened .power-buttons button *,
+body.game-interaction-hardened .cue-nudge-grid button,
+body.game-interaction-hardened .cue-nudge-grid button *,
+body.game-interaction-hardened #shoot,
+body.game-interaction-hardened #shoot * {
+  -webkit-user-select:none !important;
+  user-select:none !important;
+  -webkit-touch-callout:none !important;
+  -webkit-user-drag:none !important;
+}
+body.game-interaction-hardened .fine-aim button,
+body.game-interaction-hardened .power-buttons button,
+body.game-interaction-hardened .cue-nudge-grid button,
+body.game-interaction-hardened #shoot {
+  touch-action:none !important;
+  -webkit-tap-highlight-color:transparent;
+}
+
+
+/* V0.7.15: keep iOS controls non-selectable without globally cancelling touch events.
+   manipulation preserves reliable taps in WebKit-based iOS browsers; JS handles press-and-hold. */
+body.game-interaction-hardened .fine-aim button,
+body.game-interaction-hardened .power-buttons button,
+body.game-interaction-hardened .cue-nudge-grid button,
+body.game-interaction-hardened #shoot {
+  touch-action:manipulation !important;
+  -webkit-user-select:none !important; user-select:none !important;
+  -webkit-touch-callout:none !important;
+}
