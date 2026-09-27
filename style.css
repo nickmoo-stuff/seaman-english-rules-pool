@@ -137,3 +137,372 @@ body.game-interaction-hardened #shoot {
   -webkit-user-select:none !important; user-select:none !important;
   -webkit-touch-callout:none !important;
 }
+
+/* V0.8.0: opponent roster + reusable profile presentation framework */
+.pirate-roster-card{width:min(100%,540px)}
+.pirate-roster-intro{color:#d7c8b2}
+.pirate-choice{text-align:left;position:relative;padding:10px 12px}
+.pirate-choice b{display:block;color:inherit;font-family:Georgia,serif;font-size:16px}
+.pirate-choice b em{font-size:13px;font-weight:700;opacity:.8}
+.pirate-choice.locked{cursor:pointer;opacity:.62;background:#211912;color:#b6a58f}
+.pirate-choice.locked:hover,.pirate-choice.locked:focus{opacity:.82}
+.pirate-profile-card{width:min(100%,520px)}
+.pirate-profile-top{display:grid;grid-template-columns:112px 1fr;gap:16px;align-items:center}
+.pirate-portrait{aspect-ratio:1;border:1px solid #8a6a45;border-radius:14px;background:radial-gradient(circle at 50% 35%,#4a3929,#120e0a 72%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#e8c477;text-align:center;overflow:hidden}
+.pirate-portrait span{font:900 31px/1 Georgia,serif;letter-spacing:.04em}.pirate-portrait small{margin-top:8px;padding:0 8px;color:#aa9b87;font-size:9px;line-height:1.15}
+.pirate-profile-title small{display:block;color:#bda98a;font-size:11px;text-transform:uppercase;letter-spacing:.08em}.pirate-profile-title h2{margin:3px 0 8px;font-size:clamp(21px,6vw,30px)}
+.pirate-difficulty{display:inline-block;border:1px solid #8a6a45;border-radius:999px;padding:5px 9px;color:#e8c477;background:#17120d;font-size:11px;font-weight:900;letter-spacing:.04em}
+.pirate-profile-body{margin-top:16px;padding:12px 14px;border:1px solid #59432c;border-radius:11px;background:#1a130e}.pirate-profile-body p{margin:7px 0}.pirate-profile-flavour{color:#d8cbb8}
+#challengePirate:disabled{opacity:.48;cursor:not-allowed}
+@media(max-width:430px){.pirate-profile-top{grid-template-columns:88px 1fr;gap:12px}.pirate-profile-card{padding:16px}.pirate-portrait span{font-size:25px}}
+
+
+/* V0.8.2: Pirates & Presentation — tavern visual identity pass.
+   Presentation only: no rules, physics or AI behaviour changes. */
+:root{--ink:#120d09;--wood:#2a1a10;--wood2:#3b2515;--brass:#c9963c;--brass-hi:#f0cf82;--parch:#ead8b4;--iron:#63594d;--blood:#6f2119}
+html,body{background:#100c09}
+body{background:
+ radial-gradient(ellipse at 50% -15%,#5a3519 0,#2a190f 29%,transparent 58%),
+ repeating-linear-gradient(90deg,#17100b 0,#17100b 46px,#130d09 47px,#130d09 92px);}
+main{position:relative;padding-top:16px}
+main:before{content:"";display:block;height:5px;margin:0 2px 11px;border-radius:99px;background:linear-gradient(90deg,transparent,#8d642d 15%,#e5bf6a 50%,#8d642d 85%,transparent);opacity:.72}
+header{padding:10px 12px;background:linear-gradient(180deg,#2e1e13,#21150e);border:1px solid #654729;border-radius:12px;box-shadow:inset 0 1px #9a6c3555,0 8px 22px #0007}
+h1{text-shadow:0 2px #000,0 0 14px #c9963c33}
+header p b{color:#e8c477}
+#reset{box-shadow:inset 0 1px #ffffff12}
+.status,.controls,.rules-hud>div,details{box-shadow:inset 0 1px #ffffff08,0 6px 18px #0003}
+.controls{background:linear-gradient(180deg,#2a1d13,#21160f)}
+#shoot{background:linear-gradient(180deg,#e2b95f,#b87d2c);border:1px solid #f0cf82!important;box-shadow:inset 0 1px #fff7,0 3px 0 #71491b,0 7px 14px #0005;text-shadow:0 1px #f5d999}
+#shoot:active{transform:translateY(2px);box-shadow:inset 0 1px #fff5,0 1px 0 #71491b}
+
+/* Modal cards now read as carved tavern boards with brass edging. */
+.rules-modal{backdrop-filter:blur(2px);background:radial-gradient(circle at 50% 30%,#27190ecc,#050403f2 72%)}
+.rules-modal-card{background:
+ linear-gradient(#ffffff05,#00000018),
+ repeating-linear-gradient(0deg,#2c1c12 0,#2c1c12 34px,#29190f 35px,#29190f 70px);
+ border:2px solid #8c632f;outline:1px solid #24150b;border-radius:10px;
+ box-shadow:inset 0 0 0 3px #120c08aa,inset 0 1px #e5bf6a55,0 18px 55px #000d}
+.rules-modal-card:before,.rules-modal-card:after{content:"◆";position:absolute;top:8px;color:#9b7139;font-size:10px;text-shadow:0 1px #000}
+.rules-modal-card:before{left:10px}.rules-modal-card:after{right:10px}
+.rules-modal-card h2{color:var(--brass-hi);text-shadow:0 2px #000;letter-spacing:.025em}
+.modal-gotit{background:linear-gradient(180deg,#dfb65d,#b67b2c);border:1px solid #f0cf82;color:#160f09;box-shadow:inset 0 1px #fff6,0 3px 0 #704719}
+.modal-secondary{background:linear-gradient(180deg,#46301f,#302014);border-color:#76532f;box-shadow:inset 0 1px #ffffff10}
+.modal-secondary:hover,.modal-secondary:focus{border-color:#c9963c;background:linear-gradient(180deg,#543923,#382416)}
+
+/* Main mode menu: small masthead treatment, no image assets required. */
+.mode-menu h2:before{content:"☠  ";font-size:.85em}.mode-menu h2:after{content:"  ☠";font-size:.85em}
+.mode-menu>p{color:#c8b79d}
+.mode-actions button{position:relative;overflow:hidden}
+.mode-actions button:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 20%,#fff1 48%,transparent 70%);transform:translateX(-120%);transition:transform .35s ease}
+.mode-actions button:hover:after,.mode-actions button:focus:after{transform:translateX(120%)}
+
+/* Roster cards: distinct plaques with a compact level marker. */
+.pirate-roster-card{max-height:min(92vh,780px);overflow:auto}
+.pirate-list{gap:9px}
+.pirate-choice{min-height:62px;padding:10px 52px 10px 14px;border-width:1px;background:linear-gradient(180deg,#382518,#281a11);box-shadow:inset 0 1px #ffffff0c,0 3px 8px #0004;transition:transform .12s ease,border-color .12s ease,filter .12s ease}
+.pirate-choice:after{content:"⚓";position:absolute;right:15px;top:50%;transform:translateY(-50%);font-size:20px;opacity:.36}
+.pirate-choice.unlocked{background:linear-gradient(180deg,#c99a46,#9e6b2d);border-color:#efcc7c;color:#17100a;box-shadow:inset 0 1px #fff8,0 3px 9px #0005}
+.pirate-choice.unlocked:after{opacity:.72}
+.pirate-choice:hover,.pirate-choice:focus{transform:translateY(-1px);filter:brightness(1.08)}
+.pirate-choice b{font-size:17px;letter-spacing:.015em}.pirate-choice small{opacity:.86}
+.pirate-note{padding:9px 10px;border-left:3px solid #76532f;background:#140e0a88;border-radius:4px}
+
+/* Profile: brass-framed portrait aperture and parchment-like information panel. */
+.pirate-profile-card{overflow:hidden}
+.pirate-profile-top{padding:6px 4px 14px;border-bottom:1px solid #6d4c2b}
+.pirate-portrait{position:relative;border:2px solid #b8873e;outline:3px solid #17100b;background:radial-gradient(circle at 50% 30%,#5b432d,#24170f 57%,#0d0907 100%);box-shadow:inset 0 0 24px #000b,0 4px 14px #0008}
+.pirate-portrait:after{content:"";position:absolute;inset:5px;border:1px solid #e6c37344;border-radius:9px;pointer-events:none}
+.pirate-portrait span{color:#f0cf82;text-shadow:0 2px #000,0 0 14px #e0b85b44}
+.pirate-profile-title small{color:#c5ae87}.pirate-profile-title h2{color:#f0cf82}
+.pirate-difficulty{border-color:#b8863e;background:#120d09;box-shadow:inset 0 0 10px #000;color:#eac878}
+.pirate-profile-body{position:relative;background:linear-gradient(180deg,#e7d4ad,#cdb78d);border:1px solid #9b7746;color:#261a10;box-shadow:inset 0 0 18px #76552b33}
+.pirate-profile-body b{color:#5a351b}.pirate-profile-flavour{color:#3c2a1b!important}
+.pirate-profile-body:after{content:"";position:absolute;inset:4px;border:1px solid #6f512322;pointer-events:none}
+
+/* Tiny ornamental dividers around HUD without increasing asset weight. */
+.rules-hud>div{background:linear-gradient(180deg,#2a1d13,#21160f);border-color:#64472b}
+.rules-hud .centre{border-color:#8d642f}
+footer:before{content:"⚓  "}footer:after{content:"  ⚓"}
+
+@media(max-width:430px){
+ header{padding:8px 9px}h1{font-size:24px}.pirate-choice{min-height:58px;padding-right:44px}.pirate-choice:after{right:12px;font-size:17px}
+ .rules-modal{padding:10px}.pirate-roster-card{max-height:95vh}.pirate-profile-top{grid-template-columns:84px 1fr}
+}
+@media(prefers-reduced-motion:reduce){.mode-actions button:after,.pirate-choice{transition:none}}
+
+
+/* V0.8.2: approved cinematic character portrait integration. */
+.pirate-portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
+.pirate-portrait .portrait-fallback{display:none}
+.pirate-portrait:has(img){background:#0d0907}
+.pirate-profile-top{align-items:stretch}
+@media(max-width:430px){.pirate-portrait img{object-position:center top}}
+
+/* V0.8.3: match personality — lightweight opponent introduction presentation. */
+.match-intro-card{width:min(92vw,520px);text-align:center;overflow:hidden;position:relative}
+.match-intro-portrait{width:min(72vw,330px);aspect-ratio:1;margin:0 auto 14px;border:3px solid #b88837;border-radius:16px;overflow:hidden;box-shadow:0 12px 30px #0009,inset 0 0 0 2px #e3bd6a55;background:#17100b}
+.match-intro-portrait img{width:100%;height:100%;object-fit:cover;display:block;-webkit-user-drag:none}
+#matchIntroKicker{display:block;color:#cda34f;font-weight:900;letter-spacing:.16em;margin-bottom:5px}
+#matchIntroName{margin:0 0 10px;font-family:Georgia,serif;color:#f0d59a;text-shadow:0 2px 3px #000}
+#matchIntroLine{margin:0 auto 18px;max-width:420px;font-family:Georgia,serif;font-size:17px;line-height:1.45;color:#eadfc9;font-style:italic}
+
+/* V0.8.5 contextual pirate dialogue */
+.pirate-dialogue{display:grid;grid-template-columns:54px 1fr;gap:10px;align-items:center;min-height:58px;box-sizing:border-box;margin:10px 0;padding:8px 10px;background:linear-gradient(180deg,#2b1d12,#1c130d);border:1px solid #8d642f;border-radius:10px;box-shadow:inset 0 1px #ffffff0a,0 6px 18px #0004}
+.pirate-dialogue[hidden]{display:none}
+.pirate-dialogue img{width:54px;height:54px;object-fit:cover;border-radius:8px;border:1px solid #a87837}
+.pirate-dialogue b{font-family:Georgia,serif;color:#e8c477;font-size:13px}
+.pirate-dialogue p{margin:2px 0 0;color:#f5ead5;font-size:13px;line-height:1.3}
+
+.header-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-left:auto}
+.header-icon-btn{width:38px;min-width:38px;height:38px;padding:0;display:grid;place-items:center;font-size:19px;line-height:1;border-radius:9px}
+.settings-card{max-width:430px}
+.audio-setting{margin:14px 0;padding:12px;border:1px solid #654729;border-radius:10px;background:#1d150f}
+.audio-setting-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.audio-setting input[type=range]{width:calc(100% - 58px);vertical-align:middle}
+.audio-setting>span{display:inline-block;width:52px;text-align:right;font-weight:800;color:#e8c477}
+.audio-mute{padding:7px 11px;min-width:76px}
+.settings-note{display:block;color:#bda98a;margin-top:8px;line-height:1.35}
+@media(max-width:460px){.header-actions{gap:4px}.header-icon-btn{width:34px;min-width:34px;height:34px;font-size:17px}#reset{padding-left:9px;padding-right:9px}header{gap:7px}}
+\n\n/* V0.8.5 title screen and editable About/Credits presentation. */\n.title-screen{z-index:80}\n.title-menu-card{width:min(92vw,560px);text-align:center;position:relative;padding-top:24px}\n.title-logo-placeholder{width:118px;aspect-ratio:1;margin:0 auto 10px;border:2px solid #b8873e;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,#543a24,#17100b 68%);box-shadow:inset 0 0 24px #000b,0 8px 24px #0008}\n.title-logo-placeholder span{font-size:58px;color:#e8c477;text-shadow:0 3px #000}\n.title-menu-card h1{margin:2px 0 0;font-family:Georgia,serif;font-size:42px;color:#f0cf82;letter-spacing:.08em;text-shadow:0 3px #000}\n.title-subtitle{margin:2px 0 18px;color:#cdbb9f}\n.title-menu-actions{display:grid;gap:9px}\n.title-menu-actions button,.title-menu-actions .button-link{width:100%;box-sizing:border-box;min-height:48px}\n.title-menu-actions button small{display:block;margin-top:2px;opacity:.68}\n.title-menu-actions button:disabled{opacity:.46;cursor:not-allowed;filter:saturate(.45)}\n.button-link{display:flex;align-items:center;justify-content:center;text-decoration:none;font:inherit;padding:10px 12px;border-radius:8px}\n.title-sound-btn{position:absolute;right:13px;top:13px;width:38px;height:38px;padding:0;display:grid;place-items:center;font-size:19px;border-radius:9px}\n.about-card{width:min(92vw,650px);max-height:88vh;overflow:auto}\n.about-content{display:grid;gap:10px;margin:12px 0 18px;text-align:left}\n.about-content section{padding:11px 13px;border:1px solid #654729;border-radius:9px;background:#1d150f}\n.about-content h3{margin:0 0 5px;color:#e8c477;font-family:Georgia,serif}\n.about-content p{margin:0;color:#dfd1b9;line-height:1.45}\n@media(max-width:460px){.title-menu-card h1{font-size:34px}.title-logo-placeholder{width:94px}.title-logo-placeholder span{font-size:46px}.title-menu-actions button,.title-menu-actions .button-link{min-height:45px;font-size:13px}}\n
+
+/* V0.8.5 standalone title screen revision.
+   This is a true outer application screen, not a modal over the pool UI. */
+.title-screen{
+  position:fixed;
+  inset:0;
+  z-index:80;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:auto;
+  padding:24px 14px;
+  background:
+    radial-gradient(circle at 50% 12%,#4b301b 0,#24170f 28%,#100c09 66%,#080604 100%);
+}
+.title-screen[hidden]{display:none!important}
+.title-screen .title-menu-card{
+  width:min(92vw,560px);
+  text-align:center;
+  position:relative;
+  padding:26px 22px 22px;
+  border:1px solid #8b632f;
+  border-radius:18px;
+  background:linear-gradient(180deg,#2d1e13,#17100b 74%);
+  box-shadow:0 24px 70px #000b,inset 0 0 36px #0005;
+}
+#gameApp[hidden]{display:none!important}
+
+/* V0.8.5 title layout refinement: centre the menu as a true title composition,
+   while keeping the global sound control independent in the top-right corner. */
+.title-screen{
+  box-sizing:border-box;
+  min-height:100dvh;
+  align-items:center;
+  justify-content:center;
+}
+.title-screen .title-menu-card{
+  margin:auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+.title-screen .title-menu-actions{
+  width:100%;
+  margin-left:auto;
+  margin-right:auto;
+}
+.title-sound-btn{
+  position:fixed;
+  top:max(14px, env(safe-area-inset-top));
+  right:max(14px, env(safe-area-inset-right));
+  z-index:82;
+  width:42px;
+  min-width:42px;
+  height:42px;
+  padding:0;
+  display:grid;
+  place-items:center;
+  font-size:19px;
+  line-height:1;
+  border-radius:50%;
+}
+@media(max-width:460px){
+  .title-screen{padding:64px 12px 24px}
+  .title-sound-btn{width:38px;min-width:38px;height:38px;font-size:17px}
+}
+
+/* V0.8.5 title true-centre correction.
+   Anchor the menu composition to the viewport midpoint itself, rather than
+   allowing scrolling/padding to influence the flex centring calculation. */
+.title-screen{
+  overflow:auto;
+  padding:0;
+}
+.title-screen .title-menu-card{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  margin:0;
+  box-sizing:border-box;
+  max-height:calc(100dvh - 32px);
+  overflow:auto;
+}
+@media(max-width:460px){
+  .title-screen{padding:0}
+  .title-screen .title-menu-card{
+    width:min(92vw,560px);
+    max-height:calc(100dvh - 28px);
+  }
+}
+\n\n/* V0.8.5 title-menu tidy-up: centred link content and compact red availability notes. */
+.title-menu-actions .button-link{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  line-height:1.2;
+}
+.title-menu-actions button:disabled{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:2px;
+}
+.title-menu-actions button:disabled .not-available{
+  display:block;
+  margin:0;
+  color:#ff5b5b;
+  font-size:11px;
+  line-height:1.05;
+  font-weight:800;
+  opacity:1;
+}
+@media(max-width:460px){
+  .title-menu-actions button:disabled .not-available{font-size:10px}
+}
+
+
+/* V0.8.5 EPA rules button: force true optical/box centring independent of anchor line box. */
+.title-menu-actions .rules-link-button{
+  position:relative;
+  display:block;
+  min-height:52px;
+  padding:0;
+  overflow:hidden;
+}
+.title-menu-actions .rules-link-button>span{
+  position:absolute;
+  left:12px;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  display:block;
+  margin:0;
+  text-align:center;
+  line-height:1.2;
+}
+@media(max-width:460px){
+  .title-menu-actions .rules-link-button{min-height:45px}
+}
+
+/* V0.8.7 — character and presentation polish */
+.motion-setting{margin:14px 0;padding:12px;border:1px solid #654729;border-radius:10px;background:#1d150f}
+.motion-setting-head{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+.motion-setting b{display:block;color:#f5ead5;min-width:0}
+.motion-setting small{display:block;width:100%;color:#bda98a;font-size:11px;line-height:1.35;margin-top:7px}
+.motion-setting .motion-toggle{flex:0 0 auto;min-width:42px;width:42px;max-width:42px;padding:6px 4px;line-height:1.1}
+
+/* Short, intentional screen/modal entrances. Layout dimensions never animate. */
+@keyframes seamenFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes seamenCardIn{from{opacity:0;transform:translateY(7px) scale(.992)}to{opacity:1;transform:none}}
+@keyframes seamenPortraitSpeak{0%{transform:scale(.94);filter:brightness(.86);box-shadow:0 0 0 1px #a87837,0 0 0 rgba(255,210,105,0)}35%{transform:scale(1.10);filter:brightness(1.28) saturate(1.15);box-shadow:0 0 0 3px #ffd36b,0 0 18px 7px rgba(255,193,70,.82)}72%{transform:scale(1.045);filter:brightness(1.16) saturate(1.08);box-shadow:0 0 0 2px #f1b84e,0 0 13px 5px rgba(255,177,44,.62)}100%{transform:scale(1);filter:brightness(1.05);box-shadow:0 0 0 2px #dca74a,0 0 8px 2px rgba(255,177,44,.35)}}
+.rules-modal:not([hidden]){animation:seamenFadeIn .40s ease-out both}
+.rules-modal:not([hidden])>.rules-modal-card{animation:seamenCardIn .40s ease-out both}
+.title-screen:not([hidden]),main#gameApp:not([hidden]){animation:seamenFadeIn .40s ease-out both}
+
+/* Speaking portrait: emphasis only; its box remains fixed so the table cannot jump. */
+.pirate-dialogue{transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}
+.pirate-dialogue.dialogue-major{border-color:#d2a14d;box-shadow:inset 0 1px #ffffff12,0 0 0 1px #d2a14d33,0 7px 20px #0006;background:linear-gradient(180deg,#352316,#1d140d)}
+.pirate-dialogue.dialogue-major b{color:#ffd987}
+.pirate-dialogue.dialogue-speaking img{position:relative;z-index:1;animation:seamenPortraitSpeak .85s ease-out both;transform-origin:center}
+
+/* Keep opponent identity consistent through the result screen. */
+.result-pirate-identity{display:flex;align-items:center;gap:10px;margin:0 0 13px;padding:8px 10px;border:1px solid #72512e;border-radius:10px;background:#1b130d;text-align:left}
+.result-pirate-identity[hidden]{display:none}.result-pirate-identity img{width:54px;height:54px;object-fit:cover;border-radius:9px;border:1px solid #b3833c;box-shadow:0 3px 10px #0007}.result-pirate-identity small,.result-pirate-identity b{display:block}.result-pirate-identity small{font-size:9px;letter-spacing:.12em;color:#a99473}.result-pirate-identity b{font-family:Georgia,serif;color:#e8c477;margin-top:2px}
+
+body.reduced-character-portrait-motion .pirate-dialogue.dialogue-speaking img{animation:none!important;transform:none!important;filter:none!important}
+body.reduced-character-portrait-motion .match-intro-portrait img,
+body.reduced-character-portrait-motion .pirate-portrait img,
+body.reduced-character-portrait-motion .result-pirate-identity img{animation:none!important;transform:none!important;filter:none!important}
+@media(prefers-reduced-motion:reduce){.rules-modal:not([hidden]),.rules-modal:not([hidden])>.rules-modal-card,.title-screen:not([hidden]),main#gameApp:not([hidden]),.pirate-dialogue.dialogue-speaking img{animation:none!important}}
+
+/* V0.8.7 menu-layer isolation fix: the pool table remains completely hidden
+   until an actual frame starts. Outer menus transition over an opaque backdrop. */
+#playersModal.rules-modal,
+#pirateProfileModal.rules-modal,
+#pirateIntroModal.rules-modal,
+#aboutScreen.rules-modal{
+  background:radial-gradient(circle at 50% 30%,#27190e 0,#100b08 58%,#050403 100%);
+}
+\n\n/* V0.8.7 menu consistency + clearer portrait-motion choice.\n   All non-match application screens share the title backdrop so cross-fades never expose a different background. */\nhtml,body{background:#080604}\n.title-screen,\n.rules-modal,\n#playersModal.rules-modal,\n#pirateProfileModal.rules-modal,\n#pirateIntroModal.rules-modal,\n#aboutScreen.rules-modal,\n#trophiesScreen.rules-modal,\n#settingsModal.rules-modal{\n  background:radial-gradient(circle at 50% 12%,#4b301b 0,#24170f 28%,#100c09 66%,#080604 100%);\n}\n.motion-setting>b{display:block;margin-bottom:9px}\n.motion-choice{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:132px;margin:0 0 7px}\n.motion-choice .motion-option{min-width:0;width:100%;padding:6px 8px;opacity:.58;border-color:#5b4228}\n.motion-choice .motion-option.is-active{opacity:1;color:#17100b;background:linear-gradient(#f0cf82,#b8873e);border-color:#f0cf82;box-shadow:0 0 0 1px #f0cf8244,0 0 10px #dca74a44;font-weight:900}\n.motion-choice .motion-option:not(.is-active){color:#c9b99e;background:#241a12}\n@media(max-width:460px){.motion-choice{width:118px}}\n
+
+/* V0.8.7 single sliding switch for reduced portrait motion */
+.motion-switch{display:flex;align-items:center;gap:8px;width:max-content;max-width:100%;padding:4px 6px;border:1px solid #654729;border-radius:999px;background:#17110c;color:#b9aa91;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.motion-switch-label{font-size:10px;font-weight:900;letter-spacing:.06em;transition:color .22s ease,text-shadow .22s ease}
+.motion-switch-track{position:relative;display:block;width:48px;height:25px;flex:0 0 48px;border-radius:999px;background:#51483d;border:1px solid #756956;box-shadow:inset 0 2px 4px #0008;transition:background .25s ease,border-color .25s ease,box-shadow .25s ease}
+.motion-switch-knob{position:absolute;left:3px;top:3px;width:17px;height:17px;border-radius:50%;background:linear-gradient(#eee0bd,#bca575);box-shadow:0 1px 3px #000b;transition:transform .25s ease,background .25s ease,box-shadow .25s ease}
+.motion-switch-off{color:#f0d99d;text-shadow:0 0 7px #d4a84d66}
+.motion-switch.is-on .motion-switch-track{background:#775d2c;border-color:#d7ae58;box-shadow:inset 0 2px 4px #0007,0 0 8px #d7ae5844}
+.motion-switch.is-on .motion-switch-knob{transform:translateX(23px);background:linear-gradient(#ffe8a3,#d5a541);box-shadow:0 1px 3px #000b,0 0 8px #e4b64c99}
+.motion-switch.is-on .motion-switch-off{color:#7f7566;text-shadow:none}
+.motion-switch.is-on .motion-switch-on{color:#ffe19a;text-shadow:0 0 7px #d4a84d88}
+.motion-switch:not(.is-on) .motion-switch-on{color:#7f7566;text-shadow:none}
+.motion-switch:focus-visible{outline:2px solid #f0cf82;outline-offset:3px}
+
+/* V0.8.7: align portrait-motion switch with setting label; no light/white button chrome. */
+.motion-setting{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:14px;row-gap:7px}
+.motion-setting>b{grid-column:1;grid-row:1;margin:0;align-self:center}
+.motion-setting>.motion-switch{grid-column:2;grid-row:1;align-self:center;justify-self:end;margin:0;appearance:none;-webkit-appearance:none;background:transparent!important;border:0!important;box-shadow:none!important;outline-offset:3px;padding:0;border-radius:999px;color:#b9aa91}
+.motion-setting>small{grid-column:1 / -1;grid-row:2;margin-top:0}
+.motion-switch:hover,.motion-switch:active{background:transparent!important;border:0!important;box-shadow:none!important}
+@media(max-width:460px){.motion-setting{column-gap:9px}.motion-switch{gap:5px}.motion-switch-track{width:44px;flex-basis:44px}.motion-switch.is-on .motion-switch-knob{transform:translateX(19px)}}
+
+/* V0.8.7 — one permanent application backdrop.
+   The backdrop belongs to the document, never to an individual screen, so
+   foreground cross-fades cannot flash between different background paints. */
+html{
+  min-height:100%;
+  background:#080604;
+}
+body{
+  min-height:100vh;
+  background:#080604 !important;
+  position:relative;
+  isolation:isolate;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:radial-gradient(circle at 50% 12%,#4b301b 0,#24170f 28%,#100c09 66%,#080604 100%);
+}
+/* Full-screen navigation surfaces are foreground only. The permanent body
+   backdrop remains untouched while these screens fade in/out. */
+.title-screen,
+#playersModal.rules-modal,
+#pirateProfileModal.rules-modal,
+#pirateIntroModal.rules-modal,
+#aboutScreen.rules-modal,
+#trophiesScreen.rules-modal{
+  background:transparent !important;
+}
+/* The game itself also sits on the same permanent backdrop. */
+main#gameApp{
+  background:transparent !important;
+}

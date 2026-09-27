@@ -1,3 +1,13 @@
+SEAMEN ENGLISH RULES POOL V0.8.7
+
+V0.8.7 CHARACTER ART PASS
+- Adds seven optimised WebP opponent portraits to the profile framework.
+- Uses the approved cinematic pirate-tavern visual direction.
+- Captain Blackball uses the separately approved reference portrait.
+- Deckhand Dave includes the St George's flag / roundabout tattoo concept.
+- Portraits are presentation-only: AI, rules and physics are unchanged from the frozen V0.7.16 gameplay baseline.
+- Source artwork has been resized/compressed for distribution; game portrait assets total roughly 0.5 MB.
+
 Seamen English Rules Pool V0.4.7
 
 Changes from V0.2.9:
@@ -141,3 +151,26 @@ V0.7.16
 V0.7.16
 - Hardened iOS rapid double-tap-then-hold controls against WebKit text selection without reintroducing the touch cancellation that broke Chrome taps.
 - Added a short protected selection guard around hold controls plus double-click suppression; normal game-log selection/copy remains available.
+
+V0.8.7
+- Begins the Pirates & Presentation phase while leaving the frozen V0.7.16 AI, rules and physics behaviour unchanged.
+- Replaces the old opponent list presentation with a reusable seven-character roster/profile framework.
+- Updated roster: David Deckhand / Deckhand Dave; Simon White / Sweaty Simon; Holly Beans-Ramekin / Holly; First Mate Mick / “The Tornado”; Captain Blackball; Ol' Cyclops; Darth Vaper.
+- Tapping any opponent now opens a profile with full name, nickname/title, difficulty/special status, playing style, short bio, reputation and a lightweight portrait placeholder.
+- Locked opponents can still be inspected, but cannot be challenged until normal progression or developer unlock makes them available.
+- Character presentation metadata is centralised in game.js so later portrait art, introductions, dialogue, voice banks and special cosmetic hooks can reuse the same definitions.
+- No final character artwork, soundtrack, voice acting or special Vaper cosmetic effects are included yet; those remain deliberately parked for later presentation/audio phases.
+
+
+V0.8.7 DIALOGUE FRAMEWORK
+- Added dialogue.js as a standalone, human-editable dialogue library.
+- Five randomised introduction lines for every pirate.
+- Intro selection uses a shuffled bag per pirate/category: every line is used once in random order before that category repeats.
+- Empty documented contextual categories are ready for V0.8.7 match reactions.
+- Dialogue text is separated from game.js so writing can be edited without touching physics/AI/rules.
+- No AI, rules or physics tuning in this release.
+
+V0.8.7: Contextual dialogue framework. Pirate comments can react to pots, misses, fouls, streaks, reaching the black, victory and defeat. Ordinary comments use per-character frequency plus a two-shot cooldown; major events can override it. All copy remains in dialogue.js.
+V0.8.7 dialogue display revision: contextual dialogue no longer auto-times out. It remains visible beneath the table until the human presses PLAY SHOT; AI-internal shot execution does not dismiss it.
+
+V0.8.7 title-menu addition: new initial title screen, disabled future multiplayer/supporter entries, EPA rules link, shared audio settings, and About/Credits content stored in about.js. Version display remains V0.8.7.

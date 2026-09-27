@@ -5,7 +5,14 @@ const aiVsAiMode=document.getElementById('aiVsAiMode'),aiVsAiMenu=document.getEl
 const playersModal=document.getElementById('playersModal'),modeMenu=document.getElementById('modeMenu'),localMode=document.getElementById('localMode'),pirateMode=document.getElementById('pirateMode'),testMode=document.getElementById('testMode'),testScenarioMenu=document.getElementById('testScenarioMenu'),testBack=document.getElementById('testBack'),testPlayerName=document.getElementById('testPlayerName'),nightmareScenario=document.getElementById('nightmareScenario'),cannonScenario=document.getElementById('cannonScenario'),fiveFrameScenario=document.getElementById('fiveFrameScenario'),backToMode=document.getElementById('backToMode'),piratePlaceholder=document.getElementById('piratePlaceholder'),pirateBack=document.getElementById('pirateBack'),playersForm=document.getElementById('playersForm'),player1Name=document.getElementById('player1Name'),player2Name=document.getElementById('player2Name'),showGameLog=document.getElementById('showGameLog'),gameLogModal=document.getElementById('gameLogModal'),gameLogModalText=document.getElementById('gameLogModalText'),closeGameLog=document.getElementById('closeGameLog'),copyGameLog=document.getElementById('copyGameLog'),copyGameLogStatus=document.getElementById('copyGameLogStatus');
 let playerNames={1:'Player 1',2:'Player 2'};
 let gameMode='local',aiPlayer=null,aiTimer=null,aiWatchdogTimer=null,aiThinking=false,currentPirateLevel=1,currentPirateName='Deckhand Dave',aiVsAiLevels={1:5,2:5};
-const PIRATES=[null,{name:'Deckhand Dave',role:'Deckhand'},{name:'Salty Steve',role:'Old salt'},{name:'Bosun Barry',role:'Bosun'},{name:'First Mate Mick',role:'First mate'},{name:'Captain Blackball',role:'Captain'},{name:"Ol' Cyclops",role:'DEV • 100% power'},{name:'Darth Vaper',role:'DEV • Perfect'}];
+const PIRATES=[null,
+{name:'Deckhand Dave',fullName:'David Deckhand',role:'Deckhand',style:'Enthusiastic chaos',bio:'A hopeless beginner with almost no discernible talent, but plenty to say while he is missing.',reputation:'Knows the rules and can usually hit a ball. Proud of his big boat. Does not like small ones.',portrait:'DD',image:'assets/portraits/deckhand-dave.webp'},
+{name:'Sweaty Simon',fullName:'Simon White',role:'Crew hand',style:'Overeducated geometry',bio:'Upper-middle-class confidence, Latin education and anecdotes about his uncle’s marmalade. Common sense sold separately.',reputation:'Mediocre, but dangerous at an office Christmas night out where nobody else has played for a decade.',portrait:'SS',image:'assets/portraits/sweaty-simon.webp'},
+{name:'Holly',fullName:'Holly Beans-Ramekin',role:'Free spirit',style:'Focused amateur',bio:'A free spirit who is passionately absorbed in whatever she is doing right now. Pool included.',reputation:'A competent amateur who is cleverer than she lets on and happy to play a stranger for a quid.',portrait:'HB',image:'assets/portraits/holly.webp'},
+{name:'First Mate Mick',fullName:'First Mate Mick',nickname:'“The Tornado”',role:'First mate',style:'Confident all-rounder',bio:'Sunday pub-tournament regular. Own cue. Chalk holder clipped to his belt. Talks an excellent game.',reputation:'Above average, locally notorious and convinced The Tornado means more to the pool world than it probably does.',portrait:'TM',image:'assets/portraits/tornado-mick.webp'},
+{name:'Captain Blackball',fullName:'Captain Blackball',role:'Captain',style:'Veteran strategist',bio:'Calm, reserved and genuinely formidable. The quiet pirate in the corner who never needs to advertise what he can do.',reputation:'Sees several shots ahead. Knows that true skill begins when the current pot is also used to create the next one.',portrait:'CB',image:'assets/portraits/captain-blackball.webp'},
+{name:"Ol' Cyclops",fullName:"Ol' Cyclops",role:'Special opponent',style:'ABSOLUTE VIOLENCE',bio:'Quiet when left alone. Aggressive when annoyed. Usually annoyed.',reputation:'Technically capable, fundamentally insane: EVERYTHING MUST BE HIT AT 100% POWER. Sees himself with difficulty.',portrait:'OC',image:'assets/portraits/ol-cyclops.webp'},
+{name:'Darth Vaper',fullName:'DARTH VAPER',role:'Near-perfect superboss',style:'Relentless perfectionist',bio:'Fearful, angry, hateful, suffering, revengeful — and enormously intelligent. He wants ultimate power, then more.',reputation:'A terrifying positional player capable of absurd escapes and streaks. Still human, still beatable, and principled enough not to cheat.',portrait:'DV',image:'assets/portraits/darth-vaper.webp'}];
 let devPiratesUnlocked=false,devScenariosUnlocked=false,currentScenario=null;
 let fiveFrameTestActive=false,fiveFrameTestCompleted=0,pendingFiveFrameCelebration=null;
 // V0.7.16: iOS/WebKit rapid multi-tap + hold selection hardening without cancelling ordinary button taps.
@@ -35,7 +42,9 @@ document.addEventListener('dblclick',e=>{if(e.target instanceof Element&&e.targe
 
 function getUnlockedPirateLevel(){try{return clamp(Number(localStorage.getItem('seamenPirateUnlocked')||1),1,5)}catch(e){return 1}}
 function setUnlockedPirateLevel(level){try{localStorage.setItem('seamenPirateUnlocked',String(clamp(level,1,5)))}catch(e){}}
-function refreshPirateButtons(){const unlocked=getUnlockedPirateLevel();document.querySelectorAll('.pirate-choice[data-level]').forEach(btn=>{const level=Number(btn.dataset.level),isDev=level>=6,open=isDev?devPiratesUnlocked:level<=unlocked;btn.disabled=!open;btn.classList.toggle('unlocked',open);const small=btn.querySelector('small');if(small)small.textContent=isDev?`DEV opponent • ${open?PIRATES[level].role:'Locked 🔒'}`:`Difficulty ${level} • ${open?PIRATES[level].role:'Locked 🔒'}`;});}
+function pirateIsOpen(level){const isDev=level>=6;return isDev?devPiratesUnlocked:level<=getUnlockedPirateLevel();}
+function renderPirateRoster(){const list=document.getElementById('pirateList');if(!list)return;list.innerHTML=PIRATES.slice(1).map((p,i)=>{const level=i+1,nick=p.nickname?` <em>${p.nickname}</em>`:'';return `<button class="pirate-choice" data-level="${level}" type="button"><b>${p.name}${nick}</b><small></small></button>`}).join('');refreshPirateButtons();}
+function refreshPirateButtons(){document.querySelectorAll('.pirate-choice[data-level]').forEach(btn=>{const level=Number(btn.dataset.level),p=PIRATES[level],open=pirateIsOpen(level),isDev=level>=6;btn.disabled=false;btn.classList.toggle('unlocked',open);btn.classList.toggle('locked',!open);btn.setAttribute('aria-disabled',String(!open));const small=btn.querySelector('small');if(small)small.textContent=isDev?`${p.role} • ${open?'Available':'Locked 🔒'}`:`Difficulty ${level} • ${open?p.role:'Locked 🔒'}`;});}
 const shootBtn=document.getElementById('shoot'),confirmCue=document.getElementById('confirmCue'),cuePlacementControls=document.getElementById('cuePlacementControls'),tableWrap=document.querySelector('.table-wrap'),powerEl=document.getElementById('power'),powerText=document.getElementById('powerText'),angleEl=document.getElementById('angle'),angleText=document.getElementById('angleText'),msg=document.getElementById('message'),turnEl=document.getElementById('turn');
 const phaseEl=document.getElementById('phase'),lastShotEl=document.getElementById('lastShot'),choice=document.getElementById('choice'),choiceText=document.getElementById('choiceText'),choiceA=document.getElementById('choiceA'),choiceB=document.getElementById('choiceB'),turnOverlay=document.getElementById('turnOverlay'),breakHelp=document.getElementById('breakHelp'),breakRules=document.getElementById('breakRules'),closeBreakRules=document.getElementById('closeBreakRules'),winModal=document.getElementById('winModal'),winTitle=document.getElementById('winTitle'),winText=document.getElementById('winText'),playAgain=document.getElementById('playAgain'),returnMenu=document.getElementById('returnMenu'),prototypeModal=document.getElementById('prototypeModal'),prototypeGotIt=document.getElementById('prototypeGotIt');
 const PLAY_W=1600,PLAY_H=800,rail=90,W=PLAY_W+rail*2,H=PLAY_H+rail*2,L=rail,R=L+PLAY_W,T=rail,B=T+PLAY_H;
@@ -46,6 +55,45 @@ let balls=[],angle=Math.PI,moving=false,last=performance.now(),draggingCue=false
 let state,shot=null,placementMode='none',pendingChoice=null,pendingAIPlan=null;
 let devAngleGuide=false,playHistory=[],shotNumber=0;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const pirateDialogue=document.getElementById('pirateDialogue'),pirateDialoguePortrait=document.getElementById('pirateDialoguePortrait'),pirateDialogueName=document.getElementById('pirateDialogueName'),pirateDialogueText=document.getElementById('pirateDialogueText');
+let dialogueLastShot=-99,dialogueReachedBlack={1:false,2:false};
+const dialogueChance={1:.55,2:.48,3:.42,4:.46,5:.30,6:.22,7:.28};
+function hidePirateDialogue(){if(pirateDialogue)pirateDialogue.hidden=true;}
+function showPirateDialogue(category,{major=false}={}){
+  if(gameMode!=='pirate'||!currentPirateLevel||!window.SeamenDialogue)return false;
+  if(!major&&shotNumber-dialogueLastShot<2)return false;
+  if(!major&&Math.random()>(dialogueChance[currentPirateLevel]??.35))return false;
+  const line=window.SeamenDialogue.getLine(currentPirateLevel,category);if(!line)return false;
+  const p=PIRATES[currentPirateLevel];pirateDialoguePortrait.src=p.image;pirateDialogueName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;pirateDialogueText.textContent=line;pirateDialogue.classList.toggle('dialogue-major',major);pirateDialogue.classList.remove('dialogue-speaking');pirateDialogue.hidden=false;void pirateDialogue.offsetWidth;if(!document.body.classList.contains('reduced-character-portrait-motion'))pirateDialogue.classList.add('dialogue-speaking');dialogueLastShot=shotNumber;
+  return true;
+}
+function contextualDialogue(completed){
+  if(gameMode!=='pirate'||!completed||completed.isBreak)return;
+  const actor=completed.player,isAI=actor===aiPlayer,result=lastShotEl.textContent||'';
+  if(state.frameOver){showPirateDialogue(state.winner===aiPlayer?'victory':'defeat',{major:true});return;}
+  const foul=result.startsWith('FOUL:')||result.includes('potted illegally');
+  const pot=result.includes('LEGAL POT:')||result.includes('LEGAL COMBINATION:')||result.startsWith('LEGAL: both colours');
+  const miss=result.includes('LOSS OF TURN')||result.startsWith('LEGAL: correct first contact');
+  const group=state.groups[actor];
+  if(group&&remaining(group)===0&&!dialogueReachedBlack[actor]){dialogueReachedBlack[actor]=true;showPirateDialogue(isAI?'aiOnBlack':'humanOnBlack',{major:true});return;}
+  if(foul){
+    // A foul awards the incoming player ball in hand. Prefer that objective event over
+    // the generic foul line when copy exists; fall back to the established foul reaction.
+    const bihCategory=isAI?'humanBallInHand':'aiBallInHand';
+    if(showPirateDialogue(bihCategory,{major:true}))return;
+    showPirateDialogue(isAI?'aiFoul':'humanFoul',{major:true});return;
+  }
+  if(pot){
+    const objectPots=completed.pots.filter(t=>t!=='white');
+    const multiBall=objectPots.length>=2||result.includes('LEGAL COMBINATION:')||result.startsWith('LEGAL: both colours');
+    const cushionAction=!!completed.cushionAfterContact;
+    if(multiBall&&showPirateDialogue(isAI?'aiCannonPot':'humanCannonPot',{major:true}))return;
+    if(cushionAction&&showPirateDialogue(isAI?'aiCushionPot':'humanCushionPot',{major:true}))return;
+    const streak=(potStreakPlayer===actor?potStreakCount:0);if(!isAI&&streak>=4){showPirateDialogue('humanBigStreak',{major:true});return;}if(streak>=2){showPirateDialogue(isAI?'aiStreak':'humanStreak',{major:streak>=4});return;}showPirateDialogue(isAI?'aiPot':'humanPot');return;
+  }
+  if(miss)showPirateDialogue(isAI?'aiMiss':'humanMiss');
+}
+
 let turnOverlayTimer=null;
 function announceTurn(){
   if(!turnOverlay||!state||state.frameOver||pendingChoice)return;
@@ -60,7 +108,7 @@ function announceTurn(){
 
 let audioCtx=null,lastBallSound=0,lastCushionSound=0;
 function audioReady(){if(!audioCtx){const AC=window.AudioContext||window.webkitAudioContext;if(AC)audioCtx=new AC();}if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();return audioCtx;}
-function tone(freq,dur=.05,gain=.06,type='sine',when=0){const ac=audioReady();if(!ac)return;const t=ac.currentTime+when,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(gain,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+dur);}
+function tone(freq,dur=.05,gain=.06,type='sine',when=0){if(masterMuted||masterLevel<=0)return;const ac=audioReady();if(!ac)return;const t=ac.currentTime+when,o=ac.createOscillator(),g=ac.createGain(),effectiveGain=Math.max(.0001,gain*masterLevel);o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(effectiveGain,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+dur);}
 function soundShot(power){tone(105+power*55,.055,.09,'triangle');tone(62,.07,.035,'sine',.008);}
 function soundBall(speed=300){const now=performance.now();if(now-lastBallSound<28)return;lastBallSound=now;tone(330+Math.min(speed,900)*.12,.025,.025,'square');}
 function soundCushion(speed=250){const now=performance.now();if(now-lastCushionSound<35)return;lastCushionSound=now;tone(145+Math.min(speed,800)*.06,.035,.035,'triangle');}
@@ -85,8 +133,9 @@ function rackBalls(){balls=[];balls.push(ball(L+PLAY_W*.8,H/2,'white','cue'));co
 function rack28Balls(){balls=[];balls.push(ball(L+PLAY_W*.8,H/2,'white','cue'));const sy=H/2,gap=ballR*2.06,rowDx=gap*.89,apexX=L+PLAY_W*.31;let types=[];for(let i=0;i<13;i++)types.push('red');for(let i=0;i<14;i++)types.push('yellow');types.push('black');let id=0,idx=0;for(let ri=0;ri<7;ri++){const x=apexX-ri*rowDx;for(let i=0;i<=ri;i++){let type;if(ri===3&&i===1){type='black';const bi=types.indexOf('black');types.splice(bi,1);}else{const pick=Math.floor(Math.random()*types.length);type=types.splice(pick,1)[0];}balls.push(ball(x,sy+(i-ri/2)*gap,type,id++));}}}
 function randomFreeSpot(existing,minX,maxX,minY,maxY){for(let tries=0;tries<300;tries++){const x=minX+Math.random()*(maxX-minX),y=minY+Math.random()*(maxY-minY);if(existing.every(b=>Math.hypot(b.x-x,b.y-y)>ballR*2.35))return{x,y};}return{x:minX+60,y:minY+60};}
 function rackNightmare(){balls=[];/* Keep the six-yellow blockade horizontally central. The deliberate escape gap is on the LEFT, so all three reds are generated on the RIGHT-hand side away from that exit. */const cx=L+PLAY_W*.50,cy=H/2;balls.push(ball(cx,cy,'white','cue'));let id=0;const ringAngles=[-120,-72,-24,24,72,120];for(const deg of ringAngles){const a=deg*Math.PI/180,r=ballR*3.15;balls.push(ball(cx+Math.cos(a)*r,cy+Math.sin(a)*r,'yellow',id++));}for(let i=0;i<3;i++){const q=randomFreeSpot(balls,L+PLAY_W*.62,R-ballR*3,T+ballR*3,B-ballR*3);balls.push(ball(q.x,q.y,'red',id++));}const q=randomFreeSpot(balls,L+PLAY_W*.18,L+PLAY_W*.82,T+ballR*3,B-ballR*3);balls.push(ball(q.x,q.y,'black',id++));}
-function startScenario(kind){clearTimeout(aiTimer);currentScenario=kind;gameMode='pirate';aiPlayer=2;currentPirateLevel=5;currentPirateName='Captain Blackball';playerNames={1:(testPlayerName?.value.trim()||'Player 1'),2:'Captain Blackball'};resetPotStreak();if(kind==='nightmare')rackNightmare();else rack28Balls();state=newState(kind==='nightmare'?2:1);if(kind==='nightmare'){state.breakShot=false;state.groups={1:'yellow',2:'red'};placementMode='none';msg.textContent="Blackball’s nightmare — Captain Blackball is on RED and must play from the fixed cue-ball position.";}else{placementMode='baulk';msg.textContent='Cannon fodder — 28 object balls racked in seven rows. Place the white in baulk for the opening break.';}moving=false;shot=null;draggingCue=false;pendingChoice=null;choice.hidden=true;shootBtn.disabled=placementMode!=='none';playersModal.hidden=true;updateHUD();setTimeout(announceTurn,40);setTimeout(maybeScheduleAI,500);}
+function startScenario(kind){if(gameApp)gameApp.hidden=false;clearTimeout(aiTimer);currentScenario=kind;gameMode='pirate';aiPlayer=2;currentPirateLevel=5;currentPirateName='Captain Blackball';playerNames={1:(testPlayerName?.value.trim()||'Player 1'),2:'Captain Blackball'};resetPotStreak();if(kind==='nightmare')rackNightmare();else rack28Balls();state=newState(kind==='nightmare'?2:1);if(kind==='nightmare'){state.breakShot=false;state.groups={1:'yellow',2:'red'};placementMode='none';msg.textContent="Blackball’s nightmare — Captain Blackball is on RED and must play from the fixed cue-ball position.";}else{placementMode='baulk';msg.textContent='Cannon fodder — 28 object balls racked in seven rows. Place the white in baulk for the opening break.';}moving=false;shot=null;draggingCue=false;pendingChoice=null;choice.hidden=true;shootBtn.disabled=placementMode!=='none';playersModal.hidden=true;updateHUD();setTimeout(announceTurn,40);setTimeout(maybeScheduleAI,500);}
 function startFiveFrameTest(){
+  if(gameApp)gameApp.hidden=false;
   clearTimeout(aiTimer);clearTimeout(aiWatchdogTimer);aiTimer=aiWatchdogTimer=null;
   currentScenario='fiveframe';fiveFrameTestActive=true;fiveFrameTestCompleted=0;pendingFiveFrameCelebration=null;
   gameMode='aivai';aiVsAiLevels={1:5,2:7};aiPlayer=1;currentPirateLevel=5;currentPirateName='Captain Blackball';
@@ -96,7 +145,7 @@ function startFiveFrameTest(){
   newFrame(1);msg.textContent='5-frame AI testing run — Frame 1 of 5. Captain Blackball vs Darth Vaper.';
 }
 function restartCurrentGame(breaker=1){if(currentScenario==='fiveframe')return startFiveFrameTest();if(currentScenario)return startScenario(currentScenario);newFrame(breaker);}
-function newFrame(breaker=1){clearTimeout(aiTimer);rackBalls();resetPotStreak();state=newState(breaker);moving=false;shot=null;placementMode='baulk';draggingCue=false;pendingChoice=null;choice.hidden=true;shootBtn.disabled=true;msg.textContent='Opening break — tap or drag anywhere in baulk to place the white, then confirm its position.';updateHUD();setTimeout(announceTurn,40);setTimeout(maybeScheduleAI,450);}
+function newFrame(breaker=1){clearTimeout(aiTimer);rackBalls();resetPotStreak();dialogueReachedBlack={1:false,2:false};dialogueLastShot=-99;hidePirateDialogue();state=newState(breaker);moving=false;shot=null;placementMode='baulk';draggingCue=false;pendingChoice=null;choice.hidden=true;shootBtn.disabled=true;msg.textContent='Opening break — tap or drag anywhere in baulk to place the white, then confirm its position.';updateHUD();setTimeout(announceTurn,40);setTimeout(maybeScheduleAI,450);}
 function cue(){return balls[0];}
 function opponent(p){return p===1?2:1;}
 function pname(p){return playerNames[p]||`Player ${p}`;}
@@ -122,7 +171,7 @@ function nudgePower(delta){if(moving||state.frameOver||pendingChoice)return;powe
 function addHoldPower(id,delta){const el=document.getElementById(id);addPressHold(el,()=>nudgePower(delta),90);}
 addHoldPower('powerMinus45',-45);addHoldPower('powerMinus5',-5);addHoldPower('powerPlus5',5);addHoldPower('powerPlus45',45);
 function beginShot(){clearTimeout(aiWatchdogTimer);aiWatchdogTimer=null;if(moving||state.frameOver||pendingChoice||cue().potted||placementMode!=='none')return;const p=Number(powerEl.value)/100,speed=150+5800*Math.pow(p,1.35),c=cue();shot={number:++shotNumber,player:state.player,isBreak:state.breakShot,startOn:onType(state.player),firstContact:null,firstContactId:null,pots:[],cuePotted:false,cushionAfterContact:false,objectCushions:new Set(),breakCrossers:new Set(),aiPlan:pendingAIPlan};pendingAIPlan=null;placementMode='none';draggingCue=false;c.vx=Math.cos(angle)*speed;c.vy=Math.sin(angle)*speed;soundShot(p);moving=true;shootBtn.disabled=true;breakHelp.hidden=true;breakRules.hidden=true;msg.textContent='Balls in motion…';}
-shootBtn.addEventListener('click',beginShot);
+shootBtn.addEventListener('click',()=>{hidePirateDialogue();beginShot();});
 function collide(a,b){let dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy,min=ballR*2;if(d2>=min*min||d2===0)return;let d=Math.sqrt(d2),nx=dx/d,ny=dy/d,over=min-d;a.x-=nx*over/2;a.y-=ny*over/2;b.x+=nx*over/2;b.y+=ny*over/2;if(shot&&!shot.firstContact){if(a.type==='white'&&b.type!=='white'&&!b.potted){shot.firstContact=b.type;shot.firstContactId=b.id;}else if(b.type==='white'&&a.type!=='white'&&!a.potted){shot.firstContact=a.type;shot.firstContactId=a.id;}}let rvx=b.vx-a.vx,rvy=b.vy-a.vy,sep=rvx*nx+rvy*ny;if(sep>=0)return;soundBall(Math.abs(sep));const j=-(1+.965)*sep/2,ix=j*nx,iy=j*ny;a.vx-=ix;a.vy-=iy;b.vx+=ix;b.vy+=iy;}
 function pocketBall(b){soundPocketDrop();b.potted=true;b.vx=b.vy=0;if(shot){shot.pots.push(b.type);if(b.type==='white')shot.cuePotted=true;}return true;}
 function pocketCheck(b){
@@ -180,7 +229,7 @@ function evaluateNormal(){const p=state.player,opp=opponent(p),on=shot.startOn,p
   const g=state.groups[p],onLabel=on==='black'?'black':g,ownPots=pots.filter(t=>t===g).length,oppPots=pots.filter(t=>t===state.groups[opp]).length;if(ownPots>0){soundLegalPot(p,ownPots);msg.textContent=`Legal pot — ${pname(p)} continues${oppPots?` (${oppPots} opponent ball also potted)`:''}.`;lastShotEl.textContent=oppPots?`LEGAL COMBINATION: ${ownPots} ${g.toUpperCase()} + ${oppPots} opponent ball${oppPots===1?'':'s'} potted • own/on ball was struck first • continue`:`LEGAL POT: ${ownPots} ${g.toUpperCase()} potted • continue`;}else{if(oppPots)soundFoulPot();else resetPotStreak();state.player=opp;msg.textContent=oppPots?`Opponent ball potted without an on-ball — loss of turn. ${pname(opp)}'s turn, ${state.groups[opp]} group.`:`No ${onLabel} potted — ${pname(opp)}'s turn, ${state.groups[opp]} group.`;lastShotEl.textContent=oppPots?`LOSS OF TURN: opponent ball potted but no ${onLabel.toUpperCase()} potted • ${pname(opp)}'s turn, ${state.groups[opp].toUpperCase()} group • cue ball stays where it lies`:`LOSS OF TURN: no ${onLabel.toUpperCase()} potted • ${pname(opp)}'s turn, ${state.groups[opp].toUpperCase()} group`;}updateHUD();}
 function renderPlayLog(){const el=document.getElementById('playLog');if(!el)return;el.textContent=playHistory.length?playHistory.join('\n\n'):'No shots recorded yet.';}
 function recordShotTrace(s){const first=s.firstContact?`${s.firstContact.toUpperCase()}${s.firstContactId!==null?` #${s.firstContactId}`:''}`:'NONE';const pots=s.pots.length?s.pots.map(x=>x.toUpperCase()).join(', '):'none';const result=lastShotEl.textContent||msg.textContent;let qa='';if(s.aiPlan){const matched=s.firstContactId===s.aiPlan.targetId;qa=`\nAI QA: planned ${String(s.aiPlan.targetType).toUpperCase()} #${s.aiPlan.targetId} • actual first contact ${first} • ${matched?'PLAN CONTACT MATCH':'⚠ PLAN CONTACT MISMATCH'}`;}playHistory.push(`#${s.number} | ${pname(s.player)} | ${s.isBreak?'BREAK':`on ${String(s.startOn).toUpperCase()}`}\nFirst contact: ${first} | Pots: ${pots} | Cushion after contact: ${s.cushionAfterContact?'yes':'no'}${qa}\nResult: ${result}\nTable after: red ${remaining('red')}, yellow ${remaining('yellow')}, black ${remaining('black')}`);renderPlayLog();}
-function endShot(){moving=false;shootBtn.disabled=false;const completed=shot;if(completed.isBreak)evaluateBreak();else evaluateNormal();recordShotTrace(completed);shot=null;if(pendingFiveFrameCelebration){const done=pendingFiveFrameCelebration;pendingFiveFrameCelebration=null;showWinCelebration(done.winner,done.text);return;}if(!pendingChoice&&!state.frameOver){shootBtn.disabled=placementMode!=='none';updatePlacementUI();announceTurn();maybeScheduleAI();}}
+function endShot(){moving=false;shootBtn.disabled=false;const completed=shot;if(completed.isBreak)evaluateBreak();else evaluateNormal();contextualDialogue(completed);recordShotTrace(completed);shot=null;if(pendingFiveFrameCelebration){const done=pendingFiveFrameCelebration;pendingFiveFrameCelebration=null;showWinCelebration(done.winner,done.text);return;}if(!pendingChoice&&!state.frameOver){shootBtn.disabled=placementMode!=='none';updatePlacementUI();announceTurn();maybeScheduleAI();}}
 function rayBallHit(x,y,dx,dy,ignore){let best=Infinity,hitBall=null;for(const b of balls){if(b===ignore||b.potted||b.type==='white')continue;const ox=b.x-x,oy=b.y-y,t=ox*dx+oy*dy;if(t<=.01)continue;const perp2=ox*ox+oy*oy-t*t,rr=(ballR*2)**2;if(perp2<=rr){const hit=t-Math.sqrt(Math.max(0,rr-perp2));if(hit<best){best=hit;hitBall=b;}}}return{distance:best,ball:hitBall};}
 function rayCushionDistance(x,y,dx,dy){let vals=[];if(dx>1e-6)vals.push((R-ballR-x)/dx);if(dx<-1e-6)vals.push((L+ballR-x)/dx);if(dy>1e-6)vals.push((B-ballR-y)/dy);if(dy<-1e-6)vals.push((T+ballR-y)/dy);vals=vals.filter(v=>v>.01);return vals.length?Math.min(...vals):Infinity;}
 function guide(){if(moving||state.frameOver||pendingChoice||cue().potted)return;const c=cue(),dx=Math.cos(angle),dy=Math.sin(angle);let best=2000,target=null;for(const b of balls.slice(1)){if(b.potted)continue;const ox=b.x-c.x,oy=b.y-c.y,t=ox*dx+oy*dy;if(t<=0)continue;const perp2=ox*ox+oy*oy-t*t,rr=(ballR*2)**2;if(perp2<=rr){const hit=t-Math.sqrt(rr-perp2);if(hit<best){best=hit;target=b;}}}const tx=c.x+dx*best,ty=c.y+dy*best;ctx.save();ctx.setLineDash([13,12]);ctx.strokeStyle='#fff9';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(c.x,c.y);ctx.lineTo(tx,ty);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#fff8';ctx.beginPath();ctx.arc(tx,ty,6,0,Math.PI*2);ctx.fill();
@@ -1049,6 +1098,8 @@ function maybeScheduleAI(){
     msg.textContent=`${pname(aiPlayer)} takes the shot…`;aiThinking=false;beginShot();
   },1250);
 }
+const resultPirateIdentity=document.getElementById('resultPirateIdentity'),resultPiratePortrait=document.getElementById('resultPiratePortrait'),resultPirateRole=document.getElementById('resultPirateRole'),resultPirateName=document.getElementById('resultPirateName');
+function refreshResultPirateIdentity(){if(!resultPirateIdentity)return;if(gameMode!=='pirate'||!currentPirateLevel){resultPirateIdentity.hidden=true;return;}const p=PIRATES[currentPirateLevel];resultPiratePortrait.src=p.image;resultPirateName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;resultPirateRole.textContent=currentPirateLevel>=6?'SPECIAL OPPONENT':`DIFFICULTY ${currentPirateLevel} • ${p.role.toUpperCase()}`;resultPirateIdentity.hidden=false;}
 function showWinCelebration(winner,text){
   clearTimeout(turnOverlayTimer);turnOverlay.classList.remove('show');
   if(fiveFrameTestActive){
@@ -1062,15 +1113,16 @@ function showWinCelebration(winner,text){
       return;
     }
     fiveFrameTestActive=false;currentScenario=null;
+    if(resultPirateIdentity)resultPirateIdentity.hidden=true;
     soundFiveFrameComplete();
     winTitle.textContent='5-frame AI testing run complete!';
     winText.textContent='DING DING DING DING DING! All 5 Captain Blackball vs Darth Vaper frames are complete.';
     winModal.hidden=false;return;
   }
-  soundVictory();winTitle.textContent=`${pname(winner)} wins!`;winText.textContent=text;winModal.hidden=false;
+  soundVictory();refreshResultPirateIdentity();winTitle.textContent=`${pname(winner)} wins!`;winText.textContent=text;winModal.hidden=false;
 }
 playAgain.onclick=()=>{winModal.hidden=true;prototypeModal.hidden=true;restartCurrentGame(1);};
-returnMenu.onclick=()=>{winModal.hidden=true;prototypeModal.hidden=true;showModeMenu();};
+returnMenu.onclick=()=>{winModal.hidden=true;prototypeModal.hidden=true;showTitleScreen();};
 prototypeGotIt.onclick=()=>{prototypeModal.hidden=true;winModal.hidden=false;};
 
 showGameLog.onclick=()=>{gameLogModalText.textContent=playHistory.length?playHistory.join('\n\n'):'No shots recorded yet.';if(copyGameLogStatus)copyGameLogStatus.textContent='';if(copyGameLog){copyGameLog.textContent='Select all and copy';copyGameLog.classList.remove('copied');}winModal.hidden=true;gameLogModal.hidden=false;};
@@ -1080,14 +1132,29 @@ function showModeMenu(){fiveFrameTestActive=false;fiveFrameTestCompleted=0;curre
 function populateAiVsAi(){for(const sel of [aiVsAiP1,aiVsAiP2]){sel.innerHTML='';for(let i=1;i<=7;i++){const o=document.createElement('option');o.value=i;o.textContent=`${PIRATES[i].name} — ${i<=5?'Difficulty '+i:PIRATES[i].role}`;sel.appendChild(o);}}aiVsAiP1.value='5';aiVsAiP2.value='5';}
 aiVsAiMode.onclick=()=>{audioReady();currentScenario=null;populateAiVsAi();modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=true;if(testScenarioMenu)testScenarioMenu.hidden=true;aiVsAiMenu.hidden=false;};
 aiVsAiBack.onclick=()=>showModeMenu();
-startAiVsAi.onclick=()=>{const l1=Number(aiVsAiP1.value),l2=Number(aiVsAiP2.value);aiVsAiLevels={1:l1,2:l2};gameMode='aivai';aiPlayer=1;currentScenario=null;playerNames={1:PIRATES[l1].name,2:PIRATES[l2].name};playersModal.hidden=true;aiVsAiMenu.hidden=true;audioReady();newFrame(1);};
+startAiVsAi.onclick=()=>{if(gameApp)gameApp.hidden=false;const l1=Number(aiVsAiP1.value),l2=Number(aiVsAiP2.value);aiVsAiLevels={1:l1,2:l2};gameMode='aivai';aiPlayer=1;currentScenario=null;playerNames={1:PIRATES[l1].name,2:PIRATES[l2].name};playersModal.hidden=true;aiVsAiMenu.hidden=true;audioReady();newFrame(1);};
 localMode.onclick=()=>{audioReady();currentScenario=null;gameMode='local';aiPlayer=null;modeMenu.hidden=true;playersForm.hidden=false;piratePlaceholder.hidden=true;player1Name.focus();};
 pirateMode.onclick=()=>{audioReady();currentScenario=null;refreshPirateButtons();modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=false;if(testScenarioMenu)testScenarioMenu.hidden=true;piratePlayerName?.focus();};
 testMode.onclick=()=>{audioReady();modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=true;testScenarioMenu.hidden=false;nightmareScenario.disabled=!devScenariosUnlocked;cannonScenario.disabled=!devScenariosUnlocked;if(fiveFrameScenario)fiveFrameScenario.disabled=!devScenariosUnlocked;testPlayerName?.focus();};
 testBack.onclick=showModeMenu;nightmareScenario.onclick=()=>{if(devScenariosUnlocked)startScenario('nightmare');};cannonScenario.onclick=()=>{if(devScenariosUnlocked)startScenario('cannon');};if(fiveFrameScenario)fiveFrameScenario.onclick=()=>{if(devScenariosUnlocked)startFiveFrameTest();};
 backToMode.onclick=showModeMenu;pirateBack.onclick=showModeMenu;
-playersForm.addEventListener('submit',e=>{e.preventDefault();playerNames={1:player1Name.value.trim()||'Player 1',2:player2Name.value.trim()||'Player 2'};audioReady();playersModal.hidden=true;newFrame(1);});
-piratePlaceholder.addEventListener('submit',e=>{e.preventDefault();const btn=e.submitter?.closest?.('.pirate-choice[data-level]');if(!btn||btn.disabled)return;const level=Number(btn.dataset.level);if(level>=6&&!devPiratesUnlocked)return;if(level<=5&&level>getUnlockedPirateLevel())return;currentScenario=null;currentPirateLevel=level;currentPirateName=btn.dataset.name||PIRATES[level].name;gameMode='pirate';aiPlayer=2;playerNames={1:piratePlayerName.value.trim()||'Player 1',2:currentPirateName};audioReady();playersModal.hidden=true;newFrame(1);});
+playersForm.addEventListener('submit',e=>{e.preventDefault();if(gameApp)gameApp.hidden=false;playerNames={1:player1Name.value.trim()||'Player 1',2:player2Name.value.trim()||'Player 2'};audioReady();playersModal.hidden=true;newFrame(1);});
+const pirateProfileModal=document.getElementById('pirateProfileModal'),pirateProfileName=document.getElementById('pirateProfileName'),pirateProfileFullName=document.getElementById('pirateProfileFullName'),pirateProfileDifficulty=document.getElementById('pirateProfileDifficulty'),pirateProfileStyle=document.getElementById('pirateProfileStyle'),pirateProfileBio=document.getElementById('pirateProfileBio'),pirateProfileReputation=document.getElementById('pirateProfileReputation'),piratePortrait=document.getElementById('piratePortrait'),challengePirate=document.getElementById('challengePirate'),closePirateProfile=document.getElementById('closePirateProfile');
+const pirateIntroModal=document.getElementById('pirateIntroModal'),matchIntroPortrait=document.getElementById('matchIntroPortrait'),matchIntroKicker=document.getElementById('matchIntroKicker'),matchIntroName=document.getElementById('matchIntroName'),matchIntroLine=document.getElementById('matchIntroLine'),startPirateMatch=document.getElementById('startPirateMatch');
+// V0.8.7: keep the pre-match introduction outside the hidden gameplay tree.
+// This lets Challenge show the intro while the table remains completely hidden until Rack 'em up! is pressed.
+if(pirateIntroModal && pirateIntroModal.parentElement!==document.body) document.body.appendChild(pirateIntroModal);
+let pendingPirateStart=null;
+let profiledPirateLevel=1;
+function showPirateProfile(level){const p=PIRATES[level];if(!p)return;profiledPirateLevel=level;const open=pirateIsOpen(level);pirateProfileFullName.textContent=p.fullName;pirateProfileName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;pirateProfileDifficulty.textContent=`${level>=6?'SPECIAL':'DIFFICULTY '+level} • ${p.role}`;pirateProfileStyle.textContent=p.style;pirateProfileBio.textContent=p.bio;pirateProfileReputation.textContent=p.reputation;piratePortrait.innerHTML=`<img src="${p.image}" alt="" draggable="false"><span class="portrait-fallback">${p.portrait}</span>`;challengePirate.disabled=!open;challengePirate.textContent=open?'Challenge':'Locked 🔒';pirateProfileModal.hidden=false;}
+function startProfiledPirate(){const level=profiledPirateLevel;if(!pirateIsOpen(level))return;const p=PIRATES[level];pendingPirateStart={level,playerName:piratePlayerName.value.trim()||'Player 1'};audioReady();pirateProfileModal.hidden=true;playersModal.hidden=true;matchIntroPortrait.src=p.image;matchIntroName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;matchIntroLine.textContent=(window.SeamenDialogue?.getLine(level,'intro'))||p.bio;matchIntroKicker.textContent=level>=6?'SPECIAL OPPONENT':'YOUR OPPONENT';pirateIntroModal.hidden=false;}
+function beginPendingPirateMatch(){if(!pendingPirateStart)return;if(gameApp)gameApp.hidden=false;const {level,playerName}=pendingPirateStart,p=PIRATES[level];pendingPirateStart=null;pirateIntroModal.hidden=true;currentScenario=null;currentPirateLevel=level;currentPirateName=p.name;gameMode='pirate';aiPlayer=2;playerNames={1:playerName,2:currentPirateName};newFrame(1);}
+startPirateMatch?.addEventListener('click',beginPendingPirateMatch);
+const cancelPirateIntro=document.getElementById('cancelPirateIntro');
+cancelPirateIntro?.addEventListener('click',()=>{pendingPirateStart=null;pirateIntroModal.hidden=true;playersModal.hidden=false;modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=false;if(testScenarioMenu)testScenarioMenu.hidden=true;if(aiVsAiMenu)aiVsAiMenu.hidden=true;refreshPirateButtons();});
+document.getElementById('pirateList')?.addEventListener('click',e=>{const btn=e.target.closest('.pirate-choice[data-level]');if(btn)showPirateProfile(Number(btn.dataset.level));});
+challengePirate?.addEventListener('click',startProfiledPirate);closePirateProfile?.addEventListener('click',()=>pirateProfileModal.hidden=true);
+renderPirateRoster();
 function detectUnsupportedBrowser(){
   const ua=navigator.userAgent||'';
   const embedded=/FBAN|FBAV|FB_IAB|Instagram|Messenger|Line\/|; wv\)|\bwv\b/i.test(ua);
@@ -1101,3 +1168,41 @@ syncAngleUI();newFrame(1);requestAnimationFrame(loop);
 
 // V0.2.8: contextual break-scoring help.
 breakHelp.onclick=()=>{breakRules.hidden=false};closeBreakRules.onclick=()=>{breakRules.hidden=true};breakRules.addEventListener('click',e=>{if(e.target===breakRules)breakRules.hidden=true});
+
+/* V0.8.7 audio/presentation controls: master controls current SFX; music bus is ready for V0.9 soundtrack. */
+const soundToggle=document.getElementById('soundToggle'),settingsButton=document.getElementById('settingsButton'),settingsModal=document.getElementById('settingsModal'),closeSettings=document.getElementById('closeSettings'),masterVolume=document.getElementById('masterVolume'),masterVolumeText=document.getElementById('masterVolumeText'),masterMute=document.getElementById('masterMute'),musicVolume=document.getElementById('musicVolume'),musicVolumeText=document.getElementById('musicVolumeText'),musicMute=document.getElementById('musicMute'),portraitMotionToggle=document.getElementById('portraitMotionToggle');
+// Keep the shared Settings modal at document level so it can open from both the standalone title screen and the in-game header.
+if(settingsModal && settingsModal.parentElement!==document.body) document.body.appendChild(settingsModal);
+let masterLevel=1,masterMuted=false,musicLevel=1,musicMuted=false,reducedCharacterPortraitMotion=false;
+try{const saved=JSON.parse(localStorage.getItem('seamenAudioSettings')||'{}');if(Number.isFinite(saved.masterLevel))masterLevel=Math.max(0,Math.min(1,saved.masterLevel));if(typeof saved.masterMuted==='boolean')masterMuted=saved.masterMuted;if(Number.isFinite(saved.musicLevel))musicLevel=Math.max(0,Math.min(1,saved.musicLevel));if(typeof saved.musicMuted==='boolean')musicMuted=saved.musicMuted;if(typeof saved.reducedCharacterPortraitMotion==='boolean')reducedCharacterPortraitMotion=saved.reducedCharacterPortraitMotion;}catch(e){}
+document.body.classList.toggle('reduced-character-portrait-motion',reducedCharacterPortraitMotion);
+function saveAudioSettings(){try{localStorage.setItem('seamenAudioSettings',JSON.stringify({masterLevel,masterMuted,musicLevel,musicMuted,reducedCharacterPortraitMotion}));}catch(e){}}
+function refreshAudioSettings(){if(masterVolume)masterVolume.value=Math.round(masterLevel*100);if(masterVolumeText)masterVolumeText.textContent=`${Math.round(masterLevel*100)}%`;if(masterMute)masterMute.textContent=masterMuted?'Unmute':'Mute';if(musicVolume)musicVolume.value=Math.round(musicLevel*100);if(musicVolumeText)musicVolumeText.textContent=`${Math.round(musicLevel*100)}%`;if(musicMute)musicMute.textContent=musicMuted?'Unmute':'Mute';if(portraitMotionToggle){portraitMotionToggle.classList.toggle('is-on',reducedCharacterPortraitMotion);portraitMotionToggle.setAttribute('aria-checked',String(reducedCharacterPortraitMotion));portraitMotionToggle.title=reducedCharacterPortraitMotion?'Reduced character portrait motion: On':'Reduced character portrait motion: Off';}document.body.classList.toggle('reduced-character-portrait-motion',reducedCharacterPortraitMotion);if(soundToggle){soundToggle.textContent=masterMuted||masterLevel<=0?'🔇':'🔊';soundToggle.setAttribute('aria-label',masterMuted?'Unmute all sound':'Mute all sound');soundToggle.title=masterMuted?'Unmute all sound':'Mute all sound';}}
+if(soundToggle)soundToggle.onclick=()=>{masterMuted=!masterMuted;refreshAudioSettings();saveAudioSettings();};
+if(settingsButton)settingsButton.onclick=()=>{refreshAudioSettings();settingsModal.hidden=false;};
+if(closeSettings)closeSettings.onclick=()=>{settingsModal.hidden=true;};
+if(settingsModal)settingsModal.addEventListener('click',e=>{if(e.target===settingsModal)settingsModal.hidden=true;});
+if(masterVolume)masterVolume.oninput=()=>{masterLevel=Number(masterVolume.value)/100;if(masterLevel>0)masterMuted=false;refreshAudioSettings();saveAudioSettings();};
+if(masterMute)masterMute.onclick=()=>{masterMuted=!masterMuted;refreshAudioSettings();saveAudioSettings();};
+if(musicVolume)musicVolume.oninput=()=>{musicLevel=Number(musicVolume.value)/100;if(musicLevel>0)musicMuted=false;refreshAudioSettings();saveAudioSettings();};
+if(musicMute)musicMute.onclick=()=>{musicMuted=!musicMuted;refreshAudioSettings();saveAudioSettings();};
+if(portraitMotionToggle)portraitMotionToggle.onclick=()=>{reducedCharacterPortraitMotion=!reducedCharacterPortraitMotion;refreshAudioSettings();saveAudioSettings();};
+refreshAudioSettings();
+
+
+/* V0.8.6 title screen / outer menu. Presentation only; gameplay engine unchanged. */
+if(settingsModal&&settingsModal.parentElement?.id==='gameApp')document.body.appendChild(settingsModal);
+const gameApp=document.getElementById('gameApp'),titleScreen=document.getElementById('titleScreen'),titlePlay=document.getElementById('titlePlay'),titleSettings=document.getElementById('titleSettings'),titleAbout=document.getElementById('titleAbout'),titleTrophies=document.getElementById('titleTrophies'),trophiesScreen=document.getElementById('trophiesScreen'),trophiesBack=document.getElementById('trophiesBack'),titleSoundToggle=document.getElementById('titleSoundToggle'),aboutScreen=document.getElementById('aboutScreen'),aboutContent=document.getElementById('aboutContent'),aboutBack=document.getElementById('aboutBack'),backToTitle=document.getElementById('backToTitle');
+function renderAbout(){if(!aboutContent)return;const sections=window.SeamenAbout?.sections||[];aboutContent.innerHTML='';for(const s of sections){const section=document.createElement('section');const h=document.createElement('h3');const p=document.createElement('p');h.textContent=s.title||'';p.textContent=s.body||'';section.append(h,p);aboutContent.append(section);}}
+function showTitleScreen(){pendingPirateStart=null;if(gameApp)gameApp.hidden=true;if(playersModal)playersModal.hidden=true;if(pirateProfileModal)pirateProfileModal.hidden=true;if(pirateIntroModal)pirateIntroModal.hidden=true;if(winModal)winModal.hidden=true;if(gameLogModal)gameLogModal.hidden=true;if(aboutScreen)aboutScreen.hidden=true;if(trophiesScreen)trophiesScreen.hidden=true;if(titleScreen)titleScreen.hidden=false;}
+function showWhoIsPlaying(){if(titleScreen)titleScreen.hidden=true;if(gameApp)gameApp.hidden=true;showModeMenu();}
+if(titlePlay)titlePlay.onclick=()=>{audioReady();showWhoIsPlaying();};
+if(backToTitle)backToTitle.onclick=showTitleScreen;
+if(titleSettings)titleSettings.onclick=()=>{audioReady();refreshAudioSettings();settingsModal.hidden=false;};
+if(titleTrophies)titleTrophies.onclick=()=>{if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;trophiesScreen.hidden=false;};if(trophiesBack)trophiesBack.onclick=()=>{trophiesScreen.hidden=true;titleScreen.hidden=false;};
+if(titleAbout)titleAbout.onclick=()=>{renderAbout();if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;aboutScreen.hidden=false;};
+if(aboutBack)aboutBack.onclick=()=>{aboutScreen.hidden=true;titleScreen.hidden=false;};
+function refreshTitleSound(){if(!titleSoundToggle)return;titleSoundToggle.textContent=masterMuted||masterLevel<=0?'🔇':'🔊';titleSoundToggle.setAttribute('aria-label',masterMuted?'Unmute all sound':'Mute all sound');titleSoundToggle.title=masterMuted?'Unmute all sound':'Mute all sound';}
+if(titleSoundToggle)titleSoundToggle.onclick=()=>{masterMuted=!masterMuted;refreshAudioSettings();refreshTitleSound();saveAudioSettings();};
+const _refreshAudioSettings=refreshAudioSettings;refreshAudioSettings=function(){_refreshAudioSettings();refreshTitleSound();};
+renderAbout();refreshTitleSound();showTitleScreen();
