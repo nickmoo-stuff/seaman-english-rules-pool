@@ -1,6 +1,6 @@
-SEAMEN ENGLISH RULES POOL V0.8.7
+SEAMEN ENGLISH RULES POOL V0.9.0
 
-V0.8.7 CHARACTER ART PASS
+V0.9.0 CHARACTER ART PASS
 - Adds seven optimised WebP opponent portraits to the profile framework.
 - Uses the approved cinematic pirate-tavern visual direction.
 - Captain Blackball uses the separately approved reference portrait.
@@ -152,7 +152,7 @@ V0.7.16
 - Hardened iOS rapid double-tap-then-hold controls against WebKit text selection without reintroducing the touch cancellation that broke Chrome taps.
 - Added a short protected selection guard around hold controls plus double-click suppression; normal game-log selection/copy remains available.
 
-V0.8.7
+V0.9.0
 - Begins the Pirates & Presentation phase while leaving the frozen V0.7.16 AI, rules and physics behaviour unchanged.
 - Replaces the old opponent list presentation with a reusable seven-character roster/profile framework.
 - Updated roster: David Deckhand / Deckhand Dave; Simon White / Sweaty Simon; Holly Beans-Ramekin / Holly; First Mate Mick / “The Tornado”; Captain Blackball; Ol' Cyclops; Darth Vaper.
@@ -162,15 +162,18 @@ V0.8.7
 - No final character artwork, soundtrack, voice acting or special Vaper cosmetic effects are included yet; those remain deliberately parked for later presentation/audio phases.
 
 
-V0.8.7 DIALOGUE FRAMEWORK
+V0.9.0 DIALOGUE FRAMEWORK
 - Added dialogue.js as a standalone, human-editable dialogue library.
 - Five randomised introduction lines for every pirate.
 - Intro selection uses a shuffled bag per pirate/category: every line is used once in random order before that category repeats.
-- Empty documented contextual categories are ready for V0.8.7 match reactions.
+- Empty documented contextual categories are ready for V0.9.0 match reactions.
 - Dialogue text is separated from game.js so writing can be edited without touching physics/AI/rules.
 - No AI, rules or physics tuning in this release.
 
-V0.8.7: Contextual dialogue framework. Pirate comments can react to pots, misses, fouls, streaks, reaching the black, victory and defeat. Ordinary comments use per-character frequency plus a two-shot cooldown; major events can override it. All copy remains in dialogue.js.
-V0.8.7 dialogue display revision: contextual dialogue no longer auto-times out. It remains visible beneath the table until the human presses PLAY SHOT; AI-internal shot execution does not dismiss it.
+V0.9.0: Contextual dialogue framework. Pirate comments can react to pots, misses, fouls, streaks, reaching the black, victory and defeat. Ordinary comments use per-character frequency plus a two-shot cooldown; major events can override it. All copy remains in dialogue.js.
+V0.9.0 dialogue display revision: contextual dialogue no longer auto-times out. It remains visible beneath the table until the human presses PLAY SHOT; AI-internal shot execution does not dismiss it.
 
-V0.8.7 title-menu addition: new initial title screen, disabled future multiplayer/supporter entries, EPA rules link, shared audio settings, and About/Credits content stored in about.js. Version display remains V0.8.7.
+V0.9.0 title-menu addition: new initial title screen, disabled future multiplayer/supporter entries, EPA rules link, shared audio settings, and About/Credits content stored in about.js. Version display remains V0.9.0.
+
+
+V0.9.0 soundtrack: 128 kbps AAC-LC (.m4a). Anthem on fresh boot, random non-repeating match music per frame, Ale in the Hold after returning to menu, credits music from About / credits. Outro asset reserved for future use.

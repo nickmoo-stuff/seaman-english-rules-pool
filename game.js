@@ -52,6 +52,9 @@ const ballR=25.4,pocketR=41,BAULK_X=L+PLAY_W*.8,CENTRE_X=(L+R)/2;
 const pockets=[[L,T],[CENTRE_X,T],[R,T],[L,B],[CENTRE_X,B],[R,B]];
 const colors={red:'#b72d2d',yellow:'#e3b834',black:'#151515',white:'#f5f1e7'};
 let balls=[],angle=Math.PI,moving=false,last=performance.now(),draggingCue=false;
+let cueStrikeVisual=null;
+let equippedTableTheme='classic',equippedCue='classic';
+try{equippedTableTheme=localStorage.getItem('seamenTableTheme')||'classic';equippedCue=localStorage.getItem('seamenCue')||'classic';}catch(e){}
 let state,shot=null,placementMode='none',pendingChoice=null,pendingAIPlan=null;
 let devAngleGuide=false,playHistory=[],shotNumber=0;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -107,25 +110,65 @@ function announceTurn(){
 }
 
 let audioCtx=null,lastBallSound=0,lastCushionSound=0;
+const SFX_GAIN=2.0; // V0.9.1: +6 dB-ish gameplay SFX lift so effects sit above the soundtrack.
 function audioReady(){if(!audioCtx){const AC=window.AudioContext||window.webkitAudioContext;if(AC)audioCtx=new AC();}if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();return audioCtx;}
-function tone(freq,dur=.05,gain=.06,type='sine',when=0){if(masterMuted||masterLevel<=0)return;const ac=audioReady();if(!ac)return;const t=ac.currentTime+when,o=ac.createOscillator(),g=ac.createGain(),effectiveGain=Math.max(.0001,gain*masterLevel);o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(effectiveGain,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+dur);}
-function soundShot(power){tone(105+power*55,.055,.09,'triangle');tone(62,.07,.035,'sine',.008);}
-function soundBall(speed=300){const now=performance.now();if(now-lastBallSound<28)return;lastBallSound=now;tone(330+Math.min(speed,900)*.12,.025,.025,'square');}
-function soundCushion(speed=250){const now=performance.now();if(now-lastCushionSound<35)return;lastCushionSound=now;tone(145+Math.min(speed,800)*.06,.035,.035,'triangle');}
+function tone(freq,dur=.05,gain=.06,type='sine',when=0){if(masterMuted||masterLevel<=0)return;const ac=audioReady();if(!ac)return;const t=ac.currentTime+when,o=ac.createOscillator(),g=ac.createGain(),effectiveGain=Math.max(.0001,Math.min(.22,gain*SFX_GAIN)*masterLevel);o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(effectiveGain,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+dur);}
+function soundVaperCue(){
+  if(masterMuted||masterLevel<=0)return;
+  const ac=audioReady();if(!ac)return;
+  const t=ac.currentTime;
+  // V0.9.1: dark, bass-heavy original energy-blade cue. Keep the fundamental low and
+  // use close detuned harmonics for a heavy electrical throb rather than a cartoon zap.
+  const bus=ac.createGain(),filter=ac.createBiquadFilter();
+  filter.type='lowpass';filter.frequency.setValueAtTime(720,t);filter.Q.value=1.8;
+  const peak=Math.max(.0001,Math.min(.22,.09*SFX_GAIN)*masterLevel);
+  bus.gain.setValueAtTime(.0001,t);
+  bus.gain.exponentialRampToValueAtTime(peak,t+.018);
+  bus.gain.setValueAtTime(peak*.92,t+.11);
+  bus.gain.exponentialRampToValueAtTime(.0001,t+.46);
+  filter.connect(bus);bus.connect(ac.destination);
+  const voices=[
+    {type:'sawtooth',freq:46,detune:-5,gain:.78},
+    {type:'sawtooth',freq:47,detune:7,gain:.58},
+    {type:'triangle',freq:92,detune:-3,gain:.34}
+  ];
+  voices.forEach(v=>{
+    const o=ac.createOscillator(),vg=ac.createGain();
+    o.type=v.type;o.frequency.setValueAtTime(v.freq,t);o.detune.setValueAtTime(v.detune,t);
+    // Tiny downward bend gives the strike weight without the old rising sci-fi chirp.
+    o.frequency.exponentialRampToValueAtTime(v.freq*.91,t+.42);
+    vg.gain.value=v.gain;o.connect(vg);vg.connect(filter);o.start(t);o.stop(t+.48);
+  });
+  // Brief low mechanical/electrical strike at contact.
+  const hit=ac.createOscillator(),hg=ac.createGain();
+  hit.type='triangle';hit.frequency.setValueAtTime(74,t);hit.frequency.exponentialRampToValueAtTime(48,t+.085);
+  hg.gain.setValueAtTime(Math.max(.0001,Math.min(.13,.055*SFX_GAIN)*masterLevel),t);
+  hg.gain.exponentialRampToValueAtTime(.0001,t+.095);hit.connect(hg);hg.connect(ac.destination);hit.start(t);hit.stop(t+.10);
+}
+function soundShot(power){
+  const vaperShot=gameMode==='pirate'&&currentPirateLevel===7&&shot?.player===aiPlayer;
+  if(vaperShot){soundVaperCue();tone(58+power*12,.055,.026,'triangle',.018);return;}
+  // V0.9.1 mix pass: normal cue gets a firmer transient and body. Vaper is deliberately untouched.
+  tone(112+power*58,.065,.145,'triangle');tone(68,.085,.065,'sine',.008);tone(420+power*80,.025,.055,'square');
+}
+function soundBall(speed=300){const now=performance.now();if(now-lastBallSound<24)return;lastBallSound=now;const force=Math.min(1,Math.max(.35,speed/520));tone(350+Math.min(speed,900)*.13,.035,.085*force,'square');tone(185+Math.min(speed,700)*.05,.028,.04*force,'triangle',.004);}
+function soundCushion(speed=250){const now=performance.now();if(now-lastCushionSound<30)return;lastCushionSound=now;const force=Math.min(1,Math.max(.38,speed/480));tone(150+Math.min(speed,800)*.065,.05,.09*force,'triangle');tone(92,.04,.035*force,'sine',.006);}
 let potStreakPlayer=null,potStreakCount=0;
+let legalPotSparkles=[];
+let potFadeVisuals=[];
 function resetPotStreak(){potStreakPlayer=null;potStreakCount=0;}
-function soundPocketDrop(){tone(82,.11,.075,'sine');tone(116,.08,.04,'triangle',.015);}
+function soundPocketDrop(){tone(78,.14,.14,'sine');tone(118,.11,.085,'triangle',.012);tone(235,.045,.06,'square',.02);}
 function soundLegalPot(player,count=1){
   if(potStreakPlayer!==player){potStreakPlayer=player;potStreakCount=0;}
   for(let n=0;n<count;n++){
     const step=potStreakCount+n,scale=Math.pow(2,Math.min(step,8)/24),when=n*.12;
-    tone(740*scale,.075,.042,'square',when);tone(1110*scale,.10,.034,'triangle',when+.05);tone(1480*scale,.15,.024,'sine',when+.095);
+    tone(740*scale,.09,.085,'square',when);tone(1110*scale,.12,.072,'triangle',when+.05);tone(1480*scale,.17,.052,'sine',when+.095);
   }
   potStreakCount+=count;
 }
-function soundFoulPot(){tone(1040,.085,.045,'triangle');tone(780,.11,.04,'triangle',.075);tone(520,.18,.045,'sine',.16);tone(110,.14,.055,'sine',.03);resetPotStreak();}
+function soundFoulPot(){tone(1040,.10,.095,'triangle');tone(780,.13,.085,'triangle',.075);tone(520,.20,.095,'sine',.16);tone(105,.17,.12,'sine',.03);resetPotStreak();}
 
-function soundVictory(){[523,659,784,1047].forEach((f,i)=>tone(f,.18,.07,'triangle',i*.11));tone(1319,.35,.08,'sine',.45);}
+function soundVictory(){[523,659,784,1047].forEach((f,i)=>tone(f,.20,.12,'triangle',i*.11));tone(1319,.38,.14,'sine',.45);}
 function soundFiveFrameComplete(){[0,1,2,3,4].forEach(i=>{tone(1175,.16,.09,'triangle',i*.24);tone(1760,.10,.045,'sine',i*.24+.035);});}
 function ball(x,y,type,id){return{x,y,vx:0,vy:0,type,id,potted:false,crossedCentre:false};}
 function newState(breaker=1){return{player:breaker,breaker,groups:{1:null,2:null},breakShot:true,frameOver:false,winner:null};}
@@ -145,7 +188,7 @@ function startFiveFrameTest(){
   newFrame(1);msg.textContent='5-frame AI testing run — Frame 1 of 5. Captain Blackball vs Darth Vaper.';
 }
 function restartCurrentGame(breaker=1){if(currentScenario==='fiveframe')return startFiveFrameTest();if(currentScenario)return startScenario(currentScenario);newFrame(breaker);}
-function newFrame(breaker=1){clearTimeout(aiTimer);rackBalls();resetPotStreak();dialogueReachedBlack={1:false,2:false};dialogueLastShot=-99;hidePirateDialogue();state=newState(breaker);moving=false;shot=null;placementMode='baulk';draggingCue=false;pendingChoice=null;choice.hidden=true;shootBtn.disabled=true;msg.textContent='Opening break — tap or drag anywhere in baulk to place the white, then confirm its position.';updateHUD();setTimeout(announceTurn,40);setTimeout(maybeScheduleAI,450);}
+function newFrame(breaker=1){clearTimeout(aiTimer);rackBalls();potFadeVisuals=[];legalPotSparkles=[];resetPotStreak();dialogueReachedBlack={1:false,2:false};dialogueLastShot=-99;hidePirateDialogue();state=newState(breaker);moving=false;shot=null;placementMode='baulk';draggingCue=false;pendingChoice=null;choice.hidden=true;shootBtn.disabled=true;msg.textContent='Opening break — tap or drag anywhere in baulk to place the white, then confirm its position.';updateHUD();setTimeout(announceTurn,40);setTimeout(maybeScheduleAI,450);}
 function cue(){return balls[0];}
 function opponent(p){return p===1?2:1;}
 function pname(p){return playerNames[p]||`Player ${p}`;}
@@ -170,21 +213,21 @@ function addHoldNudge(id,delta){const el=document.getElementById(id);addPressHol
 function nudgePower(delta){if(moving||state.frameOver||pendingChoice)return;powerEl.value=clamp(Number(powerEl.value)+delta,Number(powerEl.min),Number(powerEl.max));powerText.textContent=powerEl.value+'%';}
 function addHoldPower(id,delta){const el=document.getElementById(id);addPressHold(el,()=>nudgePower(delta),90);}
 addHoldPower('powerMinus45',-45);addHoldPower('powerMinus5',-5);addHoldPower('powerPlus5',5);addHoldPower('powerPlus45',45);
-function beginShot(){clearTimeout(aiWatchdogTimer);aiWatchdogTimer=null;if(moving||state.frameOver||pendingChoice||cue().potted||placementMode!=='none')return;const p=Number(powerEl.value)/100,speed=150+5800*Math.pow(p,1.35),c=cue();shot={number:++shotNumber,player:state.player,isBreak:state.breakShot,startOn:onType(state.player),firstContact:null,firstContactId:null,pots:[],cuePotted:false,cushionAfterContact:false,objectCushions:new Set(),breakCrossers:new Set(),aiPlan:pendingAIPlan};pendingAIPlan=null;placementMode='none';draggingCue=false;c.vx=Math.cos(angle)*speed;c.vy=Math.sin(angle)*speed;soundShot(p);moving=true;shootBtn.disabled=true;breakHelp.hidden=true;breakRules.hidden=true;msg.textContent='Balls in motion…';}
+function beginShot(){clearTimeout(aiWatchdogTimer);aiWatchdogTimer=null;if(moving||state.frameOver||pendingChoice||cue().potted||placementMode!=='none')return;const p=Number(powerEl.value)/100,speed=150+5800*Math.pow(p,1.35),c=cue();shot={number:++shotNumber,player:state.player,isBreak:state.breakShot,startOn:onType(state.player),firstContact:null,firstContactId:null,pots:[],cuePotted:false,cushionAfterContact:false,objectCushions:new Set(),breakCrossers:new Set(),aiPlan:pendingAIPlan};pendingAIPlan=null;placementMode='none';draggingCue=false;cueStrikeVisual={started:performance.now(),angle,x:c.x,y:c.y,player:state.player,vaper:(gameMode==='pirate'&&currentPirateLevel===7&&state.player===aiPlayer)};c.vx=Math.cos(angle)*speed;c.vy=Math.sin(angle)*speed;soundShot(p);moving=true;shootBtn.disabled=true;breakHelp.hidden=true;breakRules.hidden=true;msg.textContent='Balls in motion…';}
 shootBtn.addEventListener('click',()=>{hidePirateDialogue();beginShot();});
 function collide(a,b){let dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy,min=ballR*2;if(d2>=min*min||d2===0)return;let d=Math.sqrt(d2),nx=dx/d,ny=dy/d,over=min-d;a.x-=nx*over/2;a.y-=ny*over/2;b.x+=nx*over/2;b.y+=ny*over/2;if(shot&&!shot.firstContact){if(a.type==='white'&&b.type!=='white'&&!b.potted){shot.firstContact=b.type;shot.firstContactId=b.id;}else if(b.type==='white'&&a.type!=='white'&&!a.potted){shot.firstContact=a.type;shot.firstContactId=a.id;}}let rvx=b.vx-a.vx,rvy=b.vy-a.vy,sep=rvx*nx+rvy*ny;if(sep>=0)return;soundBall(Math.abs(sep));const j=-(1+.965)*sep/2,ix=j*nx,iy=j*ny;a.vx-=ix;a.vy-=iy;b.vx+=ix;b.vy+=iy;}
-function pocketBall(b){soundPocketDrop();b.potted=true;b.vx=b.vy=0;if(shot){shot.pots.push(b.type);if(b.type==='white')shot.cuePotted=true;}return true;}
+function pocketBall(b,pocketIndex=null){soundPocketDrop();const potNow=performance.now();b.potted=true;b.potFadeStarted=potNow;b.vx=b.vy=0;potFadeVisuals.push({x:b.x,y:b.y,type:b.type,started:potNow});if(b.type!=='white'&&pocketIndex!=null){legalPotSparkles.push({pocketIndex,started:potNow,seed:Math.random()*Math.PI*2});}if(shot){shot.pots.push(b.type);shot.potEvents??=[];shot.potEvents.push({type:b.type,pocketIndex});if(b.type==='white')shot.cuePotted=true;}return true;}
 function pocketCheck(b){
   // Normal pocket capture around each pocket centre.
-  for(const p of pockets){const dx=b.x-p[0],dy=b.y-p[1];if(dx*dx+dy*dy<pocketR*pocketR)return pocketBall(b);}
+  for(let pi=0;pi<pockets.length;pi++){const p=pockets[pi],dx=b.x-p[0],dy=b.y-p[1];if(dx*dx+dy*dy<pocketR*pocketR)return pocketBall(b,pi);}
   // Pocket-throat capture: once a ball has genuinely entered through an open
   // pocket mouth it must fall, rather than slipping beyond the cushion and
   // becoming stranded outside the playable bed.
   const mouth=pocketR+ballR*.55;
   if((b.y<T-ballR*.12||b.y>B+ballR*.12)&&
-     (Math.abs(b.x-L)<mouth||Math.abs(b.x-CENTRE_X)<mouth||Math.abs(b.x-R)<mouth))return pocketBall(b);
+     (Math.abs(b.x-L)<mouth||Math.abs(b.x-CENTRE_X)<mouth||Math.abs(b.x-R)<mouth)){const pi=pockets.reduce((best,p,i)=>Math.hypot(b.x-p[0],b.y-p[1])<Math.hypot(b.x-pockets[best][0],b.y-pockets[best][1])?i:best,0);return pocketBall(b,pi);}
   if((b.x<L-ballR*.12||b.x>R+ballR*.12)&&
-     (Math.abs(b.y-T)<mouth||Math.abs(b.y-B)<mouth))return pocketBall(b);
+     (Math.abs(b.y-T)<mouth||Math.abs(b.y-B)<mouth)){const pi=pockets.reduce((best,p,i)=>Math.hypot(b.x-p[0],b.y-p[1])<Math.hypot(b.x-pockets[best][0],b.y-pockets[best][1])?i:best,0);return pocketBall(b,pi);}
   return false;
 }
 function noteCushion(b){soundCushion(Math.hypot(b.vx,b.vy));if(!shot||!shot.firstContact)return;shot.cushionAfterContact=true;if(b.type!=='white')shot.objectCushions.add(b.id);}
@@ -210,8 +253,8 @@ function walls(b){
 function trackBreakCrossing(b){if(!shot||!shot.isBreak||b.type==='white'||b.potted||b.crossedCentre)return;/* Rack is on the left/top side. A break point is earned as soon as the WHOLE object ball has passed the centre-pocket line. */if(b.x-ballR>=CENTRE_X){b.crossedCentre=true;shot.breakCrossers.add(b.id);}}
 function step(dt){const maxSpeed=Math.max(...balls.filter(b=>!b.potted).map(b=>Math.hypot(b.vx,b.vy)),0),sub=Math.max(4,Math.min(12,Math.ceil(maxSpeed*dt/(ballR*.55)))),sdt=dt/sub;for(let k=0;k<sub;k++){for(const b of balls){if(b.potted)continue;b.x+=b.vx*sdt;b.y+=b.vy*sdt;trackBreakCrossing(b);if(pocketCheck(b))continue;walls(b);const drag=Math.pow(.985,sdt*60);b.vx*=drag;b.vy*=drag;if(Math.hypot(b.vx,b.vy)<5)b.vx=b.vy=0;}for(let i=0;i<balls.length;i++)if(!balls[i].potted)for(let j=i+1;j<balls.length;j++)if(!balls[j].potted)collide(balls[i],balls[j]);}}
 function allStopped(){return balls.every(b=>b.potted||Math.hypot(b.vx,b.vy)<.01)}
-function respotBlack(){const b=balls.find(x=>x.type==='black');if(!b||!b.potted)return;b.potted=false;b.vx=b.vy=0;const spotX=L+PLAY_W*.25,spotY=H/2;for(let dir of [-1,1])for(let dist=0;dist<PLAY_W*.6;dist+=ballR*2.05){const x=spotX+dir*dist,y=spotY;if(x>L+ballR&&x<R-ballR&&balls.filter(o=>o!==b&&!o.potted).every(o=>Math.hypot(o.x-x,o.y-y)>=ballR*2.01)){b.x=x;b.y=y;return;}}}
-function restoreCue(mode){const c=cue();c.potted=false;c.vx=c.vy=0;placementMode=mode;let x=mode==='baulk'?L+PLAY_W*.8:L+PLAY_W*.72,y=H/2;for(let tries=0;tries<40&&!validCuePosition(x,y);tries++)y=T+ballR+((tries+1)*(PLAY_H-2*ballR)/41);c.x=x;c.y=y;}
+function respotBlack(){const b=balls.find(x=>x.type==='black');if(!b||!b.potted)return;b.potted=false;b.potFadeStarted=null;b.vx=b.vy=0;const spotX=L+PLAY_W*.25,spotY=H/2;for(let dir of [-1,1])for(let dist=0;dist<PLAY_W*.6;dist+=ballR*2.05){const x=spotX+dir*dist,y=spotY;if(x>L+ballR&&x<R-ballR&&balls.filter(o=>o!==b&&!o.potted).every(o=>Math.hypot(o.x-x,o.y-y)>=ballR*2.01)){b.x=x;b.y=y;return;}}}
+function restoreCue(mode){const c=cue();c.potted=false;c.potFadeStarted=null;c.vx=c.vy=0;placementMode=mode;let x=mode==='baulk'?L+PLAY_W*.8:L+PLAY_W*.72,y=H/2;for(let tries=0;tries<40&&!validCuePosition(x,y);tries++)y=T+ballR+((tries+1)*(PLAY_H-2*ballR)/41);c.x=x;c.y=y;}
 function finishFrame(winner,text,resultText='Frame complete'){state.frameOver=true;state.winner=winner;moving=false;shootBtn.disabled=true;placementMode='none';let finalText=text;if(gameMode==='pirate'&&winner===1&&currentPirateLevel<5){const before=getUnlockedPirateLevel(),next=currentPirateLevel+1;if(next>before){setUnlockedPirateLevel(next);refreshPirateButtons();finalText+=` ${PIRATES[next].name} (Difficulty ${next}) unlocked!`;}}msg.textContent=finalText;lastShotEl.textContent=resultText;updateHUD();if(fiveFrameTestActive)pendingFiveFrameCelebration={winner,text:finalText};else showWinCelebration(winner,finalText);}
 function standardFoul(reason,ballInHand='anywhere'){if(shot&&shot.pots.length)soundFoulPot();else resetPotStreak();const incoming=opponent(state.player);state.player=incoming;state.breakShot=false;if(cue().potted)restoreCue(ballInHand==='baulk'?'baulk':'anywhere');else placementMode='anywhere';msg.textContent=`FOUL — ${reason}. ${pname(incoming)}: cue ball in hand ${ballInHand==='baulk'?'in baulk':'anywhere'}.`;lastShotEl.textContent=`FOUL: ${reason} • Opponent gets cue ball in hand ${ballInHand==='baulk'?'in baulk':'anywhere'}.`;}
 function showBreakChoice(){pendingChoice='break';choice.hidden=false;const chooser=opponent(state.breaker);choiceText.textContent=`Illegal break — 3 points are required. ${pname(chooser)} chooses who takes the re-rack break.`;choiceA.textContent='I will break';choiceB.textContent='Opponent breaks';shootBtn.disabled=true;choiceA.onclick=()=>resolveBreakChoice(chooser);choiceB.onclick=()=>resolveBreakChoice(state.breaker);if(aiPlayer===chooser||gameMode==='aivai'){choice.hidden=true;msg.textContent=`Illegal break — ${pname(chooser)} is choosing who breaks the re-rack…`;clearTimeout(aiTimer);aiTimer=setTimeout(()=>resolveBreakChoice(chooser),1100);}}
@@ -235,9 +278,163 @@ function rayCushionDistance(x,y,dx,dy){let vals=[];if(dx>1e-6)vals.push((R-ballR
 function guide(){if(moving||state.frameOver||pendingChoice||cue().potted)return;const c=cue(),dx=Math.cos(angle),dy=Math.sin(angle);let best=2000,target=null;for(const b of balls.slice(1)){if(b.potted)continue;const ox=b.x-c.x,oy=b.y-c.y,t=ox*dx+oy*dy;if(t<=0)continue;const perp2=ox*ox+oy*oy-t*t,rr=(ballR*2)**2;if(perp2<=rr){const hit=t-Math.sqrt(rr-perp2);if(hit<best){best=hit;target=b;}}}const tx=c.x+dx*best,ty=c.y+dy*best;ctx.save();ctx.setLineDash([13,12]);ctx.strokeStyle='#fff9';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(c.x,c.y);ctx.lineTo(tx,ty);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#fff8';ctx.beginPath();ctx.arc(tx,ty,6,0,Math.PI*2);ctx.fill();
   if(devAngleGuide&&target){const nx=target.x-tx,ny=target.y-ty,nlen=Math.hypot(nx,ny);if(nlen>.001){const odx=nx/nlen,ody=ny/nlen;const ballHit=rayBallHit(target.x,target.y,odx,ody,target),cush=rayCushionDistance(target.x,target.y,odx,ody),dist=Math.min(ballHit.distance,cush);if(Number.isFinite(dist)&&dist>0){ctx.strokeStyle='#ffe28a';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(target.x,target.y);ctx.lineTo(target.x+odx*dist,target.y+ody*dist);ctx.stroke();}}}
   ctx.restore();}
-function draw(){ctx.clearRect(0,0,W,H);ctx.fillStyle='#56371f';ctx.fillRect(0,0,W,H);ctx.fillStyle='#2a7b57';ctx.fillRect(L,T,R-L,B-T);ctx.strokeStyle='#163f30';ctx.lineWidth=8;ctx.strokeRect(L,T,R-L,B-T);ctx.strokeStyle='#d8d0b755';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(BAULK_X,T);ctx.lineTo(BAULK_X,B);ctx.stroke();for(const p of pockets){ctx.fillStyle='#090909';ctx.beginPath();ctx.arc(p[0],p[1],pocketR,0,Math.PI*2);ctx.fill()}guide();for(const b of balls){if(b.potted)continue;ctx.fillStyle=colors[b.type];ctx.beginPath();ctx.arc(b.x,b.y,ballR,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#0007';ctx.lineWidth=2;ctx.stroke();if(b.type==='black'){ctx.fillStyle='#eee';ctx.font='bold 15px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('8',b.x,b.y)}}}
+function tableThemePalette(){
+  if(equippedTableTheme==='captain')return{rail:'#4a2916',cloth:'#18583f',edge:'#c99a4c',ambience:'rgba(238,177,86,.045)'};
+  if(equippedTableTheme==='spectral')return{rail:'#263b3e',cloth:'#285f59',edge:'#8ed4c4',ambience:'rgba(124,235,217,.07)'};
+  return{rail:'#56371f',cloth:'#2a7b57',edge:'#163f30',ambience:null};
+}
+function drawTableAtmosphere(now,pal){
+  if(equippedTableTheme==='captain'){
+    // Rich varnished timber. Highlights breathe slowly rather than travelling around the table.
+    const gloss=ctx.createLinearGradient(0,0,W,H);gloss.addColorStop(0,'rgba(255,221,151,.23)');gloss.addColorStop(.20,'rgba(255,255,255,.035)');gloss.addColorStop(.55,'rgba(85,34,10,.17)');gloss.addColorStop(1,'rgba(255,190,93,.15)');
+    ctx.fillStyle=gloss;ctx.fillRect(0,0,W,T);ctx.fillRect(0,B,W,H-B);ctx.fillRect(0,T,L,B-T);ctx.fillRect(R,T,W-R,B-T);
+    const pulse=.34+.12*Math.sin(now/1450);ctx.save();ctx.strokeStyle=`rgba(255,215,132,${pulse})`;ctx.lineWidth=4;ctx.shadowColor='rgba(255,190,80,.34)';ctx.shadowBlur=14+4*Math.sin(now/1800);ctx.strokeRect(L-9,T-9,R-L+18,B-T+18);ctx.restore();
+  }else if(equippedTableTheme==='spectral'){
+    // Extremely transparent drifting mist, kept below balls/guides for readability.
+    ctx.save();ctx.beginPath();ctx.rect(L,T,R-L,B-T);ctx.clip();
+    const t=now/1000;
+    for(let i=0;i<5;i++){
+      const x=L+((i*337+t*24*(i%2?1:-1))%(R-L+420))-210;
+      const y=T+(PLAY_H*(.16+i*.17))+Math.sin(t*.28+i*1.7)*35;
+      const g=ctx.createRadialGradient(x,y,0,x,y,220);g.addColorStop(0,'rgba(202,255,246,.045)');g.addColorStop(.55,'rgba(157,239,226,.022)');g.addColorStop(1,'rgba(120,220,210,0)');ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(x,y,240,72,.12*Math.sin(t*.2+i),0,Math.PI*2);ctx.fill();
+    }
+    ctx.restore();
+    const pulse=.24+.10*Math.sin(now/1350);ctx.save();ctx.strokeStyle=`rgba(177,255,240,${pulse})`;ctx.lineWidth=4;ctx.shadowColor='rgba(112,255,230,.42)';ctx.shadowBlur=15+4*Math.sin(now/1700);ctx.strokeRect(L-7,T-7,R-L+14,B-T+14);ctx.restore();
+  }
+}
+function drawCushionShadows(){
+  // Soft full-length cushion shadows: strongest at the rail, fading into the cloth.
+  const depth=44;
+  ctx.save();
+  let g=ctx.createLinearGradient(0,T,0,T+depth);g.addColorStop(0,'rgba(0,0,0,.27)');g.addColorStop(.42,'rgba(0,0,0,.12)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(L,T,R-L,depth);
+  g=ctx.createLinearGradient(0,B,0,B-depth);g.addColorStop(0,'rgba(0,0,0,.27)');g.addColorStop(.42,'rgba(0,0,0,.12)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(L,B-depth,R-L,depth);
+  g=ctx.createLinearGradient(L,0,L+depth,0);g.addColorStop(0,'rgba(0,0,0,.25)');g.addColorStop(.42,'rgba(0,0,0,.105)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(L,T,depth,B-T);
+  g=ctx.createLinearGradient(R,0,R-depth,0);g.addColorStop(0,'rgba(0,0,0,.25)');g.addColorStop(.42,'rgba(0,0,0,.105)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(R-depth,T,depth,B-T);
+  ctx.restore();
+}
+function pocketInwardAngle(x,y){
+  const eps=2;
+  const left=Math.abs(x-L)<eps,right=Math.abs(x-R)<eps,top=Math.abs(y-T)<eps,bottom=Math.abs(y-B)<eps;
+  if(top&&left)return Math.PI/4;
+  if(top&&right)return Math.PI*3/4;
+  if(bottom&&left)return -Math.PI/4;
+  if(bottom&&right)return -Math.PI*3/4;
+  if(top)return Math.PI/2;
+  if(bottom)return -Math.PI/2;
+  return 0;
+}
+function drawPocket(p){
+  const x=p[0],y=p[1],inward=pocketInwardAngle(x,y);ctx.save();
+  // Recessed dark pocket first. The opening remains unobstructed on the table-facing side.
+  const hole=ctx.createRadialGradient(x-pocketR*.22,y-pocketR*.25,2,x,y,pocketR*1.08);
+  hole.addColorStop(0,'#252a2c');hole.addColorStop(.32,'#101214');hole.addColorStop(.70,'#030404');hole.addColorStop(1,'#000');
+  ctx.fillStyle=hole;ctx.beginPath();ctx.arc(x,y,pocketR+2,0,Math.PI*2);ctx.fill();
+  // Metallic collar is deliberately an OPEN arc, like a real pocket mouth rather than a ring.
+  const rimR=pocketR+8,gap=Math.PI*.64,start=inward+gap/2,end=inward+Math.PI*2-gap/2;
+  const metal=ctx.createLinearGradient(x-rimR,y-rimR,x+rimR,y+rimR);metal.addColorStop(0,'#f1f3f3');metal.addColorStop(.24,'#7f888b');metal.addColorStop(.48,'#3f474a');metal.addColorStop(.72,'#d7dbdc');metal.addColorStop(1,'#555d60');
+  ctx.strokeStyle='rgba(7,9,10,.9)';ctx.lineWidth=15;ctx.lineCap='round';ctx.beginPath();ctx.arc(x,y,rimR,start,end);ctx.stroke();
+  ctx.strokeStyle=metal;ctx.lineWidth=10;ctx.beginPath();ctx.arc(x,y,rimR,start,end);ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,.28)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,rimR-3,start+.03,end-.03);ctx.stroke();
+  // Short angled jaw caps at each side of the mouth help the cushion appear to terminate at the pocket.
+  for(const a of [start,end]){const ax=x+Math.cos(a)*rimR,ay=y+Math.sin(a)*rimR;const tx=Math.cos(inward),ty=Math.sin(inward);ctx.strokeStyle='rgba(18,20,21,.9)';ctx.lineWidth=9;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax+tx*13,ay+ty*13);ctx.stroke();ctx.strokeStyle='#9ca4a6';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax+tx*12,ay+ty*12);ctx.stroke();}
+  ctx.restore();
+}
+function triggerLegalPotSparkles(){
+  // Celebration is deliberately independent from the potted ball object. By the time
+  // a shot is adjudicated the physics ball has already been removed, so snapshot the
+  // pocket events into their own short-lived render objects.
+  if(!shot||shot._legalSparklesTriggered)return;
+  shot._legalSparklesTriggered=true;
+  const now=performance.now(),seen=new Set();
+  const events=(shot.potEvents||[]).filter(ev=>ev.type!=='white');
+  for(const ev of events){
+    let pi=ev.pocketIndex;
+    // Defensive fallback for old/special pot paths: use the nearest pocket to the
+    // corresponding recent fade visual rather than silently losing the celebration.
+    if(pi==null){
+      const fade=[...potFadeVisuals].reverse().find(v=>v.type===ev.type&&now-v.started<1200);
+      if(fade)pi=pockets.reduce((best,p,i)=>Math.hypot(fade.x-p[0],fade.y-p[1])<Math.hypot(fade.x-pockets[best][0],fade.y-pockets[best][1])?i:best,0);
+    }
+    if(pi==null||seen.has(pi))continue;
+    seen.add(pi);
+    legalPotSparkles.push({pocketIndex:pi,started:now,seed:Math.random()*Math.PI*2});
+  }
+}
+function drawPotFadeVisuals(now=performance.now()){
+  potFadeVisuals=potFadeVisuals.filter(v=>now-v.started<500);
+  for(const v of potFadeVisuals){
+    const q=Math.max(0,Math.min(1,(now-v.started)/500)),alpha=1-q,scale=1-.12*q;
+    ctx.save();ctx.globalAlpha=alpha;ctx.translate(v.x,v.y);ctx.scale(scale,scale);ctx.translate(-v.x,-v.y);
+    ctx.fillStyle=colors[v.type];ctx.beginPath();ctx.arc(v.x,v.y,ballR,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#0007';ctx.lineWidth=2;ctx.stroke();
+    drawBallPolish({x:v.x,y:v.y,type:v.type});
+    if(v.type==='black'){ctx.fillStyle='#eee';ctx.font='bold 15px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('8',v.x,v.y)}
+    ctx.restore();
+  }
+}
+function drawLegalPotSparkles(now=performance.now()){
+  legalPotSparkles=legalPotSparkles.filter(s=>now-s.started<560);
+  for(const s of legalPotSparkles){
+    const age=now-s.started,q=Math.max(0,Math.min(1,age/560)),p=pockets[s.pocketIndex];if(!p)continue;
+    const x=p[0],y=p[1],pulse=Math.sin(q*Math.PI),alpha=.25+.75*pulse;
+    ctx.save();
+    // Soft expanding halo makes the PING readable even on small/mobile tables.
+    const halo=ctx.createRadialGradient(x,y,pocketR*.55,x,y,pocketR+28+q*12);
+    halo.addColorStop(0,`rgba(255,244,194,${.20*pulse})`);
+    halo.addColorStop(.48,`rgba(255,211,104,${.16*pulse})`);
+    halo.addColorStop(1,'rgba(255,211,104,0)');
+    ctx.fillStyle=halo;ctx.beginPath();ctx.arc(x,y,pocketR+30+q*12,0,Math.PI*2);ctx.fill();
+    // Bright metallic rim flash.
+    ctx.strokeStyle=`rgba(255,235,165,${.88*pulse})`;ctx.lineWidth=4;ctx.shadowColor='rgba(255,214,105,.95)';ctx.shadowBlur=16*pulse+2;
+    ctx.beginPath();ctx.arc(x,y,pocketR+10+q*4,0,Math.PI*2);ctx.stroke();
+    // Six compact four-point stars.
+    for(let i=0;i<6;i++){
+      const a=s.seed+i*Math.PI/3,dist=pocketR+14+q*(20+(i%2)*5),sx=x+Math.cos(a)*dist,sy=y+Math.sin(a)*dist,size=(3.5+(i%3)*1.2)*pulse;
+      ctx.fillStyle=`rgba(255,245,205,${alpha*pulse})`;ctx.shadowBlur=7*pulse;
+      ctx.beginPath();ctx.moveTo(sx,sy-size);ctx.lineTo(sx+size*.28,sy-size*.28);ctx.lineTo(sx+size,sy);ctx.lineTo(sx+size*.28,sy+size*.28);ctx.lineTo(sx,sy+size);ctx.lineTo(sx-size*.28,sy+size*.28);ctx.lineTo(sx-size,sy);ctx.lineTo(sx-size*.28,sy-size*.28);ctx.closePath();ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+function drawCueStick(now=performance.now()){
+  if(!state||state.frameOver||cue().potted||placementMode!=='none'||pendingChoice)return;
+  let a=angle,visible=!moving,vaper=gameMode==='pirate'&&currentPirateLevel===7&&state.player===aiPlayer,travel=0,anchorX=cue().x,anchorY=cue().y,alpha=1;
+  if(cueStrikeVisual){
+    const age=now-cueStrikeVisual.started;
+    if(age<420){
+      visible=true;a=cueStrikeVisual.angle;vaper=cueStrikeVisual.vaper;anchorX=cueStrikeVisual.x;anchorY=cueStrikeVisual.y;
+      // The cue is anchored to the strike point. It lunges into the white, then retreats/fades while the white travels independently.
+      if(age<95)travel=38*(age/95);else{const q=(age-95)/325;travel=38-150*q;alpha=1-Math.max(0,(q-.42)/.58)*.88;}
+    }else cueStrikeVisual=null;
+  }
+  if(!visible)return;
+  const dx=Math.cos(a),dy=Math.sin(a),backX=-dx,backY=-dy;
+  const tipGap=ballR+10-travel,tipX=anchorX+backX*tipGap,tipY=anchorY+backY*tipGap;
+  const length=360,buttX=tipX+backX*length,buttY=tipY+backY*length;
+  ctx.save();ctx.globalAlpha=alpha;ctx.lineCap='round';
+  if(vaper){
+    ctx.shadowColor='#ff2020';ctx.shadowBlur=24;ctx.strokeStyle='rgba(255,38,38,.35)';ctx.lineWidth=18;ctx.beginPath();ctx.moveTo(tipX,tipY);ctx.lineTo(buttX,buttY);ctx.stroke();
+    ctx.shadowBlur=14;ctx.strokeStyle='#ff2a2a';ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(tipX,tipY);ctx.lineTo(buttX,buttY);ctx.stroke();
+    ctx.shadowBlur=7;ctx.strokeStyle='#fff1e8';ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(tipX,tipY);ctx.lineTo(buttX,buttY);ctx.stroke();
+  }else{
+    const grad=ctx.createLinearGradient(tipX,tipY,buttX,buttY);grad.addColorStop(0,'#efe0bc');grad.addColorStop(.12,'#cba56a');grad.addColorStop(.7,'#805126');grad.addColorStop(1,'#3d2515');
+    ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=5;ctx.strokeStyle=grad;ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(tipX,tipY);ctx.lineTo(buttX,buttY);ctx.stroke();
+    ctx.shadowBlur=0;ctx.strokeStyle='#f4ead0';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(tipX,tipY);ctx.lineTo(tipX+backX*17,tipY+backY*17);ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawBallPolish(b){
+  const r=ballR,shine=ctx.createRadialGradient(b.x-r*.38,b.y-r*.42,r*.05,b.x,b.y,r*1.05);
+  shine.addColorStop(0,'rgba(255,255,255,.72)');shine.addColorStop(.16,'rgba(255,255,255,.22)');shine.addColorStop(.48,'rgba(255,255,255,0)');shine.addColorStop(1,'rgba(0,0,0,.20)');
+  ctx.fillStyle=shine;ctx.beginPath();ctx.arc(b.x,b.y,r,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.ellipse(b.x-r*.31,b.y-r*.36,r*.12,r*.065,-.6,0,Math.PI*2);ctx.fill();
+  if(b.type==='white'){
+    // Give the cue ball the same grounded edge/depth as the coloured balls without making it grey.
+    ctx.save();ctx.strokeStyle='rgba(18,24,22,.48)';ctx.lineWidth=2.4;ctx.shadowColor='rgba(0,0,0,.34)';ctx.shadowBlur=3;ctx.beginPath();ctx.arc(b.x,b.y,r-.8,0,Math.PI*2);ctx.stroke();ctx.restore();
+  }
+}
+function draw(now=performance.now()){const pal=tableThemePalette();ctx.clearRect(0,0,W,H);ctx.fillStyle=pal.rail;ctx.fillRect(0,0,W,H);ctx.fillStyle=pal.cloth;ctx.fillRect(L,T,R-L,B-T);if(pal.ambience){ctx.fillStyle=pal.ambience;ctx.fillRect(L,T,R-L,B-T);}drawCushionShadows();drawTableAtmosphere(now,pal);ctx.strokeStyle=pal.edge;ctx.lineWidth=8;ctx.strokeRect(L,T,R-L,B-T);ctx.strokeStyle='#d8d0b755';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(BAULK_X,T);ctx.lineTo(BAULK_X,B);ctx.stroke();for(const p of pockets)drawPocket(p);guide();for(const b of balls){if(b.potted)continue;ctx.save();ctx.globalAlpha=1;ctx.fillStyle=colors[b.type];ctx.beginPath();ctx.arc(b.x,b.y,ballR,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#0007';ctx.lineWidth=2;ctx.stroke();drawBallPolish(b);if(b.type==='black'){ctx.fillStyle='#eee';ctx.font='bold 15px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('8',b.x,b.y)}ctx.restore()}drawPotFadeVisuals(now);drawLegalPotSparkles(now);drawCueStick(now);}
 function loop(now){let dt=Math.min((now-last)/1000,.025);last=now;if(moving){step(dt);if(allStopped())endShot()}draw();requestAnimationFrame(loop)}
-document.getElementById('reset').onclick=()=>restartCurrentGame(1);document.getElementById('rack').onclick=()=>restartCurrentGame(state?.breaker||1);document.getElementById('clear').onclick=()=>{balls.slice(1).forEach(b=>{if(b.type!=='black')b.potted=true});updateHUD();};document.getElementById('soft').onclick=()=>{powerEl.value=25;powerText.textContent='25%'};document.getElementById('hard').onclick=()=>{powerEl.value=100;powerText.textContent='100%'};
+document.getElementById('reset').onclick=()=>{restartCurrentGame(1);};document.getElementById('rack').onclick=()=>restartCurrentGame(state?.breaker||1);document.getElementById('clear').onclick=()=>{balls.slice(1).forEach(b=>{if(b.type!=='black')b.potted=true});updateHUD();};document.getElementById('soft').onclick=()=>{powerEl.value=25;powerText.textContent='25%'};document.getElementById('hard').onclick=()=>{powerEl.value=100;powerText.textContent='100%'};
 document.getElementById('toggleAngleGuide').onclick=e=>{devAngleGuide=!devAngleGuide;e.currentTarget.textContent=`Toggle guide Ian angle: ${devAngleGuide?'ON':'OFF'}`;};
 document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const tag=(e.target?.tagName||'').toLowerCase();if(tag==='input'||tag==='textarea'||tag==='select'||tag==='button')return;const k=e.key.toLowerCase();if(k==='a'){e.preventDefault();nudgeAngle(-.1);}else if(k==='d'){e.preventDefault();nudgeAngle(.1);}else if(k==='w'){e.preventDefault();nudgePower(5);}else if(k==='s'){e.preventDefault();nudgePower(-5);}else if(k==='g'){e.preventDefault();devAngleGuide=!devAngleGuide;const btn=document.getElementById('toggleAngleGuide');if(btn)btn.textContent=`Toggle guide Ian angle: ${devAngleGuide?'ON':'OFF'}`;}else if(k==='e'){e.preventDefault();if(!shootBtn.disabled&&!moving&&!state.frameOver&&!pendingChoice&&placementMode==='none')beginShot();}else if(k==='h'){e.preventDefault();devScenariosUnlocked=true;nightmareScenario.disabled=false;cannonScenario.disabled=false;if(fiveFrameScenario)fiveFrameScenario.disabled=false;nightmareScenario.querySelector('small').textContent='Captain Blackball • 3 reds vs 6-yellow blockade';cannonScenario.querySelector('small').textContent='Captain Blackball • oversized 28-ball rack';if(fiveFrameScenario)fiveFrameScenario.querySelector('small').textContent='Captain Blackball vs Darth Vaper • 5 automatic frames';msg.textContent='DEV: Test scenarios unlocked for this session.';}else if(k==='j'){e.preventDefault();setUnlockedPirateLevel(5);devPiratesUnlocked=true;refreshPirateButtons();msg.textContent="DEV: all five standard pirates plus Ol' Cyclops and Darth Vaper unlocked for testing.";}else if(k==='r'&&state?.frameOver&&!winModal.hidden){e.preventDefault();playAgain.click();}});
 document.getElementById('pickupCue').onclick=()=>{if(moving||state.frameOver||pendingChoice)return;restoreCue('anywhere');msg.textContent=`DEV: ${pname(state.player)} may tap or drag anywhere on the table to reposition the cue ball, then confirm.`;updateHUD();};
@@ -1122,7 +1319,7 @@ function showWinCelebration(winner,text){
   soundVictory();refreshResultPirateIdentity();winTitle.textContent=`${pname(winner)} wins!`;winText.textContent=text;winModal.hidden=false;
 }
 playAgain.onclick=()=>{winModal.hidden=true;prototypeModal.hidden=true;restartCurrentGame(1);};
-returnMenu.onclick=()=>{winModal.hidden=true;prototypeModal.hidden=true;showTitleScreen();};
+returnMenu.onclick=()=>{winModal.hidden=true;prototypeModal.hidden=true;startMenuMusic();showTitleScreen();};
 prototypeGotIt.onclick=()=>{prototypeModal.hidden=true;winModal.hidden=false;};
 
 showGameLog.onclick=()=>{gameLogModalText.textContent=playHistory.length?playHistory.join('\n\n'):'No shots recorded yet.';if(copyGameLogStatus)copyGameLogStatus.textContent='';if(copyGameLog){copyGameLog.textContent='Select all and copy';copyGameLog.classList.remove('copied');}winModal.hidden=true;gameLogModal.hidden=false;};
@@ -1132,13 +1329,13 @@ function showModeMenu(){fiveFrameTestActive=false;fiveFrameTestCompleted=0;curre
 function populateAiVsAi(){for(const sel of [aiVsAiP1,aiVsAiP2]){sel.innerHTML='';for(let i=1;i<=7;i++){const o=document.createElement('option');o.value=i;o.textContent=`${PIRATES[i].name} — ${i<=5?'Difficulty '+i:PIRATES[i].role}`;sel.appendChild(o);}}aiVsAiP1.value='5';aiVsAiP2.value='5';}
 aiVsAiMode.onclick=()=>{audioReady();currentScenario=null;populateAiVsAi();modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=true;if(testScenarioMenu)testScenarioMenu.hidden=true;aiVsAiMenu.hidden=false;};
 aiVsAiBack.onclick=()=>showModeMenu();
-startAiVsAi.onclick=()=>{if(gameApp)gameApp.hidden=false;const l1=Number(aiVsAiP1.value),l2=Number(aiVsAiP2.value);aiVsAiLevels={1:l1,2:l2};gameMode='aivai';aiPlayer=1;currentScenario=null;playerNames={1:PIRATES[l1].name,2:PIRATES[l2].name};playersModal.hidden=true;aiVsAiMenu.hidden=true;audioReady();newFrame(1);};
+startAiVsAi.onclick=()=>{startMatchMusic();if(gameApp)gameApp.hidden=false;const l1=Number(aiVsAiP1.value),l2=Number(aiVsAiP2.value);aiVsAiLevels={1:l1,2:l2};gameMode='aivai';aiPlayer=1;currentScenario=null;playerNames={1:PIRATES[l1].name,2:PIRATES[l2].name};playersModal.hidden=true;aiVsAiMenu.hidden=true;audioReady();newFrame(1);};
 localMode.onclick=()=>{audioReady();currentScenario=null;gameMode='local';aiPlayer=null;modeMenu.hidden=true;playersForm.hidden=false;piratePlaceholder.hidden=true;player1Name.focus();};
 pirateMode.onclick=()=>{audioReady();currentScenario=null;refreshPirateButtons();modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=false;if(testScenarioMenu)testScenarioMenu.hidden=true;piratePlayerName?.focus();};
 testMode.onclick=()=>{audioReady();modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=true;testScenarioMenu.hidden=false;nightmareScenario.disabled=!devScenariosUnlocked;cannonScenario.disabled=!devScenariosUnlocked;if(fiveFrameScenario)fiveFrameScenario.disabled=!devScenariosUnlocked;testPlayerName?.focus();};
-testBack.onclick=showModeMenu;nightmareScenario.onclick=()=>{if(devScenariosUnlocked)startScenario('nightmare');};cannonScenario.onclick=()=>{if(devScenariosUnlocked)startScenario('cannon');};if(fiveFrameScenario)fiveFrameScenario.onclick=()=>{if(devScenariosUnlocked)startFiveFrameTest();};
+testBack.onclick=showModeMenu;nightmareScenario.onclick=()=>{if(devScenariosUnlocked){startMatchMusic();startScenario('nightmare');}};cannonScenario.onclick=()=>{if(devScenariosUnlocked){startMatchMusic();startScenario('cannon');}};if(fiveFrameScenario)fiveFrameScenario.onclick=()=>{if(devScenariosUnlocked){startMatchMusic();startFiveFrameTest();}};
 backToMode.onclick=showModeMenu;pirateBack.onclick=showModeMenu;
-playersForm.addEventListener('submit',e=>{e.preventDefault();if(gameApp)gameApp.hidden=false;playerNames={1:player1Name.value.trim()||'Player 1',2:player2Name.value.trim()||'Player 2'};audioReady();playersModal.hidden=true;newFrame(1);});
+playersForm.addEventListener('submit',e=>{e.preventDefault();startMatchMusic();if(gameApp)gameApp.hidden=false;playerNames={1:player1Name.value.trim()||'Player 1',2:player2Name.value.trim()||'Player 2'};audioReady();playersModal.hidden=true;newFrame(1);});
 const pirateProfileModal=document.getElementById('pirateProfileModal'),pirateProfileName=document.getElementById('pirateProfileName'),pirateProfileFullName=document.getElementById('pirateProfileFullName'),pirateProfileDifficulty=document.getElementById('pirateProfileDifficulty'),pirateProfileStyle=document.getElementById('pirateProfileStyle'),pirateProfileBio=document.getElementById('pirateProfileBio'),pirateProfileReputation=document.getElementById('pirateProfileReputation'),piratePortrait=document.getElementById('piratePortrait'),challengePirate=document.getElementById('challengePirate'),closePirateProfile=document.getElementById('closePirateProfile');
 const pirateIntroModal=document.getElementById('pirateIntroModal'),matchIntroPortrait=document.getElementById('matchIntroPortrait'),matchIntroKicker=document.getElementById('matchIntroKicker'),matchIntroName=document.getElementById('matchIntroName'),matchIntroLine=document.getElementById('matchIntroLine'),startPirateMatch=document.getElementById('startPirateMatch');
 // V0.8.7: keep the pre-match introduction outside the hidden gameplay tree.
@@ -1148,7 +1345,7 @@ let pendingPirateStart=null;
 let profiledPirateLevel=1;
 function showPirateProfile(level){const p=PIRATES[level];if(!p)return;profiledPirateLevel=level;const open=pirateIsOpen(level);pirateProfileFullName.textContent=p.fullName;pirateProfileName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;pirateProfileDifficulty.textContent=`${level>=6?'SPECIAL':'DIFFICULTY '+level} • ${p.role}`;pirateProfileStyle.textContent=p.style;pirateProfileBio.textContent=p.bio;pirateProfileReputation.textContent=p.reputation;piratePortrait.innerHTML=`<img src="${p.image}" alt="" draggable="false"><span class="portrait-fallback">${p.portrait}</span>`;challengePirate.disabled=!open;challengePirate.textContent=open?'Challenge':'Locked 🔒';pirateProfileModal.hidden=false;}
 function startProfiledPirate(){const level=profiledPirateLevel;if(!pirateIsOpen(level))return;const p=PIRATES[level];pendingPirateStart={level,playerName:piratePlayerName.value.trim()||'Player 1'};audioReady();pirateProfileModal.hidden=true;playersModal.hidden=true;matchIntroPortrait.src=p.image;matchIntroName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;matchIntroLine.textContent=(window.SeamenDialogue?.getLine(level,'intro'))||p.bio;matchIntroKicker.textContent=level>=6?'SPECIAL OPPONENT':'YOUR OPPONENT';pirateIntroModal.hidden=false;}
-function beginPendingPirateMatch(){if(!pendingPirateStart)return;if(gameApp)gameApp.hidden=false;const {level,playerName}=pendingPirateStart,p=PIRATES[level];pendingPirateStart=null;pirateIntroModal.hidden=true;currentScenario=null;currentPirateLevel=level;currentPirateName=p.name;gameMode='pirate';aiPlayer=2;playerNames={1:playerName,2:currentPirateName};newFrame(1);}
+function beginPendingPirateMatch(){if(!pendingPirateStart)return;startMatchMusic();if(gameApp)gameApp.hidden=false;const {level,playerName}=pendingPirateStart,p=PIRATES[level];pendingPirateStart=null;pirateIntroModal.hidden=true;currentScenario=null;currentPirateLevel=level;currentPirateName=p.name;gameMode='pirate';aiPlayer=2;playerNames={1:playerName,2:currentPirateName};newFrame(1);}
 startPirateMatch?.addEventListener('click',beginPendingPirateMatch);
 const cancelPirateIntro=document.getElementById('cancelPirateIntro');
 cancelPirateIntro?.addEventListener('click',()=>{pendingPirateStart=null;pirateIntroModal.hidden=true;playersModal.hidden=false;modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=false;if(testScenarioMenu)testScenarioMenu.hidden=true;if(aiVsAiMenu)aiVsAiMenu.hidden=true;refreshPirateButtons();});
@@ -1169,40 +1366,185 @@ syncAngleUI();newFrame(1);requestAnimationFrame(loop);
 // V0.2.8: contextual break-scoring help.
 breakHelp.onclick=()=>{breakRules.hidden=false};closeBreakRules.onclick=()=>{breakRules.hidden=true};breakRules.addEventListener('click',e=>{if(e.target===breakRules)breakRules.hidden=true});
 
-/* V0.8.7 audio/presentation controls: master controls current SFX; music bus is ready for V0.9 soundtrack. */
+/* V0.9.0 audio/presentation controls + soundtrack manager. */
 const soundToggle=document.getElementById('soundToggle'),settingsButton=document.getElementById('settingsButton'),settingsModal=document.getElementById('settingsModal'),closeSettings=document.getElementById('closeSettings'),masterVolume=document.getElementById('masterVolume'),masterVolumeText=document.getElementById('masterVolumeText'),masterMute=document.getElementById('masterMute'),musicVolume=document.getElementById('musicVolume'),musicVolumeText=document.getElementById('musicVolumeText'),musicMute=document.getElementById('musicMute'),portraitMotionToggle=document.getElementById('portraitMotionToggle');
 // Keep the shared Settings modal at document level so it can open from both the standalone title screen and the in-game header.
 if(settingsModal && settingsModal.parentElement!==document.body) document.body.appendChild(settingsModal);
-let masterLevel=1,masterMuted=false,musicLevel=1,musicMuted=false,reducedCharacterPortraitMotion=false;
-try{const saved=JSON.parse(localStorage.getItem('seamenAudioSettings')||'{}');if(Number.isFinite(saved.masterLevel))masterLevel=Math.max(0,Math.min(1,saved.masterLevel));if(typeof saved.masterMuted==='boolean')masterMuted=saved.masterMuted;if(Number.isFinite(saved.musicLevel))musicLevel=Math.max(0,Math.min(1,saved.musicLevel));if(typeof saved.musicMuted==='boolean')musicMuted=saved.musicMuted;if(typeof saved.reducedCharacterPortraitMotion==='boolean')reducedCharacterPortraitMotion=saved.reducedCharacterPortraitMotion;}catch(e){}
+let masterLevel=1,masterMuted=false,musicLevel=.50,musicMuted=false,reducedCharacterPortraitMotion=false;
+try{
+  const saved=JSON.parse(localStorage.getItem('seamenAudioSettings')||'{}');
+  if(Number.isFinite(saved.masterLevel))masterLevel=Math.max(0,Math.min(1,saved.masterLevel));
+  if(typeof saved.masterMuted==='boolean')masterMuted=saved.masterMuted;
+  if(Number.isFinite(saved.musicLevel))musicLevel=Math.max(0,Math.min(1,saved.musicLevel));
+  if(typeof saved.musicMuted==='boolean')musicMuted=saved.musicMuted;
+  if(typeof saved.reducedCharacterPortraitMotion==='boolean')reducedCharacterPortraitMotion=saved.reducedCharacterPortraitMotion;
+  // V0.9.1 one-time migration: establish the revised 50% soundtrack baseline.
+  // Once this marker is written, the player's own subsequent music-volume choice is preserved.
+  if(localStorage.getItem('seamenAudio091Music50Migrated')!=='1'){
+    musicLevel=.50;
+    saved.musicLevel=musicLevel;
+    localStorage.setItem('seamenAudioSettings',JSON.stringify({
+      masterLevel,masterMuted,musicLevel,musicMuted,reducedCharacterPortraitMotion
+    }));
+    localStorage.setItem('seamenAudio091Music50Migrated','1');
+  }
+}catch(e){}
 document.body.classList.toggle('reduced-character-portrait-motion',reducedCharacterPortraitMotion);
 function saveAudioSettings(){try{localStorage.setItem('seamenAudioSettings',JSON.stringify({masterLevel,masterMuted,musicLevel,musicMuted,reducedCharacterPortraitMotion}));}catch(e){}}
-function refreshAudioSettings(){if(masterVolume)masterVolume.value=Math.round(masterLevel*100);if(masterVolumeText)masterVolumeText.textContent=`${Math.round(masterLevel*100)}%`;if(masterMute)masterMute.textContent=masterMuted?'Unmute':'Mute';if(musicVolume)musicVolume.value=Math.round(musicLevel*100);if(musicVolumeText)musicVolumeText.textContent=`${Math.round(musicLevel*100)}%`;if(musicMute)musicMute.textContent=musicMuted?'Unmute':'Mute';if(portraitMotionToggle){portraitMotionToggle.classList.toggle('is-on',reducedCharacterPortraitMotion);portraitMotionToggle.setAttribute('aria-checked',String(reducedCharacterPortraitMotion));portraitMotionToggle.title=reducedCharacterPortraitMotion?'Reduced character portrait motion: On':'Reduced character portrait motion: Off';}document.body.classList.toggle('reduced-character-portrait-motion',reducedCharacterPortraitMotion);if(soundToggle){soundToggle.textContent=masterMuted||masterLevel<=0?'🔇':'🔊';soundToggle.setAttribute('aria-label',masterMuted?'Unmute all sound':'Mute all sound');soundToggle.title=masterMuted?'Unmute all sound':'Mute all sound';}}
+function setSwitchState(el,on,label){if(!el)return;el.classList.toggle('is-on',on);el.setAttribute('aria-checked',String(on));el.title=`${label}: ${on?'On':'Off'}`;}
+function refreshAudioSettings(){if(masterVolume)masterVolume.value=Math.round(masterLevel*100);if(masterVolumeText)masterVolumeText.textContent=`${Math.round(masterLevel*100)}%`;setSwitchState(masterMute,masterMuted,'Master mute');if(musicVolume)musicVolume.value=Math.round(musicLevel*100);if(musicVolumeText)musicVolumeText.textContent=`${Math.round(musicLevel*100)}%`;setSwitchState(musicMute,musicMuted,'Music mute');setSwitchState(portraitMotionToggle,reducedCharacterPortraitMotion,'Reduced character portrait motion');document.body.classList.toggle('reduced-character-portrait-motion',reducedCharacterPortraitMotion);const icon=masterMuted?'🔇':(masterLevel<=0?'🔈':'🔊');const label=masterMuted?'Unmute all sound':'Mute all sound';for(const el of [soundToggle,document.getElementById('titleSoundToggle')]){if(el){el.textContent=icon;el.setAttribute('aria-label',label);el.title=label;}}updateMusicVolume();}
 if(soundToggle)soundToggle.onclick=()=>{masterMuted=!masterMuted;refreshAudioSettings();saveAudioSettings();};
 if(settingsButton)settingsButton.onclick=()=>{refreshAudioSettings();settingsModal.hidden=false;};
 if(closeSettings)closeSettings.onclick=()=>{settingsModal.hidden=true;};
 if(settingsModal)settingsModal.addEventListener('click',e=>{if(e.target===settingsModal)settingsModal.hidden=true;});
-if(masterVolume)masterVolume.oninput=()=>{masterLevel=Number(masterVolume.value)/100;if(masterLevel>0)masterMuted=false;refreshAudioSettings();saveAudioSettings();};
+if(masterVolume)masterVolume.oninput=()=>{masterLevel=Number(masterVolume.value)/100;refreshAudioSettings();saveAudioSettings();};
 if(masterMute)masterMute.onclick=()=>{masterMuted=!masterMuted;refreshAudioSettings();saveAudioSettings();};
-if(musicVolume)musicVolume.oninput=()=>{musicLevel=Number(musicVolume.value)/100;if(musicLevel>0)musicMuted=false;refreshAudioSettings();saveAudioSettings();};
+if(musicVolume)musicVolume.oninput=()=>{musicLevel=Number(musicVolume.value)/100;refreshAudioSettings();saveAudioSettings();};
 if(musicMute)musicMute.onclick=()=>{musicMuted=!musicMuted;refreshAudioSettings();saveAudioSettings();};
 if(portraitMotionToggle)portraitMotionToggle.onclick=()=>{reducedCharacterPortraitMotion=!reducedCharacterPortraitMotion;refreshAudioSettings();saveAudioSettings();};
+
+
+/* V0.9.0 soundtrack manager.
+   Music states:
+   - anthem: fresh boot / pre-match navigation
+   - match: continuous gameplay-session playlist; a new random non-repeating match track starts only when the current one ends
+   - menu: Ale in the Hold after returning from a completed/started frame
+   - credits: takes over when About / credits is opened and continues until a frame starts
+   - outro: reserved for a future story/outro feature and intentionally unused
+*/
+const MUSIC={
+  anthem:'assets/music/anthem.m4a',
+  menu:'assets/music/ale-in-the-hold.m4a',
+  credits:'assets/music/credits1.m4a',
+  outro:'assets/music/outro1.m4a',
+  matches:Array.from({length:10},(_,i)=>`assets/music/match${i+1}.m4a`)
+};
+const musicDeck=[new Audio(),new Audio()];
+musicDeck.forEach(a=>{a.preload='auto';a.loop=false;a.playsInline=true;});
+let activeMusicDeck=0,currentMusicKey='',pendingMusicRequest=null,lastMatchMusic=-1,musicFadeToken=0;
+function musicTargetVolume(){return (masterMuted||musicMuted)?0:Math.max(0,Math.min(1,masterLevel*musicLevel));}
+function updateMusicVolume(){
+  if(!musicDeck)return;
+  const target=musicTargetVolume();
+  musicDeck.forEach((a,i)=>{if(i===activeMusicDeck&&!a.paused)a.volume=target;else if(a.paused)a.volume=0;});
+}
+function fadeMusicVolume(audio,from,to,duration,token,onDone){
+  const start=performance.now();
+  function step(now){
+    if(token!==musicFadeToken)return;
+    const t=Math.min(1,(now-start)/duration),v=from+(to-from)*t;
+    audio.volume=Math.max(0,Math.min(1,v));
+    if(t<1)requestAnimationFrame(step);else if(onDone)onDone();
+  }
+  requestAnimationFrame(step);
+}
+async function playMusic(key,src,{crossfade=true}={}){
+  if(!src)return;
+  if(currentMusicKey===key&&!musicDeck[activeMusicDeck].paused){updateMusicVolume();return;}
+  const old=musicDeck[activeMusicDeck],nextIndex=1-activeMusicDeck,next=musicDeck[nextIndex];
+  const token=++musicFadeToken,target=musicTargetVolume();
+  pendingMusicRequest={key,src};
+  next.pause();next.currentTime=0;next.src=src;next.loop=!key.startsWith('match');next.onended=key.startsWith('match')?()=>{if(activeMusicDeck===nextIndex&&currentMusicKey===key)startMatchMusic();}:null;next.volume=0;
+  try{
+    await next.play();
+    pendingMusicRequest=null;currentMusicKey=key;activeMusicDeck=nextIndex;
+    if(crossfade&&!old.paused&&old.src){
+      const oldStart=old.volume;
+      fadeMusicVolume(old,oldStart,0,800,token,()=>{old.pause();old.currentTime=0;});
+      fadeMusicVolume(next,0,target,800,token);
+    }else{
+      if(!old.paused){old.pause();old.currentTime=0;}
+      next.volume=target;
+    }
+  }catch(err){
+    // Mobile browsers may block audible autoplay until the first user gesture.
+    // Keep the requested state queued; gameplay must never depend on music succeeding.
+    next.pause();
+  }
+}
+function retryPendingMusic(){
+  if(!pendingMusicRequest)return;
+  const {key,src}=pendingMusicRequest;
+  playMusic(key,src,{crossfade:false});
+}
+function startBootAnthem(){playMusic('anthem',MUSIC.anthem,{crossfade:false});}
+function startMenuMusic(){playMusic('menu',MUSIC.menu);}
+function startCreditsMusic(){playMusic('credits',MUSIC.credits);}
+// V0.10.0: shuffled match-music bag. Every match track is heard once in a
+// random order before the bag is refilled, while also preventing an immediate
+// repeat across bag boundaries. This avoids random clustering around the same
+// one or two tracks during a long play session.
+let matchMusicBag=[];
+function refillMatchMusicBag(){
+  matchMusicBag=MUSIC.matches.map((_,i)=>i);
+  for(let i=matchMusicBag.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [matchMusicBag[i],matchMusicBag[j]]=[matchMusicBag[j],matchMusicBag[i]];
+  }
+  if(matchMusicBag.length>1&&matchMusicBag[0]===lastMatchMusic){
+    const j=1+Math.floor(Math.random()*(matchMusicBag.length-1));
+    [matchMusicBag[0],matchMusicBag[j]]=[matchMusicBag[j],matchMusicBag[0]];
+  }
+}
+function startMatchMusic(){
+  if(!matchMusicBag.length)refillMatchMusicBag();
+  const pick=matchMusicBag.shift();
+  lastMatchMusic=pick;
+  playMusic(`match${pick+1}`,MUSIC.matches[pick]);
+}
 refreshAudioSettings();
 
 
 /* V0.8.6 title screen / outer menu. Presentation only; gameplay engine unchanged. */
 if(settingsModal&&settingsModal.parentElement?.id==='gameApp')document.body.appendChild(settingsModal);
-const gameApp=document.getElementById('gameApp'),titleScreen=document.getElementById('titleScreen'),titlePlay=document.getElementById('titlePlay'),titleSettings=document.getElementById('titleSettings'),titleAbout=document.getElementById('titleAbout'),titleTrophies=document.getElementById('titleTrophies'),trophiesScreen=document.getElementById('trophiesScreen'),trophiesBack=document.getElementById('trophiesBack'),titleSoundToggle=document.getElementById('titleSoundToggle'),aboutScreen=document.getElementById('aboutScreen'),aboutContent=document.getElementById('aboutContent'),aboutBack=document.getElementById('aboutBack'),backToTitle=document.getElementById('backToTitle');
-function renderAbout(){if(!aboutContent)return;const sections=window.SeamenAbout?.sections||[];aboutContent.innerHTML='';for(const s of sections){const section=document.createElement('section');const h=document.createElement('h3');const p=document.createElement('p');h.textContent=s.title||'';p.textContent=s.body||'';section.append(h,p);aboutContent.append(section);}}
-function showTitleScreen(){pendingPirateStart=null;if(gameApp)gameApp.hidden=true;if(playersModal)playersModal.hidden=true;if(pirateProfileModal)pirateProfileModal.hidden=true;if(pirateIntroModal)pirateIntroModal.hidden=true;if(winModal)winModal.hidden=true;if(gameLogModal)gameLogModal.hidden=true;if(aboutScreen)aboutScreen.hidden=true;if(trophiesScreen)trophiesScreen.hidden=true;if(titleScreen)titleScreen.hidden=false;}
+const gameApp=document.getElementById('gameApp'),titleScreen=document.getElementById('titleScreen'),titlePlay=document.getElementById('titlePlay'),titleSettings=document.getElementById('titleSettings'),titleAbout=document.getElementById('titleAbout'),titleTrophies=document.getElementById('titleTrophies'),titleCosmetics=document.getElementById('titleCosmetics'),cosmeticsScreen=document.getElementById('cosmeticsScreen'),cosmeticsBack=document.getElementById('cosmeticsBack'),trophiesScreen=document.getElementById('trophiesScreen'),trophiesBack=document.getElementById('trophiesBack'),titleSoundToggle=document.getElementById('titleSoundToggle'),aboutScreen=document.getElementById('aboutScreen'),aboutContent=document.getElementById('aboutContent'),aboutBack=document.getElementById('aboutBack'),backToTitle=document.getElementById('backToTitle');
+function renderAbout(){if(!aboutContent)return;const sections=window.SeamenAbout?.sections||[];aboutContent.innerHTML='';for(const s of sections){const section=document.createElement('section'),h=document.createElement('h3'),p=document.createElement('p');h.textContent=s.title||'';p.textContent=s.body||'';section.append(h,p);if(Array.isArray(s.links)&&s.links.length){const links=document.createElement('p');links.className='about-links';s.links.forEach((item,i)=>{if(i)links.append(document.createTextNode(' | '));const a=document.createElement('a');a.href=item.url;a.textContent=item.label;a.target='_blank';a.rel='noopener noreferrer';links.append(a);});section.append(links);}aboutContent.append(section);}}
+function showTitleScreen(){pendingPirateStart=null;if(gameApp)gameApp.hidden=true;if(playersModal)playersModal.hidden=true;if(pirateProfileModal)pirateProfileModal.hidden=true;if(pirateIntroModal)pirateIntroModal.hidden=true;if(winModal)winModal.hidden=true;if(gameLogModal)gameLogModal.hidden=true;if(aboutScreen)aboutScreen.hidden=true;if(trophiesScreen)trophiesScreen.hidden=true;if(cosmeticsScreen)cosmeticsScreen.hidden=true;if(titleScreen)titleScreen.hidden=false;}
 function showWhoIsPlaying(){if(titleScreen)titleScreen.hidden=true;if(gameApp)gameApp.hidden=true;showModeMenu();}
 if(titlePlay)titlePlay.onclick=()=>{audioReady();showWhoIsPlaying();};
 if(backToTitle)backToTitle.onclick=showTitleScreen;
 if(titleSettings)titleSettings.onclick=()=>{audioReady();refreshAudioSettings();settingsModal.hidden=false;};
+function refreshCosmeticsUI(){
+  document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>b.classList.toggle('equipped',b.dataset.theme===equippedTableTheme));
+  document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>b.classList.toggle('equipped',b.dataset.cue===equippedCue));
+}
+document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>b.addEventListener('click',()=>{equippedTableTheme=b.dataset.theme;try{localStorage.setItem('seamenTableTheme',equippedTableTheme)}catch(e){}refreshCosmeticsUI();}));
+document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>b.addEventListener('click',()=>{equippedCue=b.dataset.cue;try{localStorage.setItem('seamenCue',equippedCue)}catch(e){}refreshCosmeticsUI();}));
+if(titleCosmetics)titleCosmetics.onclick=()=>{if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;cosmeticsScreen.hidden=false;refreshCosmeticsUI();};
+if(cosmeticsBack)cosmeticsBack.onclick=()=>{cosmeticsScreen.hidden=true;titleScreen.hidden=false;};
+refreshCosmeticsUI();
 if(titleTrophies)titleTrophies.onclick=()=>{if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;trophiesScreen.hidden=false;};if(trophiesBack)trophiesBack.onclick=()=>{trophiesScreen.hidden=true;titleScreen.hidden=false;};
-if(titleAbout)titleAbout.onclick=()=>{renderAbout();if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;aboutScreen.hidden=false;};
+if(titleAbout)titleAbout.onclick=()=>{startCreditsMusic();renderAbout();if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;aboutScreen.hidden=false;};
 if(aboutBack)aboutBack.onclick=()=>{aboutScreen.hidden=true;titleScreen.hidden=false;};
-function refreshTitleSound(){if(!titleSoundToggle)return;titleSoundToggle.textContent=masterMuted||masterLevel<=0?'🔇':'🔊';titleSoundToggle.setAttribute('aria-label',masterMuted?'Unmute all sound':'Mute all sound');titleSoundToggle.title=masterMuted?'Unmute all sound':'Mute all sound';}
+function refreshTitleSound(){if(!titleSoundToggle)return;titleSoundToggle.textContent=masterMuted?'🔇':(masterLevel<=0?'🔈':'🔊');titleSoundToggle.setAttribute('aria-label',masterMuted?'Unmute all sound':'Mute all sound');titleSoundToggle.title=masterMuted?'Unmute all sound':'Mute all sound';}
 if(titleSoundToggle)titleSoundToggle.onclick=()=>{masterMuted=!masterMuted;refreshAudioSettings();refreshTitleSound();saveAudioSettings();};
 const _refreshAudioSettings=refreshAudioSettings;refreshAudioSettings=function(){_refreshAudioSettings();refreshTitleSound();};
 renderAbout();refreshTitleSound();showTitleScreen();
+
+/* V0.9.0 intentional boot gate. Browsers commonly block audible autoplay until
+   a user gesture; ENTER THE TAVERN supplies that gesture and makes startup
+   deterministic across desktop/mobile. */
+const bootSplash=document.getElementById('bootSplash'),enterTavern=document.getElementById('enterTavern');
+let bootEntering=false;
+async function enterTheTavern(){
+  if(bootEntering)return;
+  bootEntering=true;
+  if(enterTavern)enterTavern.disabled=true;
+  audioReady();
+  // This call occurs synchronously from the user's click/key gesture, allowing
+  // the anthem to start where autoplay would otherwise be refused.
+  startBootAnthem();
+  if(bootSplash)bootSplash.classList.add('is-entering');
+  setTimeout(()=>{
+    if(bootSplash){bootSplash.hidden=true;bootSplash.classList.remove('is-entering');}
+    if(titleScreen)titleScreen.hidden=false;
+  },2500);
+}
+if(enterTavern){
+  enterTavern.addEventListener('click',enterTheTavern);
+  enterTavern.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();enterTheTavern();}
+  });
+}
+if(titleScreen)titleScreen.hidden=true;
+if(bootSplash)bootSplash.hidden=false;

@@ -506,3 +506,52 @@ body::before{
 main#gameApp{
   background:transparent !important;
 }
+
+/* V0.9.0 unified Settings switches */
+.audio-setting-head .audio-switch{appearance:none;-webkit-appearance:none;background:transparent!important;border:0!important;box-shadow:none!important;padding:0;margin:0;flex:0 0 auto;}
+.audio-setting-head .audio-switch:hover,.audio-setting-head .audio-switch:active{background:transparent!important;border:0!important;box-shadow:none!important;}
+.audio-setting-head{min-height:30px;}
+@media(max-width:460px){.audio-setting-head{gap:8px}.audio-setting-head .audio-switch{transform:scale(.94);transform-origin:right center;}}
+
+/* V0.9.0 boot gate: one intentional user gesture unlocks soundtrack playback.
+   Startup now uses a slow, simple fade with no wave/wash animation. */
+.boot-splash{
+  position:fixed;inset:0;z-index:2000;display:grid;place-items:center;
+  overflow:hidden;background:transparent;text-align:center;padding:24px;
+}
+.boot-splash[hidden]{display:none!important}
+.boot-splash-inner{position:relative;z-index:2;width:min(88vw,520px)}
+.boot-emblem{width:112px;aspect-ratio:1;margin:0 auto 14px;display:grid;place-items:center;
+  border:2px solid #b8873e;border-radius:50%;font-size:52px;color:#e8c477;
+  background:radial-gradient(circle at 50% 35%,#543a24,#17100b 68%);
+  box-shadow:inset 0 0 24px #000b,0 8px 24px #0008;text-shadow:0 3px #000}
+.boot-splash h1{margin:0;font-family:Georgia,serif;font-size:48px;letter-spacing:.08em;color:#f0cf82;text-shadow:0 3px #000}
+.boot-splash p{margin:4px 0 22px;color:#cdbb9f}
+.boot-enter{display:block;width:min(100%,360px);min-height:52px;margin:0 auto;font-weight:900;letter-spacing:.03em}
+.boot-splash.is-entering{animation:bootSplashAway 2.5s ease-in-out both}
+@keyframes bootSplashAway{0%{opacity:1}100%{opacity:0}}
+@media(max-width:460px){.boot-emblem{width:92px;font-size:43px}.boot-splash h1{font-size:38px}.boot-enter{min-height:50px}}
+@media(prefers-reduced-motion:reduce){.boot-splash.is-entering{animation:bootSplashAway 2.5s linear both}}
+
+/* V0.9.1 soundtrack credit links */
+.about-links{margin-top:.45rem;line-height:1.8}
+.about-links a{font-weight:800;color:#f0c36a;text-underline-offset:3px}
+.about-links a:hover,.about-links a:focus-visible{color:#ffe3a3}
+
+/* V0.9.1 audio balance/settings refinement */
+.audio-setting-head .mute-control-label{
+  margin-left:auto;
+  margin-right:.4rem;
+  font-size:.88rem;
+  font-weight:700;
+  opacity:.9;
+  white-space:nowrap;
+}
+.audio-setting-head .mute-control-label + .audio-switch{margin-left:0;}
+
+
+/* V0.10.0 cosmetics framework */
+.cosmetics-menu-button{position:relative;overflow:hidden;border-color:#cda85a!important;box-shadow:0 0 10px rgba(218,183,103,.16)}
+.cosmetics-menu-button::after{content:"";position:absolute;inset:-35% auto -35% -35%;width:18%;transform:skewX(-18deg);background:linear-gradient(90deg,transparent,rgba(255,242,190,.42),transparent);animation:cosmeticsGlisten 5.5s ease-in-out infinite;pointer-events:none}
+@keyframes cosmeticsGlisten{0%,70%{left:-35%;opacity:0}74%{opacity:.8}88%{left:125%;opacity:.55}92%,100%{left:125%;opacity:0}}
+.cosmetics-card{max-width:680px}.cosmetics-intro,.cosmetics-note{opacity:.82}.cosmetic-section{text-align:left;margin:18px 0}.cosmetic-section h3{text-align:center}.cosmetic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.cosmetic-choice{min-height:76px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;text-align:center}.cosmetic-choice small{font-size:.78em;opacity:.75}.cosmetic-choice.equipped{border-color:#e3c26e;box-shadow:0 0 0 1px #e3c26e inset,0 0 14px rgba(227,194,110,.2)}.cosmetic-choice.equipped::before{content:'EQUIPPED';font-size:.62em;letter-spacing:.12em;color:#f0d98d}.cosmetic-choice.locked{opacity:.55}
