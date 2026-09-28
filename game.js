@@ -42,6 +42,42 @@ document.addEventListener('dblclick',e=>{if(e.target instanceof Element&&e.targe
 
 function getUnlockedPirateLevel(){try{return clamp(Number(localStorage.getItem('seamenPirateUnlocked')||1),1,5)}catch(e){return 1}}
 function setUnlockedPirateLevel(level){try{localStorage.setItem('seamenPirateUnlocked',String(clamp(level,1,5)))}catch(e){}}
+
+/* V0.11.0: versioned, extensible local career record. This is deliberately separate
+   from settings and premium entitlement so future save migrations can preserve both. */
+const CAREER_KEY='seamenCareer',CAREER_SCHEMA=1;
+function defaultCareer(){return{schema:CAREER_SCHEMA,framesPlayed:0,framesWon:0,framesLost:0,shotsTaken:0,legalBallsPotted:0,foulsCommitted:0,bestPotStreak:0,sevenBallWins:0,blackOnBlackWins:0,creditsRead:false,lifetimePremium:false,piratesDefeated:{}};}
+function loadCareer(){let c=defaultCareer();try{const raw=JSON.parse(localStorage.getItem(CAREER_KEY)||'null');if(raw&&typeof raw==='object')c={...c,...raw,piratesDefeated:{...c.piratesDefeated,...(raw.piratesDefeated||{})},schema:CAREER_SCHEMA};}catch(e){}return c;}
+let career=loadCareer(),frameObjectPots={1:0,2:0},frameStatsEligible=false,frameRecorded=false,pendingBlackOnBlackWin=false;
+const PIRATE_CUE_REWARDS={1:'dave',2:'simon',3:'holly',4:'mick',5:'blackball',7:'vaper'};
+function cueUnlocked(cueId){if(cueId==='classic')return true;const level=Object.entries(PIRATE_CUE_REWARDS).find(([,id])=>id===cueId)?.[0];return !!(level&&career.piratesDefeated[String(level)]);}
+function validateEquippedCue(){if(!cueUnlocked(equippedCue)){equippedCue='classic';try{localStorage.setItem('seamenCue',equippedCue)}catch(e){}}}
+let trophyKnownUnlocked=new Set(),trophyToastQueue=[],trophyToastBusy=false;
+function trophyUnlockSet(c=career){return new Set(TROPHIES.filter(([, , ,test])=>!!test(c)).map(([id])=>id));}
+function soundTrophyUnlocked(){tone(740,.10,.09,'square');tone(988,.16,.08,'triangle',.07);tone(1319,.28,.07,'sine',.18);tone(1760,.42,.055,'sine',.38);tone(2217,.58,.045,'sine',.68);tone(2637,.72,.035,'sine',1.02);}
+function enqueueTrophyToast(id){const trophy=TROPHIES.find(t=>t[0]===id);if(!trophy)return;trophyToastQueue.push(trophy);runTrophyToastQueue();}
+function runTrophyToastQueue(){if(trophyToastBusy||!trophyToastQueue.length)return;const [,name,desc]=trophyToastQueue.shift(),toast=document.getElementById('trophyToast');if(!toast){trophyToastBusy=false;return;}trophyToastBusy=true;document.getElementById('trophyToastName').textContent=name;document.getElementById('trophyToastDesc').textContent=desc;toast.hidden=false;toast.style.display='flex';toast.style.visibility='visible';toast.style.opacity='0';void toast.offsetWidth;requestAnimationFrame(()=>{toast.classList.add('show');toast.style.opacity='1';});soundTrophyUnlocked();setTimeout(()=>{toast.classList.remove('show');toast.style.opacity='0';},2500);setTimeout(()=>{toast.hidden=true;toast.style.display='none';toast.style.visibility='hidden';trophyToastBusy=false;runTrophyToastQueue();},2850);}
+function checkNewTrophies(previous=trophyKnownUnlocked){const now=trophyUnlockSet();for(const id of now)if(!previous.has(id))enqueueTrophyToast(id);trophyKnownUnlocked=now;}
+function saveCareer(previousUnlocked=null){career.schema=CAREER_SCHEMA;try{localStorage.setItem(CAREER_KEY,JSON.stringify(career));}catch(e){}renderCareer();checkNewTrophies(previousUnlocked||trophyKnownUnlocked);}
+function careerPlayerEligible(player){return player===1&&gameMode!=='aivai'&&!currentScenario;}
+function resetFrameCareerTracking(){frameObjectPots={1:0,2:0};frameRecorded=false;pendingBlackOnBlackWin=false;frameStatsEligible=(gameMode==='pirate'||gameMode==='local')&&!currentScenario;}
+function noteCareerShot(player){if(frameStatsEligible&&careerPlayerEligible(player)){career.shotsTaken++;saveCareer();}}
+function noteCareerObjectPots(player,pots){if(!frameStatsEligible)return;const n=pots.filter(t=>t==='red'||t==='yellow').length;frameObjectPots[player]=(frameObjectPots[player]||0)+n;}
+function noteCareerLegalPots(player,count){if(!frameStatsEligible||!careerPlayerEligible(player)||count<=0)return;career.legalBallsPotted+=count;const streak=(potStreakPlayer===player?potStreakCount:0);career.bestPotStreak=Math.max(career.bestPotStreak,streak);saveCareer();}
+function noteCareerFoul(player){if(frameStatsEligible&&careerPlayerEligible(player)){career.foulsCommitted++;saveCareer();}}
+function recordCareerFrame(winner){if(!frameStatsEligible||frameRecorded)return;const trophiesBefore=trophyUnlockSet();frameRecorded=true;career.framesPlayed++;if(winner===1){career.framesWon++;if(frameObjectPots[2]===0)career.sevenBallWins++;if(pendingBlackOnBlackWin)career.blackOnBlackWins++;if(gameMode==='pirate'&&currentPirateLevel>=1)career.piratesDefeated[String(currentPirateLevel)]=true;}else career.framesLost++;saveCareer(trophiesBefore);}
+const TROPHIES=[
+ ['first-win','First blood','Win your first frame.',c=>c.framesWon>=1],['wins-5','Getting the hang of it','Win 5 frames.',c=>c.framesWon>=5],['wins-20','Tavern regular','Win 20 frames.',c=>c.framesWon>=20],['wins-50','Table legend','Win 50 frames.',c=>c.framesWon>=50],
+ ['seven-ball','Seven-ball salute','Win a 7-ball frame.',c=>c.sevenBallWins>=1],['black-black','Last ball standing','Win a genuine black-on-black frame.',c=>c.blackOnBlackWins>=1],['credits','Stayed for the credits','Read the About / credits section.',c=>c.creditsRead],
+ ['dave','Deckhand down','Defeat Deckhand Dave.',c=>!!c.piratesDefeated['1']],['simon','No sweat','Defeat Sweaty Simon.',c=>!!c.piratesDefeated['2']],['holly','Bean there, done that','Defeat Holly.',c=>!!c.piratesDefeated['3']],['mick','Eye of the Tornado','Defeat First Mate Mick.',c=>!!c.piratesDefeated['4']],['blackball','Beat the Captain','Defeat Captain Blackball.',c=>!!c.piratesDefeated['5']]
+];
+trophyKnownUnlocked=trophyUnlockSet(career);
+function renderCareer(){
+ const grid=document.getElementById('careerStatsGrid');if(grid){const pct=career.framesPlayed?Math.round(career.framesWon/career.framesPlayed*100):0;const defeatedLevels=Object.keys(career.piratesDefeated).filter(k=>career.piratesDefeated[k]).map(Number).filter(n=>n>=1&&n<=5),highest=defeatedLevels.length?PIRATES[Math.max(...defeatedLevels)].name:'None';const stats=[['Frames played',career.framesPlayed],['Wins',career.framesWon],['Losses',career.framesLost],['Win rate',pct+'%'],['Shots taken',career.shotsTaken],['Legal balls potted',career.legalBallsPotted],['Fouls committed',career.foulsCommitted],['Best pot streak',career.bestPotStreak],['7-ball wins',career.sevenBallWins],['Black-on-black wins',career.blackOnBlackWins],['Highest pirate defeated',highest]];grid.innerHTML=stats.map(([label,value])=>`<div class="career-stat"><b>${value}</b><small>${label}</small></div>`).join('');}
+ const pp=document.getElementById('pirateProgress');if(pp)pp.innerHTML=PIRATES.slice(1,6).map((pir,i)=>{const level=i+1,done=!!career.piratesDefeated[String(level)];return `<div class="pirate-progress-item ${done?'defeated':''}"><b>${pir.name}</b><small>${done?'DEFEATED ✓':'Not defeated'}</small></div>`}).join('');
+ const tg=document.getElementById('trophyGrid');if(tg)tg.innerHTML=TROPHIES.map(([id,name,desc,test])=>{const won=!!test(career);return `<div class="trophy-item ${won?'unlocked':''}" data-trophy="${id}"><b>${name}</b><small>${desc}</small><em>${won?'UNLOCKED ✓':'LOCKED'}</em></div>`}).join('');
+ const dev=document.getElementById('devProgressStats');if(dev)dev.textContent=`Schema: ${career.schema}\nFrames: ${career.framesPlayed} | W ${career.framesWon} | L ${career.framesLost}\nShots: ${career.shotsTaken} | Legal pots: ${career.legalBallsPotted} | Fouls: ${career.foulsCommitted}\nBest pot streak: ${career.bestPotStreak} | 7-ball wins: ${career.sevenBallWins} | Black-on-black wins: ${career.blackOnBlackWins}\nCredits read: ${career.creditsRead} | Lifetime premium: ${career.lifetimePremium}\nPirates defeated: ${Object.keys(career.piratesDefeated).filter(k=>career.piratesDefeated[k]).join(', ')||'none'}`;
+}
 function pirateIsOpen(level){const isDev=level>=6;return isDev?devPiratesUnlocked:level<=getUnlockedPirateLevel();}
 function renderPirateRoster(){const list=document.getElementById('pirateList');if(!list)return;list.innerHTML=PIRATES.slice(1).map((p,i)=>{const level=i+1,nick=p.nickname?` <em>${p.nickname}</em>`:'';return `<button class="pirate-choice" data-level="${level}" type="button"><b>${p.name}${nick}</b><small></small></button>`}).join('');refreshPirateButtons();}
 function refreshPirateButtons(){document.querySelectorAll('.pirate-choice[data-level]').forEach(btn=>{const level=Number(btn.dataset.level),p=PIRATES[level],open=pirateIsOpen(level),isDev=level>=6;btn.disabled=false;btn.classList.toggle('unlocked',open);btn.classList.toggle('locked',!open);btn.setAttribute('aria-disabled',String(!open));const small=btn.querySelector('small');if(small)small.textContent=isDev?`${p.role} • ${open?'Available':'Locked 🔒'}`:`Difficulty ${level} • ${open?p.role:'Locked 🔒'}`;});}
@@ -176,7 +212,7 @@ function rackBalls(){balls=[];balls.push(ball(L+PLAY_W*.8,H/2,'white','cue'));co
 function rack28Balls(){balls=[];balls.push(ball(L+PLAY_W*.8,H/2,'white','cue'));const sy=H/2,gap=ballR*2.06,rowDx=gap*.89,apexX=L+PLAY_W*.31;let types=[];for(let i=0;i<13;i++)types.push('red');for(let i=0;i<14;i++)types.push('yellow');types.push('black');let id=0,idx=0;for(let ri=0;ri<7;ri++){const x=apexX-ri*rowDx;for(let i=0;i<=ri;i++){let type;if(ri===3&&i===1){type='black';const bi=types.indexOf('black');types.splice(bi,1);}else{const pick=Math.floor(Math.random()*types.length);type=types.splice(pick,1)[0];}balls.push(ball(x,sy+(i-ri/2)*gap,type,id++));}}}
 function randomFreeSpot(existing,minX,maxX,minY,maxY){for(let tries=0;tries<300;tries++){const x=minX+Math.random()*(maxX-minX),y=minY+Math.random()*(maxY-minY);if(existing.every(b=>Math.hypot(b.x-x,b.y-y)>ballR*2.35))return{x,y};}return{x:minX+60,y:minY+60};}
 function rackNightmare(){balls=[];/* Keep the six-yellow blockade horizontally central. The deliberate escape gap is on the LEFT, so all three reds are generated on the RIGHT-hand side away from that exit. */const cx=L+PLAY_W*.50,cy=H/2;balls.push(ball(cx,cy,'white','cue'));let id=0;const ringAngles=[-120,-72,-24,24,72,120];for(const deg of ringAngles){const a=deg*Math.PI/180,r=ballR*3.15;balls.push(ball(cx+Math.cos(a)*r,cy+Math.sin(a)*r,'yellow',id++));}for(let i=0;i<3;i++){const q=randomFreeSpot(balls,L+PLAY_W*.62,R-ballR*3,T+ballR*3,B-ballR*3);balls.push(ball(q.x,q.y,'red',id++));}const q=randomFreeSpot(balls,L+PLAY_W*.18,L+PLAY_W*.82,T+ballR*3,B-ballR*3);balls.push(ball(q.x,q.y,'black',id++));}
-function startScenario(kind){if(gameApp)gameApp.hidden=false;clearTimeout(aiTimer);currentScenario=kind;gameMode='pirate';aiPlayer=2;currentPirateLevel=5;currentPirateName='Captain Blackball';playerNames={1:(testPlayerName?.value.trim()||'Player 1'),2:'Captain Blackball'};resetPotStreak();if(kind==='nightmare')rackNightmare();else rack28Balls();state=newState(kind==='nightmare'?2:1);if(kind==='nightmare'){state.breakShot=false;state.groups={1:'yellow',2:'red'};placementMode='none';msg.textContent="Blackball’s nightmare — Captain Blackball is on RED and must play from the fixed cue-ball position.";}else{placementMode='baulk';msg.textContent='Cannon fodder — 28 object balls racked in seven rows. Place the white in baulk for the opening break.';}moving=false;shot=null;draggingCue=false;pendingChoice=null;choice.hidden=true;shootBtn.disabled=placementMode!=='none';playersModal.hidden=true;updateHUD();setTimeout(announceTurn,40);setTimeout(maybeScheduleAI,500);}
+function startScenario(kind){if(gameApp)gameApp.hidden=false;clearTimeout(aiTimer);currentScenario=kind;gameMode='pirate';resetFrameCareerTracking();aiPlayer=2;currentPirateLevel=5;currentPirateName='Captain Blackball';playerNames={1:(testPlayerName?.value.trim()||'Player 1'),2:'Captain Blackball'};resetPotStreak();if(kind==='nightmare')rackNightmare();else rack28Balls();state=newState(kind==='nightmare'?2:1);if(kind==='nightmare'){state.breakShot=false;state.groups={1:'yellow',2:'red'};placementMode='none';msg.textContent="Blackball’s nightmare — Captain Blackball is on RED and must play from the fixed cue-ball position.";}else{placementMode='baulk';msg.textContent='Cannon fodder — 28 object balls racked in seven rows. Place the white in baulk for the opening break.';}moving=false;shot=null;draggingCue=false;pendingChoice=null;choice.hidden=true;shootBtn.disabled=placementMode!=='none';playersModal.hidden=true;updateHUD();setTimeout(announceTurn,40);setTimeout(maybeScheduleAI,500);}
 function startFiveFrameTest(){
   if(gameApp)gameApp.hidden=false;
   clearTimeout(aiTimer);clearTimeout(aiWatchdogTimer);aiTimer=aiWatchdogTimer=null;
@@ -188,7 +224,7 @@ function startFiveFrameTest(){
   newFrame(1);msg.textContent='5-frame AI testing run — Frame 1 of 5. Captain Blackball vs Darth Vaper.';
 }
 function restartCurrentGame(breaker=1){if(currentScenario==='fiveframe')return startFiveFrameTest();if(currentScenario)return startScenario(currentScenario);newFrame(breaker);}
-function newFrame(breaker=1){clearTimeout(aiTimer);rackBalls();potFadeVisuals=[];legalPotSparkles=[];resetPotStreak();dialogueReachedBlack={1:false,2:false};dialogueLastShot=-99;hidePirateDialogue();state=newState(breaker);moving=false;shot=null;placementMode='baulk';draggingCue=false;pendingChoice=null;choice.hidden=true;shootBtn.disabled=true;msg.textContent='Opening break — tap or drag anywhere in baulk to place the white, then confirm its position.';updateHUD();setTimeout(announceTurn,40);setTimeout(maybeScheduleAI,450);}
+function newFrame(breaker=1){clearTimeout(aiTimer);resetFrameCareerTracking();rackBalls();potFadeVisuals=[];legalPotSparkles=[];resetPotStreak();dialogueReachedBlack={1:false,2:false};dialogueLastShot=-99;hidePirateDialogue();state=newState(breaker);moving=false;shot=null;placementMode='baulk';draggingCue=false;pendingChoice=null;choice.hidden=true;shootBtn.disabled=true;msg.textContent='Opening break — tap or drag anywhere in baulk to place the white, then confirm its position.';updateHUD();setTimeout(announceTurn,40);setTimeout(maybeScheduleAI,450);}
 function cue(){return balls[0];}
 function opponent(p){return p===1?2:1;}
 function pname(p){return playerNames[p]||`Player ${p}`;}
@@ -213,7 +249,7 @@ function addHoldNudge(id,delta){const el=document.getElementById(id);addPressHol
 function nudgePower(delta){if(moving||state.frameOver||pendingChoice)return;powerEl.value=clamp(Number(powerEl.value)+delta,Number(powerEl.min),Number(powerEl.max));powerText.textContent=powerEl.value+'%';}
 function addHoldPower(id,delta){const el=document.getElementById(id);addPressHold(el,()=>nudgePower(delta),90);}
 addHoldPower('powerMinus45',-45);addHoldPower('powerMinus5',-5);addHoldPower('powerPlus5',5);addHoldPower('powerPlus45',45);
-function beginShot(){clearTimeout(aiWatchdogTimer);aiWatchdogTimer=null;if(moving||state.frameOver||pendingChoice||cue().potted||placementMode!=='none')return;const p=Number(powerEl.value)/100,speed=150+5800*Math.pow(p,1.35),c=cue();shot={number:++shotNumber,player:state.player,isBreak:state.breakShot,startOn:onType(state.player),firstContact:null,firstContactId:null,pots:[],cuePotted:false,cushionAfterContact:false,objectCushions:new Set(),breakCrossers:new Set(),aiPlan:pendingAIPlan};pendingAIPlan=null;placementMode='none';draggingCue=false;cueStrikeVisual={started:performance.now(),angle,x:c.x,y:c.y,player:state.player,vaper:(gameMode==='pirate'&&currentPirateLevel===7&&state.player===aiPlayer)};c.vx=Math.cos(angle)*speed;c.vy=Math.sin(angle)*speed;soundShot(p);moving=true;shootBtn.disabled=true;breakHelp.hidden=true;breakRules.hidden=true;msg.textContent='Balls in motion…';}
+function beginShot(){clearTimeout(aiWatchdogTimer);aiWatchdogTimer=null;if(moving||state.frameOver||pendingChoice||cue().potted||placementMode!=='none')return;noteCareerShot(state.player);const p=Number(powerEl.value)/100,speed=150+5800*Math.pow(p,1.35),c=cue();shot={number:++shotNumber,player:state.player,isBreak:state.breakShot,startOn:onType(state.player),firstContact:null,firstContactId:null,pots:[],cuePotted:false,cushionAfterContact:false,objectCushions:new Set(),breakCrossers:new Set(),aiPlan:pendingAIPlan};pendingAIPlan=null;placementMode='none';draggingCue=false;cueStrikeVisual={started:performance.now(),angle,x:c.x,y:c.y,player:state.player,style:cueStyleForShooter(state.player)};c.vx=Math.cos(angle)*speed;c.vy=Math.sin(angle)*speed;soundShot(p);moving=true;shootBtn.disabled=true;breakHelp.hidden=true;breakRules.hidden=true;msg.textContent='Balls in motion…';}
 shootBtn.addEventListener('click',()=>{hidePirateDialogue();beginShot();});
 function collide(a,b){let dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy,min=ballR*2;if(d2>=min*min||d2===0)return;let d=Math.sqrt(d2),nx=dx/d,ny=dy/d,over=min-d;a.x-=nx*over/2;a.y-=ny*over/2;b.x+=nx*over/2;b.y+=ny*over/2;if(shot&&!shot.firstContact){if(a.type==='white'&&b.type!=='white'&&!b.potted){shot.firstContact=b.type;shot.firstContactId=b.id;}else if(b.type==='white'&&a.type!=='white'&&!a.potted){shot.firstContact=a.type;shot.firstContactId=a.id;}}let rvx=b.vx-a.vx,rvy=b.vy-a.vy,sep=rvx*nx+rvy*ny;if(sep>=0)return;soundBall(Math.abs(sep));const j=-(1+.965)*sep/2,ix=j*nx,iy=j*ny;a.vx-=ix;a.vy-=iy;b.vx+=ix;b.vy+=iy;}
 function pocketBall(b,pocketIndex=null){soundPocketDrop();const potNow=performance.now();b.potted=true;b.potFadeStarted=potNow;b.vx=b.vy=0;potFadeVisuals.push({x:b.x,y:b.y,type:b.type,started:potNow});if(b.type!=='white'&&pocketIndex!=null){legalPotSparkles.push({pocketIndex,started:potNow,seed:Math.random()*Math.PI*2});}if(shot){shot.pots.push(b.type);shot.potEvents??=[];shot.potEvents.push({type:b.type,pocketIndex});if(b.type==='white')shot.cuePotted=true;}return true;}
@@ -255,24 +291,24 @@ function step(dt){const maxSpeed=Math.max(...balls.filter(b=>!b.potted).map(b=>M
 function allStopped(){return balls.every(b=>b.potted||Math.hypot(b.vx,b.vy)<.01)}
 function respotBlack(){const b=balls.find(x=>x.type==='black');if(!b||!b.potted)return;b.potted=false;b.potFadeStarted=null;b.vx=b.vy=0;const spotX=L+PLAY_W*.25,spotY=H/2;for(let dir of [-1,1])for(let dist=0;dist<PLAY_W*.6;dist+=ballR*2.05){const x=spotX+dir*dist,y=spotY;if(x>L+ballR&&x<R-ballR&&balls.filter(o=>o!==b&&!o.potted).every(o=>Math.hypot(o.x-x,o.y-y)>=ballR*2.01)){b.x=x;b.y=y;return;}}}
 function restoreCue(mode){const c=cue();c.potted=false;c.potFadeStarted=null;c.vx=c.vy=0;placementMode=mode;let x=mode==='baulk'?L+PLAY_W*.8:L+PLAY_W*.72,y=H/2;for(let tries=0;tries<40&&!validCuePosition(x,y);tries++)y=T+ballR+((tries+1)*(PLAY_H-2*ballR)/41);c.x=x;c.y=y;}
-function finishFrame(winner,text,resultText='Frame complete'){state.frameOver=true;state.winner=winner;moving=false;shootBtn.disabled=true;placementMode='none';let finalText=text;if(gameMode==='pirate'&&winner===1&&currentPirateLevel<5){const before=getUnlockedPirateLevel(),next=currentPirateLevel+1;if(next>before){setUnlockedPirateLevel(next);refreshPirateButtons();finalText+=` ${PIRATES[next].name} (Difficulty ${next}) unlocked!`;}}msg.textContent=finalText;lastShotEl.textContent=resultText;updateHUD();if(fiveFrameTestActive)pendingFiveFrameCelebration={winner,text:finalText};else showWinCelebration(winner,finalText);}
-function standardFoul(reason,ballInHand='anywhere'){if(shot&&shot.pots.length)soundFoulPot();else resetPotStreak();const incoming=opponent(state.player);state.player=incoming;state.breakShot=false;if(cue().potted)restoreCue(ballInHand==='baulk'?'baulk':'anywhere');else placementMode='anywhere';msg.textContent=`FOUL — ${reason}. ${pname(incoming)}: cue ball in hand ${ballInHand==='baulk'?'in baulk':'anywhere'}.`;lastShotEl.textContent=`FOUL: ${reason} • Opponent gets cue ball in hand ${ballInHand==='baulk'?'in baulk':'anywhere'}.`;}
+function finishFrame(winner,text,resultText='Frame complete'){recordCareerFrame(winner);state.frameOver=true;state.winner=winner;moving=false;shootBtn.disabled=true;placementMode='none';let finalText=text;if(gameMode==='pirate'&&winner===1&&currentPirateLevel<5){const before=getUnlockedPirateLevel(),next=currentPirateLevel+1;if(next>before){setUnlockedPirateLevel(next);refreshPirateButtons();finalText+=` ${PIRATES[next].name} (Difficulty ${next}) unlocked!`;}}msg.textContent=finalText;lastShotEl.textContent=resultText;updateHUD();if(fiveFrameTestActive)pendingFiveFrameCelebration={winner,text:finalText};else showWinCelebration(winner,finalText);}
+function standardFoul(reason,ballInHand='anywhere'){noteCareerFoul(state.player);if(shot&&shot.pots.length)soundFoulPot();else resetPotStreak();const incoming=opponent(state.player);state.player=incoming;state.breakShot=false;if(cue().potted)restoreCue(ballInHand==='baulk'?'baulk':'anywhere');else placementMode='anywhere';msg.textContent=`FOUL — ${reason}. ${pname(incoming)}: cue ball in hand ${ballInHand==='baulk'?'in baulk':'anywhere'}.`;lastShotEl.textContent=`FOUL: ${reason} • Opponent gets cue ball in hand ${ballInHand==='baulk'?'in baulk':'anywhere'}.`;}
 function showBreakChoice(){pendingChoice='break';choice.hidden=false;const chooser=opponent(state.breaker);choiceText.textContent=`Illegal break — 3 points are required. ${pname(chooser)} chooses who takes the re-rack break.`;choiceA.textContent='I will break';choiceB.textContent='Opponent breaks';shootBtn.disabled=true;choiceA.onclick=()=>resolveBreakChoice(chooser);choiceB.onclick=()=>resolveBreakChoice(state.breaker);if(aiPlayer===chooser||gameMode==='aivai'){choice.hidden=true;msg.textContent=`Illegal break — ${pname(chooser)} is choosing who breaks the re-rack…`;clearTimeout(aiTimer);aiTimer=setTimeout(()=>resolveBreakChoice(chooser),1100);}}
 function resolveBreakChoice(breaker){pendingChoice=null;choice.hidden=true;newFrame(breaker);msg.textContent=`Re-rack — ${pname(breaker)} to break.`;}
 function describeColourPots(pots){const reds=pots.filter(t=>t==='red').length,yellows=pots.filter(t=>t==='yellow').length,parts=[];if(reds)parts.push(`${reds} RED${reds===1?'':'S'}`);if(yellows)parts.push(`${yellows} YELLOW${yellows===1?'':'S'}`);return parts.length?parts.join(' + '):'no red/yellow balls';}
-function evaluateBreak(){const pottedObjects=balls.filter(b=>b.type!=='white'&&b.potted).map(b=>b.id),pointIds=new Set([...shot.breakCrossers,...pottedObjects]),points=pointIds.size,groupPots=shot.pots.filter(t=>t==='red'||t==='yellow'),potSummary=describeColourPots(groupPots);lastShotEl.textContent=`Break: ${points} point${points===1?'':'s'} • ${potSummary} potted${points<3?' • 3 points required for a legal break':''}`;if(points<3){if(shot.pots.length)soundFoulPot();else resetPotStreak();moving=false;showBreakChoice();return;}state.breakShot=false;if(shot.pots.includes('black'))respotBlack();if(shot.cuePotted){if(shot.pots.length)soundFoulPot();else resetPotStreak();state.player=opponent(state.player);restoreCue('baulk');msg.textContent=`Legal break (${points} points) — ${potSummary} potted; IN-OFF. ${pname(state.player)} has cue ball in hand in baulk. Table remains OPEN.`;}else if(groupPots.length>0){soundLegalPot(state.player,groupPots.length);msg.textContent=`Legal break (${points} points) — ${potSummary} potted. Table remains OPEN; ${pname(state.player)} continues.`;}else{resetPotStreak();state.player=opponent(state.player);msg.textContent=`Legal break (${points} points) — no red/yellow balls potted. ${pname(state.player)}'s turn. Table remains OPEN.`;}updateHUD();}
+function evaluateBreak(){const pottedObjects=balls.filter(b=>b.type!=='white'&&b.potted).map(b=>b.id),pointIds=new Set([...shot.breakCrossers,...pottedObjects]),points=pointIds.size,groupPots=shot.pots.filter(t=>t==='red'||t==='yellow'),potSummary=describeColourPots(groupPots);lastShotEl.textContent=`Break: ${points} point${points===1?'':'s'} • ${potSummary} potted${points<3?' • 3 points required for a legal break':''}`;if(points<3){noteCareerFoul(state.player);if(shot.pots.length)soundFoulPot();else resetPotStreak();moving=false;showBreakChoice();return;}state.breakShot=false;if(shot.pots.includes('black'))respotBlack();if(shot.cuePotted){noteCareerFoul(state.player);if(shot.pots.length)soundFoulPot();else resetPotStreak();state.player=opponent(state.player);restoreCue('baulk');msg.textContent=`Legal break (${points} points) — ${potSummary} potted; IN-OFF. ${pname(state.player)} has cue ball in hand in baulk. Table remains OPEN.`;}else if(groupPots.length>0){soundLegalPot(state.player,groupPots.length);noteCareerLegalPots(state.player,groupPots.length);msg.textContent=`Legal break (${points} points) — ${potSummary} potted. Table remains OPEN; ${pname(state.player)} continues.`;}else{resetPotStreak();state.player=opponent(state.player);msg.textContent=`Legal break (${points} points) — no red/yellow balls potted. ${pname(state.player)}'s turn. Table remains OPEN.`;}updateHUD();}
 function legalFirstContact(player,onAtStart=shot.startOn){const on=onAtStart;if(on==='open')return shot.firstContact==='red'||shot.firstContact==='yellow';return shot.firstContact===on;}
 function evaluateNormal(){const p=state.player,opp=opponent(p),on=shot.startOn,pots=shot.pots.filter(t=>t!=='white'),blackPotted=pots.includes('black');const ownBefore=state.groups[p]?remaining(state.groups[p])+shot.pots.filter(t=>t===state.groups[p]).length:null;
-  if(blackPotted){const cleared=state.groups[p]&&ownBefore===0;if(!cleared||shot.cuePotted||!legalFirstContact(p,on)){const left=state.groups[p]?ownBefore:0,reason=shot.cuePotted?'cue ball also potted':!legalFirstContact(p,on)?'illegal first contact':`${left} ${String(state.groups[p]||'colour').toUpperCase()}${left===1?'':'S'} remaining`;soundFoulPot();finishFrame(opp,`LOSS OF FRAME — ${pname(p)} potted the eight-ball illegally. ${pname(opp)} beat off ${pname(p)}!`,`LOSS — BLACK potted illegally • ${reason} • ${pname(opp)} wins`);return;}soundLegalPot(p,1);finishFrame(p,`${pname(p)} legally pots the eight-ball. ${pname(p)} beat off ${pname(opp)}!`,`WIN — BLACK potted legally • ${pname(p)} wins`);return;}
+  if(blackPotted){const cleared=state.groups[p]&&ownBefore===0;if(!cleared||shot.cuePotted||!legalFirstContact(p,on)){noteCareerFoul(p);const left=state.groups[p]?ownBefore:0,reason=shot.cuePotted?'cue ball also potted':!legalFirstContact(p,on)?'illegal first contact':`${left} ${String(state.groups[p]||'colour').toUpperCase()}${left===1?'':'S'} remaining`;soundFoulPot();finishFrame(opp,`LOSS OF FRAME — ${pname(p)} potted the eight-ball illegally. ${pname(opp)} beat off ${pname(p)}!`,`LOSS — BLACK potted illegally • ${reason} • ${pname(opp)} wins`);return;}pendingBlackOnBlackWin=(remaining('red')===0&&remaining('yellow')===0);soundLegalPot(p,1);noteCareerLegalPots(p,1);finishFrame(p,`${pname(p)} legally pots the eight-ball. ${pname(p)} beat off ${pname(opp)}!`,`WIN — BLACK potted legally • ${pname(p)} wins`);return;}
   const firstOK=legalFirstContact(p,on),actionAfter=shot.pots.length>0||shot.cushionAfterContact;
   if(shot.cuePotted){standardFoul('cue ball potted (in-off)');updateHUD();return;}
   if(!firstOK){standardFoul(on==='open'?'failed to contact a red or yellow first':`first contact was ${shot.firstContact||'no ball'}, not ${on}`);updateHUD();return;}
   if(!actionAfter){standardFoul('no ball was potted and no ball contacted a cushion after first contact');updateHUD();return;}
-  if(!state.groups[p]){const reds=pots.filter(t=>t==='red').length,yellows=pots.filter(t=>t==='yellow').length;if(reds||yellows){let g;if(reds&&yellows)g=shot.firstContact;else g=reds?'red':'yellow';state.groups[p]=g;state.groups[opp]=g==='red'?'yellow':'red';soundLegalPot(p,pots.filter(t=>t==='red'||t==='yellow').length);const combo=reds&&yellows;msg.textContent=combo?`Legal combination — RED and YELLOW potted. ${pname(p)} struck ${g.toUpperCase()} first, so ${pname(p)} is ${g.toUpperCase()} and continues.`:`Groups decided — ${pname(p)} is ${g.toUpperCase()}. Legal pot: continue.`;lastShotEl.textContent=combo?`LEGAL: both colours potted • ${g.toUpperCase()} struck first, so that group is assigned • continue`:`LEGAL POT: ${g.toUpperCase()} potted • group assigned to ${pname(p)} • continue`;updateHUD();return;}resetPotStreak();state.player=opp;msg.textContent=`Legal shot, no pot — ${pname(opp)}. Table remains OPEN.`;lastShotEl.textContent='LEGAL: correct first contact + cushion, but no pot • loss of turn • table stays open';updateHUD();return;}
-  const g=state.groups[p],onLabel=on==='black'?'black':g,ownPots=pots.filter(t=>t===g).length,oppPots=pots.filter(t=>t===state.groups[opp]).length;if(ownPots>0){soundLegalPot(p,ownPots);msg.textContent=`Legal pot — ${pname(p)} continues${oppPots?` (${oppPots} opponent ball also potted)`:''}.`;lastShotEl.textContent=oppPots?`LEGAL COMBINATION: ${ownPots} ${g.toUpperCase()} + ${oppPots} opponent ball${oppPots===1?'':'s'} potted • own/on ball was struck first • continue`:`LEGAL POT: ${ownPots} ${g.toUpperCase()} potted • continue`;}else{if(oppPots)soundFoulPot();else resetPotStreak();state.player=opp;msg.textContent=oppPots?`Opponent ball potted without an on-ball — loss of turn. ${pname(opp)}'s turn, ${state.groups[opp]} group.`:`No ${onLabel} potted — ${pname(opp)}'s turn, ${state.groups[opp]} group.`;lastShotEl.textContent=oppPots?`LOSS OF TURN: opponent ball potted but no ${onLabel.toUpperCase()} potted • ${pname(opp)}'s turn, ${state.groups[opp].toUpperCase()} group • cue ball stays where it lies`:`LOSS OF TURN: no ${onLabel.toUpperCase()} potted • ${pname(opp)}'s turn, ${state.groups[opp].toUpperCase()} group`;}updateHUD();}
+  if(!state.groups[p]){const reds=pots.filter(t=>t==='red').length,yellows=pots.filter(t=>t==='yellow').length;if(reds||yellows){let g;if(reds&&yellows)g=shot.firstContact;else g=reds?'red':'yellow';state.groups[p]=g;state.groups[opp]=g==='red'?'yellow':'red';soundLegalPot(p,pots.filter(t=>t==='red'||t==='yellow').length);noteCareerLegalPots(p,pots.filter(t=>t==='red'||t==='yellow').length);const combo=reds&&yellows;msg.textContent=combo?`Legal combination — RED and YELLOW potted. ${pname(p)} struck ${g.toUpperCase()} first, so ${pname(p)} is ${g.toUpperCase()} and continues.`:`Groups decided — ${pname(p)} is ${g.toUpperCase()}. Legal pot: continue.`;lastShotEl.textContent=combo?`LEGAL: both colours potted • ${g.toUpperCase()} struck first, so that group is assigned • continue`:`LEGAL POT: ${g.toUpperCase()} potted • group assigned to ${pname(p)} • continue`;updateHUD();return;}resetPotStreak();state.player=opp;msg.textContent=`Legal shot, no pot — ${pname(opp)}. Table remains OPEN.`;lastShotEl.textContent='LEGAL: correct first contact + cushion, but no pot • loss of turn • table stays open';updateHUD();return;}
+  const g=state.groups[p],onLabel=on==='black'?'black':g,ownPots=pots.filter(t=>t===g).length,oppPots=pots.filter(t=>t===state.groups[opp]).length;if(ownPots>0){soundLegalPot(p,ownPots);noteCareerLegalPots(p,ownPots);msg.textContent=`Legal pot — ${pname(p)} continues${oppPots?` (${oppPots} opponent ball also potted)`:''}.`;lastShotEl.textContent=oppPots?`LEGAL COMBINATION: ${ownPots} ${g.toUpperCase()} + ${oppPots} opponent ball${oppPots===1?'':'s'} potted • own/on ball was struck first • continue`:`LEGAL POT: ${ownPots} ${g.toUpperCase()} potted • continue`;}else{if(oppPots)soundFoulPot();else resetPotStreak();state.player=opp;msg.textContent=oppPots?`Opponent ball potted without an on-ball — loss of turn. ${pname(opp)}'s turn, ${state.groups[opp]} group.`:`No ${onLabel} potted — ${pname(opp)}'s turn, ${state.groups[opp]} group.`;lastShotEl.textContent=oppPots?`LOSS OF TURN: opponent ball potted but no ${onLabel.toUpperCase()} potted • ${pname(opp)}'s turn, ${state.groups[opp].toUpperCase()} group • cue ball stays where it lies`:`LOSS OF TURN: no ${onLabel.toUpperCase()} potted • ${pname(opp)}'s turn, ${state.groups[opp].toUpperCase()} group`;}updateHUD();}
 function renderPlayLog(){const el=document.getElementById('playLog');if(!el)return;el.textContent=playHistory.length?playHistory.join('\n\n'):'No shots recorded yet.';}
 function recordShotTrace(s){const first=s.firstContact?`${s.firstContact.toUpperCase()}${s.firstContactId!==null?` #${s.firstContactId}`:''}`:'NONE';const pots=s.pots.length?s.pots.map(x=>x.toUpperCase()).join(', '):'none';const result=lastShotEl.textContent||msg.textContent;let qa='';if(s.aiPlan){const matched=s.firstContactId===s.aiPlan.targetId;qa=`\nAI QA: planned ${String(s.aiPlan.targetType).toUpperCase()} #${s.aiPlan.targetId} • actual first contact ${first} • ${matched?'PLAN CONTACT MATCH':'⚠ PLAN CONTACT MISMATCH'}`;}playHistory.push(`#${s.number} | ${pname(s.player)} | ${s.isBreak?'BREAK':`on ${String(s.startOn).toUpperCase()}`}\nFirst contact: ${first} | Pots: ${pots} | Cushion after contact: ${s.cushionAfterContact?'yes':'no'}${qa}\nResult: ${result}\nTable after: red ${remaining('red')}, yellow ${remaining('yellow')}, black ${remaining('black')}`);renderPlayLog();}
-function endShot(){moving=false;shootBtn.disabled=false;const completed=shot;if(completed.isBreak)evaluateBreak();else evaluateNormal();contextualDialogue(completed);recordShotTrace(completed);shot=null;if(pendingFiveFrameCelebration){const done=pendingFiveFrameCelebration;pendingFiveFrameCelebration=null;showWinCelebration(done.winner,done.text);return;}if(!pendingChoice&&!state.frameOver){shootBtn.disabled=placementMode!=='none';updatePlacementUI();announceTurn();maybeScheduleAI();}}
+function endShot(){moving=false;shootBtn.disabled=false;const completed=shot;noteCareerObjectPots(completed.player,completed.pots);if(completed.isBreak)evaluateBreak();else evaluateNormal();contextualDialogue(completed);recordShotTrace(completed);shot=null;if(pendingFiveFrameCelebration){const done=pendingFiveFrameCelebration;pendingFiveFrameCelebration=null;showWinCelebration(done.winner,done.text);return;}if(!pendingChoice&&!state.frameOver){shootBtn.disabled=placementMode!=='none';updatePlacementUI();announceTurn();maybeScheduleAI();}}
 function rayBallHit(x,y,dx,dy,ignore){let best=Infinity,hitBall=null;for(const b of balls){if(b===ignore||b.potted||b.type==='white')continue;const ox=b.x-x,oy=b.y-y,t=ox*dx+oy*dy;if(t<=.01)continue;const perp2=ox*ox+oy*oy-t*t,rr=(ballR*2)**2;if(perp2<=rr){const hit=t-Math.sqrt(Math.max(0,rr-perp2));if(hit<best){best=hit;hitBall=b;}}}return{distance:best,ball:hitBall};}
 function rayCushionDistance(x,y,dx,dy){let vals=[];if(dx>1e-6)vals.push((R-ballR-x)/dx);if(dx<-1e-6)vals.push((L+ballR-x)/dx);if(dy>1e-6)vals.push((B-ballR-y)/dy);if(dy<-1e-6)vals.push((T+ballR-y)/dy);vals=vals.filter(v=>v>.01);return vals.length?Math.min(...vals):Infinity;}
 function guide(){if(moving||state.frameOver||pendingChoice||cue().potted)return;const c=cue(),dx=Math.cos(angle),dy=Math.sin(angle);let best=2000,target=null;for(const b of balls.slice(1)){if(b.potted)continue;const ox=b.x-c.x,oy=b.y-c.y,t=ox*dx+oy*dy;if(t<=0)continue;const perp2=ox*ox+oy*oy-t*t,rr=(ballR*2)**2;if(perp2<=rr){const hit=t-Math.sqrt(rr-perp2);if(hit<best){best=hit;target=b;}}}const tx=c.x+dx*best,ty=c.y+dy*best;ctx.save();ctx.setLineDash([13,12]);ctx.strokeStyle='#fff9';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(c.x,c.y);ctx.lineTo(tx,ty);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#fff8';ctx.beginPath();ctx.arc(tx,ty,6,0,Math.PI*2);ctx.fill();
@@ -395,13 +431,44 @@ function drawLegalPotSparkles(now=performance.now()){
     ctx.restore();
   }
 }
+function cueStyleForShooter(player=state?.player){
+  let level=null;
+  if(gameMode==='pirate'&&player===aiPlayer)level=currentPirateLevel;
+  else if(gameMode==='aivai')level=aiVsAiLevels[player];
+  if(level===7)return 'vaper';
+  if(level===5)return 'blackball';
+  if(level===4)return 'mick';
+  if(level===3)return 'holly';
+  if(level===2)return 'simon';
+  if(level===1)return 'dave';
+  if(player===1&&gameMode!=='aivai')return cueUnlocked(equippedCue)?equippedCue:'classic';
+  return 'classic';
+}
+function strokeCueLine(x1,y1,x2,y2,style){
+  ctx.lineCap='round';
+  if(style==='vaper'){
+    ctx.shadowColor='#ff2020';ctx.shadowBlur=24;ctx.strokeStyle='rgba(255,38,38,.35)';ctx.lineWidth=18;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    ctx.shadowBlur=14;ctx.strokeStyle='#ff2a2a';ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    ctx.shadowBlur=7;ctx.strokeStyle='#fff1e8';ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();return;
+  }
+  let stops;
+  if(style==='blackball')stops=[['0','#d8d2c7'],['.08','#2d2d30'],['.58','#111216'],['1','#030405']];
+  else if(style==='mick')stops=[['0','#efe0bc'],['.08','#c9a34c'],['.13','#12274c'],['.55','#071a38'],['.82','#c9a34c'],['.86','#071a38'],['.96','#c9a34c'],['1','#07152e']];
+  else if(style==='dave')stops=[['0','#ead9b5'],['.10','#9a693d'],['.55','#60391f'],['1','#342014']];
+  else if(style==='simon')stops=[['0','#efe0bc'],['.12','#cba56a'],['.38','#805126'],['.42','#3d78c5'],['.47','#805126'],['.72','#3d78c5'],['.77','#6b3f20'],['1','#3d2515']];
+  else if(style==='holly')stops=[['0','#eadfc5'],['.10','#6b397c'],['.36','#351b48'],['.42','#73a84c'],['.47','#351b48'],['.68','#73a84c'],['.73','#351b48'],['1','#1f102b']];
+  else stops=[['0','#efe0bc'],['.12','#cba56a'],['.7','#805126'],['1','#3d2515']];
+  const grad=ctx.createLinearGradient(x1,y1,x2,y2);for(const [at,c] of stops)grad.addColorStop(Number(at),c);
+  ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=5;ctx.strokeStyle=grad;ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.shadowBlur=0;ctx.strokeStyle=style==='blackball'?'#bdb8ad':'#f4ead0';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x1+(x2-x1)*.047, y1+(y2-y1)*.047);ctx.stroke();
+}
 function drawCueStick(now=performance.now()){
   if(!state||state.frameOver||cue().potted||placementMode!=='none'||pendingChoice)return;
-  let a=angle,visible=!moving,vaper=gameMode==='pirate'&&currentPirateLevel===7&&state.player===aiPlayer,travel=0,anchorX=cue().x,anchorY=cue().y,alpha=1;
+  let a=angle,visible=!moving,cueStyle=cueStyleForShooter(),travel=0,anchorX=cue().x,anchorY=cue().y,alpha=1;
   if(cueStrikeVisual){
     const age=now-cueStrikeVisual.started;
     if(age<420){
-      visible=true;a=cueStrikeVisual.angle;vaper=cueStrikeVisual.vaper;anchorX=cueStrikeVisual.x;anchorY=cueStrikeVisual.y;
+      visible=true;a=cueStrikeVisual.angle;cueStyle=cueStrikeVisual.style||'classic';anchorX=cueStrikeVisual.x;anchorY=cueStrikeVisual.y;
       // The cue is anchored to the strike point. It lunges into the white, then retreats/fades while the white travels independently.
       if(age<95)travel=38*(age/95);else{const q=(age-95)/325;travel=38-150*q;alpha=1-Math.max(0,(q-.42)/.58)*.88;}
     }else cueStrikeVisual=null;
@@ -411,15 +478,7 @@ function drawCueStick(now=performance.now()){
   const tipGap=ballR+10-travel,tipX=anchorX+backX*tipGap,tipY=anchorY+backY*tipGap;
   const length=360,buttX=tipX+backX*length,buttY=tipY+backY*length;
   ctx.save();ctx.globalAlpha=alpha;ctx.lineCap='round';
-  if(vaper){
-    ctx.shadowColor='#ff2020';ctx.shadowBlur=24;ctx.strokeStyle='rgba(255,38,38,.35)';ctx.lineWidth=18;ctx.beginPath();ctx.moveTo(tipX,tipY);ctx.lineTo(buttX,buttY);ctx.stroke();
-    ctx.shadowBlur=14;ctx.strokeStyle='#ff2a2a';ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(tipX,tipY);ctx.lineTo(buttX,buttY);ctx.stroke();
-    ctx.shadowBlur=7;ctx.strokeStyle='#fff1e8';ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(tipX,tipY);ctx.lineTo(buttX,buttY);ctx.stroke();
-  }else{
-    const grad=ctx.createLinearGradient(tipX,tipY,buttX,buttY);grad.addColorStop(0,'#efe0bc');grad.addColorStop(.12,'#cba56a');grad.addColorStop(.7,'#805126');grad.addColorStop(1,'#3d2515');
-    ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=5;ctx.strokeStyle=grad;ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(tipX,tipY);ctx.lineTo(buttX,buttY);ctx.stroke();
-    ctx.shadowBlur=0;ctx.strokeStyle='#f4ead0';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(tipX,tipY);ctx.lineTo(tipX+backX*17,tipY+backY*17);ctx.stroke();
-  }
+  strokeCueLine(tipX,tipY,buttX,buttY,cueStyle);
   ctx.restore();
 }
 function drawBallPolish(b){
@@ -1396,6 +1455,23 @@ function refreshAudioSettings(){if(masterVolume)masterVolume.value=Math.round(ma
 if(soundToggle)soundToggle.onclick=()=>{masterMuted=!masterMuted;refreshAudioSettings();saveAudioSettings();};
 if(settingsButton)settingsButton.onclick=()=>{refreshAudioSettings();settingsModal.hidden=false;};
 if(closeSettings)closeSettings.onclick=()=>{settingsModal.hidden=true;};
+/* V0.11.0 hidden DEV shortcut: while the title-screen Settings panel is open,
+   pressing K jumps straight into the existing developer panel. Deliberately
+   undiscoverable in the normal UI. */
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey||e.repeat)return;
+  if((e.key||'').toLowerCase()!=='k')return;
+  const titleSettingsOpen=settingsModal && !settingsModal.hidden && titleScreen && !titleScreen.hidden;
+  if(!titleSettingsOpen)return;
+  const tag=(e.target?.tagName||'').toLowerCase();
+  if(tag==='input'||tag==='textarea'||tag==='select')return;
+  e.preventDefault();
+  settingsModal.hidden=true;
+  titleScreen.hidden=true;
+  if(gameApp)gameApp.hidden=false;
+  const devDetails=document.querySelector('details');
+  if(devDetails){devDetails.open=true;requestAnimationFrame(()=>devDetails.scrollIntoView({behavior:'smooth',block:'start'}));}
+});
 if(settingsModal)settingsModal.addEventListener('click',e=>{if(e.target===settingsModal)settingsModal.hidden=true;});
 if(masterVolume)masterVolume.oninput=()=>{masterLevel=Number(masterVolume.value)/100;refreshAudioSettings();saveAudioSettings();};
 if(masterMute)masterMute.onclick=()=>{masterMuted=!masterMuted;refreshAudioSettings();saveAudioSettings();};
@@ -1505,20 +1581,27 @@ if(titlePlay)titlePlay.onclick=()=>{audioReady();showWhoIsPlaying();};
 if(backToTitle)backToTitle.onclick=showTitleScreen;
 if(titleSettings)titleSettings.onclick=()=>{audioReady();refreshAudioSettings();settingsModal.hidden=false;};
 function refreshCosmeticsUI(){
+  validateEquippedCue();
   document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>b.classList.toggle('equipped',b.dataset.theme===equippedTableTheme));
-  document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>b.classList.toggle('equipped',b.dataset.cue===equippedCue));
+  document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>{const id=b.dataset.cue,unlocked=cueUnlocked(id);b.classList.toggle('equipped',id===equippedCue);b.classList.toggle('locked',!unlocked);b.disabled=!unlocked;const state=b.querySelector('.cosmetic-state');if(state)state.textContent=id===equippedCue?'EQUIPPED':(unlocked?'AVAILABLE':`LOCKED • Defeat ${b.dataset.owner||'this pirate'}`);});
 }
 document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>b.addEventListener('click',()=>{equippedTableTheme=b.dataset.theme;try{localStorage.setItem('seamenTableTheme',equippedTableTheme)}catch(e){}refreshCosmeticsUI();}));
-document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>b.addEventListener('click',()=>{equippedCue=b.dataset.cue;try{localStorage.setItem('seamenCue',equippedCue)}catch(e){}refreshCosmeticsUI();}));
+document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>b.addEventListener('click',()=>{if(!cueUnlocked(b.dataset.cue))return;equippedCue=b.dataset.cue;try{localStorage.setItem('seamenCue',equippedCue)}catch(e){}refreshCosmeticsUI();}));
 if(titleCosmetics)titleCosmetics.onclick=()=>{if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;cosmeticsScreen.hidden=false;refreshCosmeticsUI();};
+document.querySelectorAll('[data-cosmetic-tab]').forEach(tab=>tab.addEventListener('click',()=>{const key=tab.dataset.cosmeticTab;document.querySelectorAll('[data-cosmetic-tab]').forEach(t=>t.classList.toggle('active',t===tab));document.querySelectorAll('[data-cosmetic-panel]').forEach(p=>{const on=p.dataset.cosmeticPanel===key;p.classList.toggle('active',on);p.hidden=!on;});}));
 if(cosmeticsBack)cosmeticsBack.onclick=()=>{cosmeticsScreen.hidden=true;titleScreen.hidden=false;};
 refreshCosmeticsUI();
-if(titleTrophies)titleTrophies.onclick=()=>{if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;trophiesScreen.hidden=false;};if(trophiesBack)trophiesBack.onclick=()=>{trophiesScreen.hidden=true;titleScreen.hidden=false;};
-if(titleAbout)titleAbout.onclick=()=>{startCreditsMusic();renderAbout();if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;aboutScreen.hidden=false;};
+if(titleTrophies)titleTrophies.onclick=()=>{renderCareer();if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;trophiesScreen.hidden=false;};if(trophiesBack)trophiesBack.onclick=()=>{trophiesScreen.hidden=true;titleScreen.hidden=false;};
+if(titleAbout)titleAbout.onclick=()=>{if(!career.creditsRead){const trophiesBefore=trophyUnlockSet();career.creditsRead=true;saveCareer(trophiesBefore);}startCreditsMusic();renderAbout();if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;aboutScreen.hidden=false;};
 if(aboutBack)aboutBack.onclick=()=>{aboutScreen.hidden=true;titleScreen.hidden=false;};
 function refreshTitleSound(){if(!titleSoundToggle)return;titleSoundToggle.textContent=masterMuted?'🔇':(masterLevel<=0?'🔈':'🔊');titleSoundToggle.setAttribute('aria-label',masterMuted?'Unmute all sound':'Mute all sound');titleSoundToggle.title=masterMuted?'Unmute all sound':'Mute all sound';}
 if(titleSoundToggle)titleSoundToggle.onclick=()=>{masterMuted=!masterMuted;refreshAudioSettings();refreshTitleSound();saveAudioSettings();};
 const _refreshAudioSettings=refreshAudioSettings;refreshAudioSettings=function(){_refreshAudioSettings();refreshTitleSound();};
+document.querySelectorAll('[data-career-tab]').forEach(tab=>tab.addEventListener('click',()=>{const key=tab.dataset.careerTab;document.querySelectorAll('[data-career-tab]').forEach(t=>t.classList.toggle('active',t===tab));const sp=document.getElementById('careerStatsPanel'),tp=document.getElementById('careerTrophiesPanel');if(sp)sp.hidden=key!=='stats';if(tp)tp.hidden=key!=='trophies';renderCareer();}));
+const devReturnTitle=document.getElementById('devReturnTitle');if(devReturnTitle)devReturnTitle.onclick=()=>{clearTimeout(aiTimer);clearTimeout(aiWatchdogTimer);moving=false;shot=null;pendingChoice=null;choice.hidden=true;winModal.hidden=true;startMenuMusic();showTitleScreen();};
+const devResetProgress=document.getElementById('devResetProgress');if(devResetProgress)devResetProgress.onclick=()=>{if(!confirm('Reset ALL saved progression and lifetime statistics? This cannot be undone.'))return;career=defaultCareer();try{localStorage.removeItem(CAREER_KEY);localStorage.setItem('seamenPirateUnlocked','1');}catch(e){}devPiratesUnlocked=false;saveCareer();refreshPirateButtons();msg.textContent='DEV: progression and statistics reset.';};
+const devTestTrophyToast=document.getElementById('devTestTrophyToast');if(devTestTrophyToast)devTestTrophyToast.onclick=()=>{trophyToastQueue.push(['dev_test','Testing the Waters','This pirate is debugging.']);runTrophyToastQueue();};
+renderCareer();
 renderAbout();refreshTitleSound();showTitleScreen();
 
 /* V0.9.0 intentional boot gate. Browsers commonly block audible autoplay until
@@ -1548,3 +1631,52 @@ if(enterTavern){
 }
 if(titleScreen)titleScreen.hidden=true;
 if(bootSplash)bootSplash.hidden=false;
+
+/* V0.11.0 DEV Custom Game -------------------------------------------------
+   A deliberately flexible test table. It keeps the current match/opponent
+   identity, skips the break, and can optionally use the real career/trophy
+   pipeline so achievement triggers can be QA-tested quickly. */
+let customGameActive=false,customGameCountsStats=false;
+const customGameModal=document.getElementById('customGameModal');
+const customReds=document.getElementById('customReds'),customYellows=document.getElementById('customYellows');
+const customCountStats=document.getElementById('customCountStats');
+const startCustomGameBtn=document.getElementById('startCustomGame'),cancelCustomGameBtn=document.getElementById('cancelCustomGame'),devCustomGameBtn=document.getElementById('devCustomGame');
+function setCustomStatsSwitch(on){customGameCountsStats=!!on;if(customCountStats){customCountStats.setAttribute('aria-checked',String(customGameCountsStats));customCountStats.classList.toggle('is-on',customGameCountsStats);}}
+if(customCountStats)customCountStats.onclick=()=>setCustomStatsSwitch(!customGameCountsStats);
+if(devCustomGameBtn)devCustomGameBtn.onclick=()=>{if(moving)return;setCustomStatsSwitch(false);customGameModal.hidden=false;};
+if(cancelCustomGameBtn)cancelCustomGameBtn.onclick=()=>{customGameModal.hidden=true;};
+function customSpot(existing){
+  // Keep a generous cushion/pocket margin and use the existing collision-safe helper.
+  return randomFreeSpot(existing,L+ballR*4,R-ballR*4,T+ballR*4,B-ballR*4);
+}
+function rackCustomGame(redCount,yellowCount){
+  balls=[];
+  // Cue retains the familiar starting location; black is fixed on the normal black spot.
+  balls.push(ball(L+PLAY_W*.8,H/2,'white','cue'));
+  const blackX=L+PLAY_W*.25;
+  let id=0;
+  balls.push(ball(blackX,H/2,'black',id++));
+  for(const [type,count] of [['red',redCount],['yellow',yellowCount]]){
+    for(let i=0;i<count;i++){
+      const q=customSpot(balls);balls.push(ball(q.x,q.y,type,id++));
+    }
+  }
+}
+function startCustomGame(){
+  const reds=clamp(parseInt(customReds?.value||'0',10)||0,0,7),yellows=clamp(parseInt(customYellows?.value||'0',10)||0,0,7);
+  clearTimeout(aiTimer);clearTimeout(aiWatchdogTimer);aiTimer=aiWatchdogTimer=null;
+  customGameActive=true;
+  // Reset the frame counters manually: the ordinary helper intentionally excludes DEV scenarios.
+  frameObjectPots={1:0,2:0};frameRecorded=false;pendingBlackOnBlackWin=false;frameStatsEligible=customGameCountsStats&&(gameMode==='pirate'||gameMode==='local');
+  rackCustomGame(reds,yellows);potFadeVisuals=[];legalPotSparkles=[];resetPotStreak();dialogueReachedBlack={1:false,2:false};dialogueLastShot=-99;hidePirateDialogue();
+  state=newState(1);state.breakShot=false;state.groups={1:null,2:null};moving=false;shot=null;placementMode='none';draggingCue=false;pendingChoice=null;choice.hidden=true;shootBtn.disabled=false;
+  customGameModal.hidden=true;
+  msg.textContent=`DEV CUSTOM GAME — ${reds} RED${reds===1?'':'S'} / ${yellows} YELLOW${yellows===1?'':'S'} • statistics ${customGameCountsStats?'ON':'OFF'}.`;
+  playHistory.push(`=== DEV CUSTOM GAME • ${reds} RED${reds===1?'':'S'} / ${yellows} YELLOW${yellows===1?'':'S'} • STATISTICS ${customGameCountsStats?'ON':'OFF'} ===`);renderPlayLog();
+  updateHUD();setTimeout(announceTurn,40);setTimeout(maybeScheduleAI,450);
+}
+if(startCustomGameBtn)startCustomGameBtn.onclick=startCustomGame;
+
+// Wrap normal frame starts so a later New Frame / Rematch cleanly leaves custom mode.
+const _newFrameNormal=newFrame;
+newFrame=function(breaker=1){customGameActive=false;customGameCountsStats=false;return _newFrameNormal(breaker);};
