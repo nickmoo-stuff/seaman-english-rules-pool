@@ -850,3 +850,56 @@ html.seamen-phone-landscape main#gameApp:not([hidden]) .landscape-mobile-notice{
   main#gameApp:not([hidden])>.mobile-scroll-zone{scrollbar-color:#b88a45 #241a12;scrollbar-width:auto}
   main#gameApp:not([hidden])>.mobile-scroll-zone>.status{margin-top:8px}
 }
+
+/* V0.13.0 universal match split-pane layout.
+   Keep the SEAMEN header and complete table at the top on desktop and mobile.
+   Everything from Playing now/status downward scrolls independently. */
+@media (min-width:951px){
+  body:has(main#gameApp:not([hidden])){
+    height:100vh;
+    height:100dvh;
+    overflow:hidden;
+  }
+  main#gameApp:not([hidden]){
+    height:100vh;
+    height:100dvh;
+    max-height:100dvh;
+    overflow:hidden !important;
+    display:flex;
+    flex-direction:column;
+    padding-bottom:0;
+  }
+  main#gameApp:not([hidden])>header{
+    position:relative !important;
+    top:auto !important;
+    flex:0 0 auto;
+    z-index:20;
+    width:100%;
+  }
+  main#gameApp:not([hidden])>.table-wrap{
+    position:relative !important;
+    top:auto !important;
+    flex:0 0 auto;
+    z-index:10;
+    width:100%;
+    margin-top:4px;
+  }
+  main#gameApp:not([hidden])>.mobile-scroll-zone{
+    display:block;
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:scroll;
+    overflow-x:hidden;
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+    padding:0 0 20px;
+    position:relative;
+    z-index:1;
+    scrollbar-color:#b88a45 #241a12;
+    scrollbar-width:auto;
+  }
+  main#gameApp:not([hidden])>.mobile-scroll-zone::-webkit-scrollbar{width:14px}
+  main#gameApp:not([hidden])>.mobile-scroll-zone::-webkit-scrollbar-track{background:#241a12;border-left:1px solid #59432c}
+  main#gameApp:not([hidden])>.mobile-scroll-zone::-webkit-scrollbar-thumb{background:linear-gradient(#d1a65c,#7f5729);border:3px solid #241a12;border-radius:10px}
+  main#gameApp:not([hidden])>.mobile-scroll-zone>.status{margin-top:8px}
+}
