@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'><title>Seamen English Rules Pool V0.13.0</title><meta name='theme-color' content='#24140c'><meta name='apple-mobile-web-app-capable' content='yes'><meta name='apple-mobile-web-app-status-bar-style' content='black-translucent'><meta name='apple-mobile-web-app-title' content='Seamen Pool'><link rel='apple-touch-icon' href='icon-192.png'><link rel='manifest' href='manifest.webmanifest'><link rel='stylesheet' href='style.css'></head><body><section id='bootSplash' class='boot-splash' aria-labelledby='bootGameName'>
+<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'><title>Seamen English Rules Pool V0.13.0</title><meta name='theme-color' content='#24140c'><link rel='manifest' href='manifest.webmanifest'><link rel='apple-touch-icon' href='icon-192.png'><link rel='stylesheet' href='style.css'></head><body><section id='bootSplash' class='boot-splash' aria-labelledby='bootGameName'>
   <div class='boot-splash-inner'>
     <div class='boot-emblem' aria-hidden='true'>⚓</div>
     <h1 id='bootGameName'>SEAMEN</h1>
@@ -39,11 +39,16 @@
   window.addEventListener('load', syncFrozenGameHeaderHeight, {once:true});
 })();
 </script><script src='dialogue.js'></script><script src='about.js'></script><script src='game.js'></script><script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('./sw.js').catch(function (err) {
-      console.warn('Service worker registration failed:', err);
-    });
-  });
-}
+(function(){
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      return Promise.all(regs.map(function(r){ return r.unregister(); }));
+    }).catch(function(){});
+  }
+  if ('caches' in window) {
+    caches.keys().then(function(keys){
+      return Promise.all(keys.filter(function(k){ return /^seamen-/i.test(k); }).map(function(k){ return caches.delete(k); }));
+    }).catch(function(){});
+  }
+})();
 </script></body></html>
