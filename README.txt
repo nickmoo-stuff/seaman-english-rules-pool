@@ -177,3 +177,5 @@ V0.9.0 title-menu addition: new initial title screen, disabled future multiplaye
 
 
 V0.9.0 soundtrack: 128 kbps AAC-LC (.m4a). Anthem on fresh boot, random non-repeating match music per frame, Ale in the Hold after returning to menu, credits music from About / credits. Outro asset reserved for future use.
+
+V0.13.3: completes About / credits content, removes the obsolete prototype Return to menu modal now superseded by the real title-menu return flow, and preserves intentional developer-panel wording including 'Toggle guide Ian angle'. No gameplay, rules, AI, physics, layout or soundtrack logic changes.
