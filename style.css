@@ -924,3 +924,12 @@ html.seamen-phone-landscape main#gameApp:not([hidden]) .landscape-mobile-notice{
 
 /* v0.14.0b: developer-only modes must never appear in the normal Play menu. */
 .dev-mode-entry[hidden]{display:none!important}
+
+
+/* V0.14.1 — integrated progression / reward presentation */
+.progression-rewards{margin:14px 0 2px;padding:12px;border:1px solid #9b7a3d;border-radius:10px;background:rgba(23,16,12,.94);text-align:left;box-shadow:inset 0 0 20px rgba(232,196,119,.05)}
+.progression-rewards h3{margin:0 0 9px;color:#f0cf82;font:900 1rem Georgia,serif;text-align:center;letter-spacing:.03em}
+.progression-rewards>div{display:flex;gap:10px;align-items:center;padding:7px 0;border-top:1px solid rgba(232,196,119,.14)}
+.progression-rewards>div:first-of-type{border-top:0}.progression-rewards>div>span{width:30px;text-align:center;font-size:1.25rem}.progression-rewards p{margin:0;min-width:0}.progression-rewards small,.progression-rewards b{display:block}.progression-rewards small{color:#bca98c;font-size:.68rem;letter-spacing:.08em}.progression-rewards b{color:#f5ead5;margin-top:2px}
+.progression-reward-card{width:min(92vw,520px);text-align:center}.progression-reward-card>small{color:#e8c477;letter-spacing:.12em;font-weight:900}.progression-rewards.standalone{margin:14px 0}
+.pirate-progress-item span{display:block;margin-top:5px;color:#bca98c;font-size:.72rem;line-height:1.25}.pirate-progress-item.defeated span{color:#cdbb9f}

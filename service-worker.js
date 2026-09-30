@@ -1,4 +1,4 @@
-const CACHE_NAME = 'seamen-pwa-v0140b';
+const CACHE_NAME = 'seamen-pwa-v0141';
 const CORE_ASSETS = [
   './',
   './index.html',
