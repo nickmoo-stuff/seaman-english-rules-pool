@@ -1,4 +1,4 @@
-SEAMEN ENGLISH RULES POOL — V0.14.1b
+SEAMEN ENGLISH RULES POOL — V0.14.1c
 ====================================
 
 A pirate-themed, portrait-first browser pool game built around English Pool Association international eightball rules. Designed for desktop and mobile browsers and installable as a Progressive Web App (PWA).
@@ -45,17 +45,17 @@ Developer test scenarios and AI-vs-AI simulation remain available through the De
 
 Some additional QA keyboard shortcuts remain in the source/build for testing.
 
-V0.14.1b MILESTONE
+V0.14.1c MILESTONE
 -----------------
-V0.14.1b is a release-polish milestone promoted from the passing V0.13.5 baseline. It does not retune pool physics, EPA rules, AI behaviour, soundtrack logic, progression, cosmetics or the Captain Blackball sequence.
+V0.14.1c is a release-polish milestone promoted from the passing V0.13.5 baseline. It does not retune pool physics, EPA rules, AI behaviour, soundtrack logic, progression, cosmetics or the Captain Blackball sequence.
 
 Changes in this milestone:
 • Replaced the historical prototype README with current game documentation.
 • Removed Test scenarios and AI vs AI from the ordinary player-facing Play menu.
 • Retained both QA modes through the Developer test panel.
-• Advanced visible version and PWA cache generation to V0.14.1b.
+• Advanced visible version and PWA cache generation to V0.14.1c.
 
-FUTURE / DELIBERATELY NOT PART OF V0.14.1b
+FUTURE / DELIBERATELY NOT PART OF V0.14.1c
 ------------------------------------------
 • Online multiplayer.
 • Supporter/reward functionality.
@@ -66,7 +66,7 @@ ABOUT / CREDITS
 See About / credits inside the game for the current creator, testing, tools and soundtrack credits and music links.
 
 
-V0.14.1b — PROGRESSION & REWARD INTEGRATION
+V0.14.1c — PROGRESSION & REWARD INTEGRATION
 • First-time pirate victories now present the trophy, cue cosmetic and next-opponent unlock together on the result screen.
 • Captain Blackball's first victory presents his cue, private table and campaign-completion milestone after the ending scene.
 • Career > Pirates defeated now shows each pirate's reward and progression relationship.

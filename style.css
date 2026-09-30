@@ -934,7 +934,7 @@ html.seamen-phone-landscape main#gameApp:not([hidden]) .landscape-mobile-notice{
 .progression-reward-card{width:min(92vw,520px);text-align:center}.progression-reward-card>small{color:#e8c477;letter-spacing:.12em;font-weight:900}.progression-rewards.standalone{margin:14px 0}
 .pirate-progress-item span{display:block;margin-top:5px;color:#bca98c;font-size:.72rem;line-height:1.25}.pirate-progress-item.defeated span{color:#cdbb9f}
 
-/* V0.14.1b — end-of-frame result modal must always sit above the frozen table.
+/* V0.14.1c — end-of-frame result modal must always sit above the frozen table.
    The split-pane match layout creates its own stacking layers, so promote the
    result/log overlays explicitly without moving or altering the table. */
 #winModal.rules-modal,
@@ -954,3 +954,7 @@ html.seamen-phone-landscape main#gameApp:not([hidden]) .landscape-mobile-notice{
   margin-top:0 !important;
   max-height:calc(100dvh - 28px) !important;
 }
+
+/* V0.14.1c: win/log modals are portalled to body by game.js, escaping the split-pane stacking context. */
+body>#winModal.rules-modal,body>#gameLogModal.rules-modal{z-index:15000!important}
+body>#winModal.rules-modal>.rules-modal-card,body>#gameLogModal.rules-modal>.rules-modal-card{z-index:2!important}
