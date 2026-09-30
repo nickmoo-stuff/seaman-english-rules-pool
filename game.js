@@ -1577,25 +1577,14 @@ function retryPendingMusic(){
 function startBootAnthem(){playMusic('anthem',MUSIC.anthem,{crossfade:false});}
 function startMenuMusic(){playMusic('menu',MUSIC.menu);}
 function startCreditsMusic(){playMusic('credits',MUSIC.credits);}
-// V0.10.0: shuffled match-music bag. Every match track is heard once in a
-// random order before the bag is refilled, while also preventing an immediate
-// repeat across bag boundaries. This avoids random clustering around the same
-// one or two tracks during a long play session.
-let matchMusicBag=[];
-function refillMatchMusicBag(){
-  matchMusicBag=MUSIC.matches.map((_,i)=>i);
-  for(let i=matchMusicBag.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [matchMusicBag[i],matchMusicBag[j]]=[matchMusicBag[j],matchMusicBag[i]];
-  }
-  if(matchMusicBag.length>1&&matchMusicBag[0]===lastMatchMusic){
-    const j=1+Math.floor(Math.random()*(matchMusicBag.length-1));
-    [matchMusicBag[0],matchMusicBag[j]]=[matchMusicBag[j],matchMusicBag[0]];
-  }
-}
+// V0.13.2: match music chooses randomly whenever a track ends, while
+// preventing the track that just played from being selected immediately again.
+// A track becomes eligible again after any different match track has played.
 function startMatchMusic(){
-  if(!matchMusicBag.length)refillMatchMusicBag();
-  const pick=matchMusicBag.shift();
+  let pick=0;
+  if(MUSIC.matches.length>1){
+    do{pick=Math.floor(Math.random()*MUSIC.matches.length);}while(pick===lastMatchMusic);
+  }
   lastMatchMusic=pick;
   playMusic(`match${pick+1}`,MUSIC.matches[pick]);
 }
