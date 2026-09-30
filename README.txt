@@ -1,4 +1,4 @@
-SEAMEN ENGLISH RULES POOL — V0.14.0
+SEAMEN ENGLISH RULES POOL — V0.14.0b
 ====================================
 
 A pirate-themed, portrait-first browser pool game built around English Pool Association international eightball rules. Designed for desktop and mobile browsers and installable as a Progressive Web App (PWA).
@@ -45,17 +45,17 @@ Developer test scenarios and AI-vs-AI simulation remain available through the De
 
 Some additional QA keyboard shortcuts remain in the source/build for testing.
 
-V0.14.0 MILESTONE
+V0.14.0b MILESTONE
 -----------------
-V0.14.0 is a release-polish milestone promoted from the passing V0.13.5 baseline. It does not retune pool physics, EPA rules, AI behaviour, soundtrack logic, progression, cosmetics or the Captain Blackball sequence.
+V0.14.0b is a release-polish milestone promoted from the passing V0.13.5 baseline. It does not retune pool physics, EPA rules, AI behaviour, soundtrack logic, progression, cosmetics or the Captain Blackball sequence.
 
 Changes in this milestone:
 • Replaced the historical prototype README with current game documentation.
 • Removed Test scenarios and AI vs AI from the ordinary player-facing Play menu.
 • Retained both QA modes through the Developer test panel.
-• Advanced visible version and PWA cache generation to V0.14.0.
+• Advanced visible version and PWA cache generation to V0.14.0b.
 
-FUTURE / DELIBERATELY NOT PART OF V0.14.0
+FUTURE / DELIBERATELY NOT PART OF V0.14.0b
 ------------------------------------------
 • Online multiplayer.
 • Supporter/reward functionality.

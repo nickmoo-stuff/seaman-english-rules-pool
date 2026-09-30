@@ -1655,7 +1655,7 @@ if(titleSoundToggle)titleSoundToggle.onclick=()=>{masterMuted=!masterMuted;refre
 const _refreshAudioSettings=refreshAudioSettings;refreshAudioSettings=function(){_refreshAudioSettings();refreshTitleSound();};
 document.querySelectorAll('[data-career-tab]').forEach(tab=>tab.addEventListener('click',()=>{const key=tab.dataset.careerTab;document.querySelectorAll('[data-career-tab]').forEach(t=>t.classList.toggle('active',t===tab));const sp=document.getElementById('careerStatsPanel'),tp=document.getElementById('careerTrophiesPanel');if(sp)sp.hidden=key!=='stats';if(tp)tp.hidden=key!=='trophies';renderCareer();}));
 const devReturnTitle=document.getElementById('devReturnTitle');if(devReturnTitle)devReturnTitle.onclick=()=>{clearTimeout(aiTimer);clearTimeout(aiWatchdogTimer);moving=false;shot=null;pendingChoice=null;choice.hidden=true;winModal.hidden=true;startMenuMusic();showTitleScreen();};
-/* V0.14.0: QA-only modes live behind the developer panel rather than the player-facing Play menu. */
+/* V0.14.0b: QA-only modes live behind the developer panel rather than the player-facing Play menu. */
 const devTestScenarios=document.getElementById('devTestScenarios');
 if(devTestScenarios)devTestScenarios.onclick=()=>{audioReady();currentScenario=null;if(titleScreen)titleScreen.hidden=true;if(gameApp)gameApp.hidden=false;playersModal.hidden=false;modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=true;if(aiVsAiMenu)aiVsAiMenu.hidden=true;if(testScenarioMenu){testScenarioMenu.hidden=false;nightmareScenario.disabled=!devScenariosUnlocked;cannonScenario.disabled=!devScenariosUnlocked;if(fiveFrameScenario)fiveFrameScenario.disabled=!devScenariosUnlocked;}testPlayerName?.focus();};
 const devAiVsAi=document.getElementById('devAiVsAi');
