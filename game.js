@@ -46,7 +46,7 @@ function setUnlockedPirateLevel(level){try{localStorage.setItem('seamenPirateUnl
 /* V0.12.0: versioned, extensible local career record. This is deliberately separate
    from settings and premium entitlement so future save migrations can preserve both. */
 const CAREER_KEY='seamenCareer',CAREER_SCHEMA=1;
-function defaultCareer(){return{schema:CAREER_SCHEMA,framesPlayed:0,framesWon:0,framesLost:0,shotsTaken:0,legalBallsPotted:0,foulsCommitted:0,bestPotStreak:0,sevenBallWins:0,blackOnBlackWins:0,creditsRead:false,lifetimePremium:false,piratesDefeated:{}};}
+function defaultCareer(){return{schema:CAREER_SCHEMA,framesPlayed:0,framesWon:0,framesLost:0,shotsTaken:0,legalBallsPotted:0,foulsCommitted:0,bestPotStreak:0,sevenBallWins:0,blackOnBlackWins:0,creditsRead:false,lifetimePremium:false,blackballIntroSeen:false,blackballEndingSeen:false,piratesDefeated:{}};}
 function loadCareer(){let c=defaultCareer();try{const raw=JSON.parse(localStorage.getItem(CAREER_KEY)||'null');if(raw&&typeof raw==='object')c={...c,...raw,piratesDefeated:{...c.piratesDefeated,...(raw.piratesDefeated||{})},schema:CAREER_SCHEMA};}catch(e){}return c;}
 let career=loadCareer(),frameObjectPots={1:0,2:0},frameStatsEligible=false,frameRecorded=false,pendingBlackOnBlackWin=false;
 const PIRATE_CUE_REWARDS={1:'dave',2:'simon',3:'holly',4:'mick',5:'blackball',7:'vaper'};
@@ -75,8 +75,9 @@ trophyKnownUnlocked=trophyUnlockSet(career);
 function renderCareer(){
  const grid=document.getElementById('careerStatsGrid');if(grid){const pct=career.framesPlayed?Math.round(career.framesWon/career.framesPlayed*100):0;const defeatedLevels=Object.keys(career.piratesDefeated).filter(k=>career.piratesDefeated[k]).map(Number).filter(n=>n>=1&&n<=5),highest=defeatedLevels.length?PIRATES[Math.max(...defeatedLevels)].name:'None';const stats=[['Frames played',career.framesPlayed],['Wins',career.framesWon],['Losses',career.framesLost],['Win rate',pct+'%'],['Shots taken',career.shotsTaken],['Legal balls potted',career.legalBallsPotted],['Fouls committed',career.foulsCommitted],['Best pot streak',career.bestPotStreak],['7-ball wins',career.sevenBallWins],['Black-on-black wins',career.blackOnBlackWins],['Highest pirate defeated',highest]];grid.innerHTML=stats.map(([label,value])=>`<div class="career-stat"><b>${value}</b><small>${label}</small></div>`).join('');}
  const pp=document.getElementById('pirateProgress');if(pp)pp.innerHTML=PIRATES.slice(1,6).map((pir,i)=>{const level=i+1,done=!!career.piratesDefeated[String(level)];return `<div class="pirate-progress-item ${done?'defeated':''}"><b>${pir.name}</b><small>${done?'DEFEATED ✓':'Not defeated'}</small></div>`}).join('');
+ const completion=document.getElementById('campaignCompletion');if(completion){const conquered=!!career.piratesDefeated['5'];completion.hidden=!conquered;if(conquered)completion.innerHTML=`<div class="campaign-completion-crown" aria-hidden="true">🏆</div><div><small>MAIN PIRATE CAMPAIGN COMPLETE</small><h3>GREATEST POOL PLAYER OF ALL THE OCEANS</h3><p>Defeated Captain Blackball aboard his ship and conquered Pirates o' the Tavern.</p><div class="uncharted-waters-tease"><b>Uncharted Waters</b><span>Strange challengers are rumoured beyond the known seas...</span></div></div>`;}
  const tg=document.getElementById('trophyGrid');if(tg)tg.innerHTML=TROPHIES.map(([id,name,desc,test])=>{const won=!!test(career);return `<div class="trophy-item ${won?'unlocked':''}" data-trophy="${id}"><b>${name}</b><small>${desc}</small><em>${won?'UNLOCKED ✓':'LOCKED'}</em></div>`}).join('');
- const dev=document.getElementById('devProgressStats');if(dev)dev.textContent=`Schema: ${career.schema}\nFrames: ${career.framesPlayed} | W ${career.framesWon} | L ${career.framesLost}\nShots: ${career.shotsTaken} | Legal pots: ${career.legalBallsPotted} | Fouls: ${career.foulsCommitted}\nBest pot streak: ${career.bestPotStreak} | 7-ball wins: ${career.sevenBallWins} | Black-on-black wins: ${career.blackOnBlackWins}\nCredits read: ${career.creditsRead} | Lifetime premium: ${career.lifetimePremium}\nPirates defeated: ${Object.keys(career.piratesDefeated).filter(k=>career.piratesDefeated[k]).join(', ')||'none'}`;
+ const dev=document.getElementById('devProgressStats');if(dev)dev.textContent=`Schema: ${career.schema}\nFrames: ${career.framesPlayed} | W ${career.framesWon} | L ${career.framesLost}\nShots: ${career.shotsTaken} | Legal pots: ${career.legalBallsPotted} | Fouls: ${career.foulsCommitted}\nBest pot streak: ${career.bestPotStreak} | 7-ball wins: ${career.sevenBallWins} | Black-on-black wins: ${career.blackOnBlackWins}\nCredits read: ${career.creditsRead} | Lifetime premium: ${career.lifetimePremium}\nBlackball intro: ${career.blackballIntroSeen} | ending: ${career.blackballEndingSeen}\nPirates defeated: ${Object.keys(career.piratesDefeated).filter(k=>career.piratesDefeated[k]).join(', ')||'none'}`;
 }
 function pirateIsOpen(level){const isDev=level>=6;return isDev?devPiratesUnlocked:level<=getUnlockedPirateLevel();}
 function renderPirateRoster(){const list=document.getElementById('pirateList');if(!list)return;list.innerHTML=PIRATES.slice(1).map((p,i)=>{const level=i+1,nick=p.nickname?` <em>${p.nickname}</em>`:'';return `<button class="pirate-choice" data-level="${level}" type="button"><b>${p.name}${nick}</b><small></small></button>`}).join('');refreshPirateButtons();}
@@ -89,7 +90,7 @@ const pockets=[[L,T],[CENTRE_X,T],[R,T],[L,B],[CENTRE_X,B],[R,B]];
 const colors={red:'#b72d2d',yellow:'#e3b834',black:'#151515',white:'#f5f1e7'};
 let balls=[],angle=Math.PI,moving=false,last=performance.now(),draggingCue=false;
 let cueStrikeVisual=null;
-let equippedTableTheme='classic',equippedCue='classic';
+let equippedTableTheme='classic',equippedCue='classic',forcedTableTheme=null;
 try{equippedTableTheme=localStorage.getItem('seamenTableTheme')||'classic';equippedCue=localStorage.getItem('seamenCue')||'classic';}catch(e){}
 let state,shot=null,placementMode='none',pendingChoice=null,pendingAIPlan=null;
 let devAngleGuide=false,playHistory=[],shotNumber=0;
@@ -327,18 +328,22 @@ function rayCushionDistance(x,y,dx,dy){let vals=[];if(dx>1e-6)vals.push((R-ballR
 function guide(){if(moving||state.frameOver||pendingChoice||cue().potted)return;const c=cue(),dx=Math.cos(angle),dy=Math.sin(angle);let best=2000,target=null;for(const b of balls.slice(1)){if(b.potted)continue;const ox=b.x-c.x,oy=b.y-c.y,t=ox*dx+oy*dy;if(t<=0)continue;const perp2=ox*ox+oy*oy-t*t,rr=(ballR*2)**2;if(perp2<=rr){const hit=t-Math.sqrt(rr-perp2);if(hit<best){best=hit;target=b;}}}const tx=c.x+dx*best,ty=c.y+dy*best;ctx.save();ctx.setLineDash([13,12]);ctx.strokeStyle='#fff9';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(c.x,c.y);ctx.lineTo(tx,ty);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#fff8';ctx.beginPath();ctx.arc(tx,ty,6,0,Math.PI*2);ctx.fill();
   if(devAngleGuide&&target){const nx=target.x-tx,ny=target.y-ty,nlen=Math.hypot(nx,ny);if(nlen>.001){const odx=nx/nlen,ody=ny/nlen;const ballHit=rayBallHit(target.x,target.y,odx,ody,target),cush=rayCushionDistance(target.x,target.y,odx,ody),dist=Math.min(ballHit.distance,cush);if(Number.isFinite(dist)&&dist>0){ctx.strokeStyle='#ffe28a';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(target.x,target.y);ctx.lineTo(target.x+odx*dist,target.y+ody*dist);ctx.stroke();}}}
   ctx.restore();}
+function activeTableTheme(){return forcedTableTheme||equippedTableTheme;}
 function tableThemePalette(){
-  if(equippedTableTheme==='captain')return{rail:'#4a2916',cloth:'#18583f',edge:'#c99a4c',ambience:'rgba(238,177,86,.045)'};
-  if(equippedTableTheme==='spectral')return{rail:'#263b3e',cloth:'#285f59',edge:'#8ed4c4',ambience:'rgba(124,235,217,.07)'};
+  const theme=activeTableTheme();
+  if(theme==='captain')return{rail:'#4a2916',cloth:'#18583f',edge:'#c99a4c',ambience:'rgba(238,177,86,.045)'};
+  if(theme==='spectral')return{rail:'#263b3e',cloth:'#285f59',edge:'#8ed4c4',ambience:'rgba(124,235,217,.07)'};
+  if(theme==='privates')return{rail:'#8b6928',cloth:'#202020',edge:'#e0b858',ambience:'rgba(205,205,205,.025)'};
   return{rail:'#56371f',cloth:'#2a7b57',edge:'#163f30',ambience:null};
 }
 function drawTableAtmosphere(now,pal){
-  if(equippedTableTheme==='captain'){
+  const theme=activeTableTheme();
+  if(theme==='captain'){
     // Rich varnished timber. Highlights breathe slowly rather than travelling around the table.
     const gloss=ctx.createLinearGradient(0,0,W,H);gloss.addColorStop(0,'rgba(255,221,151,.23)');gloss.addColorStop(.20,'rgba(255,255,255,.035)');gloss.addColorStop(.55,'rgba(85,34,10,.17)');gloss.addColorStop(1,'rgba(255,190,93,.15)');
     ctx.fillStyle=gloss;ctx.fillRect(0,0,W,T);ctx.fillRect(0,B,W,H-B);ctx.fillRect(0,T,L,B-T);ctx.fillRect(R,T,W-R,B-T);
     const pulse=.34+.12*Math.sin(now/1450);ctx.save();ctx.strokeStyle=`rgba(255,215,132,${pulse})`;ctx.lineWidth=4;ctx.shadowColor='rgba(255,190,80,.34)';ctx.shadowBlur=14+4*Math.sin(now/1800);ctx.strokeRect(L-9,T-9,R-L+18,B-T+18);ctx.restore();
-  }else if(equippedTableTheme==='spectral'){
+  }else if(theme==='spectral'){
     // Extremely transparent drifting mist, kept below balls/guides for readability.
     ctx.save();ctx.beginPath();ctx.rect(L,T,R-L,B-T);ctx.clip();
     const t=now/1000;
@@ -349,8 +354,14 @@ function drawTableAtmosphere(now,pal){
     }
     ctx.restore();
     const pulse=.24+.10*Math.sin(now/1350);ctx.save();ctx.strokeStyle=`rgba(177,255,240,${pulse})`;ctx.lineWidth=4;ctx.shadowColor='rgba(112,255,230,.42)';ctx.shadowBlur=15+4*Math.sin(now/1700);ctx.strokeRect(L-7,T-7,R-L+14,B-T+14);ctx.restore();
+  }else if(theme==='privates'){
+    // Blackball's absurdly level shipboard table: restrained gold glint, candles and thin grey mist.
+    const sweep=(now/28)%(W+500)-250,gold=ctx.createLinearGradient(sweep,0,sweep+230,0);gold.addColorStop(0,'rgba(255,220,126,0)');gold.addColorStop(.5,'rgba(255,231,157,.18)');gold.addColorStop(1,'rgba(255,220,126,0)');ctx.fillStyle=gold;ctx.fillRect(0,0,W,T);ctx.fillRect(0,B,W,H-B);
+    ctx.save();ctx.beginPath();ctx.rect(L,T,R-L,B-T);ctx.clip();const t=now/1000;for(let i=0;i<4;i++){const x=L+((i*401+t*15)%(R-L+360))-180,y=T+PLAY_H*(.22+i*.18)+Math.sin(t*.23+i)*24,g=ctx.createRadialGradient(x,y,0,x,y,190);g.addColorStop(0,'rgba(205,205,205,.035)');g.addColorStop(1,'rgba(180,180,180,0)');ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(x,y,210,52,0,0,Math.PI*2);ctx.fill();}ctx.restore();
+    for(const [x,y] of [[L+72,T+52],[R-78,T+62],[L+84,B-55]]){const flick=.14+.05*Math.sin(now/170+iSafe(x));const g=ctx.createRadialGradient(x,y,0,x,y,70);g.addColorStop(0,`rgba(255,177,76,${flick})`);g.addColorStop(1,'rgba(255,150,50,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,70,0,Math.PI*2);ctx.fill();}
   }
 }
+function iSafe(n){return Math.round(n)%997;}
 function drawCushionShadows(){
   // Soft full-length cushion shadows: strongest at the rail, fading into the cloth.
   const depth=44;
@@ -512,6 +523,16 @@ document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return
 document.getElementById('pickupCue').onclick=()=>{if(moving||state.frameOver||pendingChoice)return;restoreCue('anywhere');msg.textContent=`DEV: ${pname(state.player)} may tap or drag anywhere on the table to reposition the cue ball, then confirm.`;updateHUD();};
 document.getElementById('unlockPirates').onclick=()=>{setUnlockedPirateLevel(5);devPiratesUnlocked=true;refreshPirateButtons();msg.textContent="DEV: all five standard pirates plus Ol' Cyclops and Darth Vaper unlocked for testing.";};
 document.getElementById('unlockScenarios').onclick=()=>{devScenariosUnlocked=true;nightmareScenario.disabled=false;cannonScenario.disabled=false;if(fiveFrameScenario)fiveFrameScenario.disabled=false;nightmareScenario.querySelector('small').textContent='Captain Blackball • 3 reds vs 6-yellow blockade';cannonScenario.querySelector('small').textContent='Captain Blackball • oversized 28-ball rack';if(fiveFrameScenario)fiveFrameScenario.querySelector('small').textContent='Captain Blackball vs Darth Vaper • 5 automatic frames';msg.textContent='DEV: Test scenarios unlocked for this session.';};
+const triggerBlackballShowdown=document.getElementById('triggerBlackballShowdown');
+if(triggerBlackballShowdown)triggerBlackballShowdown.onclick=()=>{
+  audioReady();
+  pendingPirateStart={level:5,playerName:piratePlayerName?.value.trim()||'Player 1'};
+  if(pirateProfileModal)pirateProfileModal.hidden=true;
+  if(playersModal)playersModal.hidden=true;
+  // DEV preview only: replay the first-showdown presentation without changing the saved intro/ending flags.
+  forcedTableTheme='privates';
+  showBlackballStory('intro',()=>beginPendingPirateMatch(true));
+};
 confirmCue.onclick=()=>{if(placementMode==='none'||moving||state.frameOver||pendingChoice)return;placementMode='none';draggingCue=false;shootBtn.disabled=false;confirmCue.hidden=true;if(cuePlacementControls)cuePlacementControls.hidden=true;tableWrap?.classList.remove('placing-cue');msg.textContent=state.breakShot?'Cue ball placed — aim your break, choose power, then play the shot.':`Cue ball placed — ${pname(state.player)}, aim and play your shot.`;if(tutorialActive){if(state.breakShot)showTutorialStep('aim','Aim, power, shoot','Use AIM ANGLE to choose the direction, SHOT POWER to choose the strength, then press PLAY SHOT. Fine-tune your angles and shots with the buttons below the slider. The guide is simply there to show your intended direction. Crank the power up for breaks, then lower it for more precise shots after that. Find your sweet spot!','.controls');else showTutorialStep('ballinhand','Cue ball in hand',"After a foul you have what's called 'cue ball in hand' and can place it anywhere on the table, shooting forwards or backwards. In this game, tap or drag the white anywhere it fits without touching another ball, then confirm its position before aiming your next shot.",'.cue-placement-controls');}};
 const clearPlayLogButton=document.getElementById('clearPlayLog');if(clearPlayLogButton)clearPlayLogButton.onclick=()=>{playHistory=[];shotNumber=0;renderPlayLog();};
 function aiLegalTargets(){
@@ -1388,10 +1409,11 @@ function showWinCelebration(winner,text){
     winText.textContent='DING DING DING DING DING! All 5 Captain Blackball vs Darth Vaper frames are complete.';
     winModal.hidden=false;return;
   }
+  if(gameMode==='pirate'&&currentPirateLevel===5&&winner===1&&!career.blackballEndingSeen){showBlackballFirstVictory();return;}
   soundVictory();refreshResultPirateIdentity();winTitle.textContent=`${pname(winner)} wins!`;winText.textContent=text;winModal.hidden=false;
 }
-playAgain.onclick=()=>{winModal.hidden=true;restartCurrentGame(1);};
-returnMenu.onclick=()=>{winModal.hidden=true;startMenuMusic();showTitleScreen();};
+playAgain.onclick=()=>{winModal.hidden=true;forcedTableTheme=null;restartCurrentGame(1);};
+returnMenu.onclick=()=>{winModal.hidden=true;forcedTableTheme=null;startMenuMusic();showTitleScreen();};
 
 showGameLog.onclick=()=>{gameLogModalText.textContent=playHistory.length?playHistory.join('\n\n'):'No shots recorded yet.';if(copyGameLogStatus)copyGameLogStatus.textContent='';if(copyGameLog){copyGameLog.textContent='Select all and copy';copyGameLog.classList.remove('copied');}winModal.hidden=true;gameLogModal.hidden=false;};
 copyGameLog.onclick=async()=>{const text=gameLogModalText.textContent||'';try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);}else{const range=document.createRange();range.selectNodeContents(gameLogModalText);const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);const ok=document.execCommand('copy');if(!ok)throw new Error('copy failed');}copyGameLog.textContent='Copied! ✓';copyGameLog.classList.add('copied');copyGameLogStatus.textContent='Entire game log selected and copied to clipboard.';}catch(err){const range=document.createRange();range.selectNodeContents(gameLogModalText);const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);copyGameLog.textContent='Selected — press Ctrl+C';copyGameLogStatus.textContent='Automatic copy was blocked by this browser, so the full log has been selected for you.';}};
@@ -1415,9 +1437,23 @@ if(pirateIntroModal && pirateIntroModal.parentElement!==document.body) document.
 let pendingPirateStart=null;
 let profiledPirateLevel=1;
 function showPirateProfile(level){const p=PIRATES[level];if(!p)return;profiledPirateLevel=level;const open=pirateIsOpen(level);pirateProfileFullName.textContent=p.fullName;pirateProfileName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;pirateProfileDifficulty.textContent=`${level>=6?'SPECIAL':'DIFFICULTY '+level} • ${p.role}`;pirateProfileStyle.textContent=p.style;pirateProfileBio.textContent=p.bio;pirateProfileReputation.textContent=p.reputation;piratePortrait.innerHTML=`<img src="${p.image}" alt="" draggable="false"><span class="portrait-fallback">${p.portrait}</span>`;challengePirate.disabled=!open;challengePirate.textContent=open?'Challenge':'Locked 🔒';pirateProfileModal.hidden=false;}
-function startProfiledPirate(){const level=profiledPirateLevel;if(!pirateIsOpen(level))return;const p=PIRATES[level];pendingPirateStart={level,playerName:piratePlayerName.value.trim()||'Player 1'};audioReady();pirateProfileModal.hidden=true;playersModal.hidden=true;matchIntroPortrait.src=p.image;matchIntroName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;matchIntroLine.textContent=(window.SeamenDialogue?.getLine(level,'intro'))||p.bio;matchIntroKicker.textContent=level>=6?'SPECIAL OPPONENT':'YOUR OPPONENT';pirateIntroModal.hidden=false;}
-function beginPendingPirateMatch(){if(!pendingPirateStart)return;startMatchMusic();if(gameApp)gameApp.hidden=false;const {level,playerName}=pendingPirateStart,p=PIRATES[level];pendingPirateStart=null;pirateIntroModal.hidden=true;currentScenario=null;currentPirateLevel=level;currentPirateName=p.name;gameMode='pirate';aiPlayer=2;playerNames={1:playerName,2:currentPirateName};newFrame(1);}
-startPirateMatch?.addEventListener('click',beginPendingPirateMatch);
+const blackballStory=document.getElementById('blackballStory'),blackballStoryTitle=document.getElementById('blackballStoryTitle'),blackballStoryText=document.getElementById('blackballStoryText'),blackballStoryNext=document.getElementById('blackballStoryNext');
+const BLACKBALL_INTRO_LINES=[
+  "So, welcome to my ship and my private pool room in the Captain's quarters. It's just me and you now, and you only get one chance... unless you lose and try again as if this never happened.",
+  "Defeat me to become the greatest pool player of all the oceans. But beware, otherworldly beings and mysterious creatures unknown also visit from time to time. Only time will tell.",
+  "This will not be an easy game. You will need everything you've learned, and I will show you that what you think you know might make you king of the tavern, you need to up your game and think of it more like chess: 3 steps ahead, if you're going to have a chance with me or out in uncharted waters."
+];
+const BLACKBALL_ENDING_LINES=["Well done, well done indeed. A jolly fine match. Feel free to come and use my table any time you wish, and my beautiful cue. I must be at sea again in the morning, or the next morning, something like that. Gather all the practice you can muster, and most importantly, enjoy yourself!"];
+let blackballStoryMode='',blackballStoryStep=0,blackballStoryDone=null;
+function showBlackballStory(mode,onDone){blackballStoryMode=mode;blackballStoryStep=0;blackballStoryDone=onDone||null;blackballStoryTitle.textContent='Captain Blackball';blackballStory.classList.remove('fading');blackballStory.hidden=false;renderBlackballStory();}
+function renderBlackballStory(){const lines=blackballStoryMode==='ending'?BLACKBALL_ENDING_LINES:BLACKBALL_INTRO_LINES;blackballStoryText.textContent=lines[blackballStoryStep];if(blackballStoryMode==='ending')blackballStoryNext.textContent='Return to the title';else blackballStoryNext.textContent=blackballStoryStep===lines.length-1?'Begin the ultimate showdown!':'Next';}
+function closeBlackballStory(){blackballStory.classList.add('fading');setTimeout(()=>{blackballStory.hidden=true;blackballStory.classList.remove('fading');const done=blackballStoryDone;blackballStoryDone=null;if(done)done();},1050);}
+blackballStoryNext?.addEventListener('click',()=>{const lines=blackballStoryMode==='ending'?BLACKBALL_ENDING_LINES:BLACKBALL_INTRO_LINES;if(blackballStoryStep<lines.length-1){blackballStoryStep++;renderBlackballStory();return;}closeBlackballStory();});
+function beginBlackballFirstShowdown(){career.blackballIntroSeen=true;saveCareer();forcedTableTheme='privates';showBlackballStory('intro',()=>beginPendingPirateMatch(true));}
+function showBlackballFirstVictory(){career.blackballEndingSeen=true;saveCareer();forcedTableTheme='privates';startOutroMusic();showBlackballStory('ending',()=>{forcedTableTheme=null;showTitleScreen();});}
+function startProfiledPirate(){const level=profiledPirateLevel;if(!pirateIsOpen(level))return;const p=PIRATES[level];pendingPirateStart={level,playerName:piratePlayerName.value.trim()||'Player 1'};audioReady();pirateProfileModal.hidden=true;playersModal.hidden=true;if(level===5&&!career.blackballIntroSeen){beginBlackballFirstShowdown();return;}matchIntroPortrait.src=p.image;matchIntroName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;matchIntroLine.textContent=(window.SeamenDialogue?.getLine(level,'intro'))||p.bio;matchIntroKicker.textContent=level>=6?'SPECIAL OPPONENT':'YOUR OPPONENT';pirateIntroModal.hidden=false;}
+function beginPendingPirateMatch(storyApproved=false){if(!pendingPirateStart)return;if(pendingPirateStart.level===5&&!career.blackballIntroSeen&&!storyApproved){pirateIntroModal.hidden=true;beginBlackballFirstShowdown();return;}startMatchMusic();if(gameApp)gameApp.hidden=false;const {level,playerName}=pendingPirateStart,p=PIRATES[level];pendingPirateStart=null;pirateIntroModal.hidden=true;currentScenario=null;currentPirateLevel=level;currentPirateName=p.name;gameMode='pirate';aiPlayer=2;playerNames={1:playerName,2:currentPirateName};newFrame(1);}
+startPirateMatch?.addEventListener('click',()=>beginPendingPirateMatch(false));
 const cancelPirateIntro=document.getElementById('cancelPirateIntro');
 cancelPirateIntro?.addEventListener('click',()=>{pendingPirateStart=null;pirateIntroModal.hidden=true;playersModal.hidden=false;modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=false;if(testScenarioMenu)testScenarioMenu.hidden=true;if(aiVsAiMenu)aiVsAiMenu.hidden=true;refreshPirateButtons();});
 document.getElementById('pirateList')?.addEventListener('click',e=>{const btn=e.target.closest('.pirate-choice[data-level]');if(btn)showPirateProfile(Number(btn.dataset.level));});
@@ -1497,7 +1533,7 @@ const SAVE_FILE_SCHEMA=1;
 const SAVE_KEYS=['seamenCareer','seamenPirateUnlocked','seamenTableTheme','seamenCue','seamenTutorialSeen','seamenAudioSettings','seamenAudio091Music50Migrated'];
 const exportSaveBtn=document.getElementById('exportSave'),importSaveBtn=document.getElementById('importSave'),importSaveFile=document.getElementById('importSaveFile'),resetPlayerDataBtn=document.getElementById('resetPlayerData'),saveDataStatus=document.getElementById('saveDataStatus');
 function setSaveDataStatus(text,isError=false){if(!saveDataStatus)return;saveDataStatus.textContent=text||'';saveDataStatus.style.color=isError?'#f0a49a':'';}
-function collectPortableSave(){const data={};for(const key of SAVE_KEYS){try{const value=localStorage.getItem(key);if(value!==null)data[key]=value;}catch(e){}}return{game:'Seamen English Rules Pool',saveSchema:SAVE_FILE_SCHEMA,gameVersion:'0.12.1',exportedAt:new Date().toISOString(),data};}
+function collectPortableSave(){const data={};for(const key of SAVE_KEYS){try{const value=localStorage.getItem(key);if(value!==null)data[key]=value;}catch(e){}}return{game:'Seamen English Rules Pool',saveSchema:SAVE_FILE_SCHEMA,gameVersion:'0.13.4',exportedAt:new Date().toISOString(),data};}
 function validatePortableSave(obj){if(!obj||typeof obj!=='object')throw new Error('This is not a valid Seamen save file.');if(obj.game!=='Seamen English Rules Pool')throw new Error('This file does not appear to be a Seamen save.');if(!Number.isInteger(obj.saveSchema)||obj.saveSchema<1||obj.saveSchema>SAVE_FILE_SCHEMA)throw new Error('This save uses an unsupported save-file version.');if(!obj.data||typeof obj.data!=='object'||Array.isArray(obj.data))throw new Error('The save file has no valid data section.');for(const key of Object.keys(obj.data)){if(!SAVE_KEYS.includes(key))throw new Error('The save contains an unexpected data field.');if(typeof obj.data[key]!=='string')throw new Error('The save contains malformed data.');}
  if(obj.data.seamenCareer){let c;try{c=JSON.parse(obj.data.seamenCareer)}catch(e){throw new Error('Career data is damaged.');}if(!c||typeof c!=='object'||Array.isArray(c))throw new Error('Career data is damaged.');if(Number(c.schema||1)>CAREER_SCHEMA)throw new Error('This career save was made by a newer incompatible version.');}
  if(obj.data.seamenAudioSettings){try{const a=JSON.parse(obj.data.seamenAudioSettings);if(!a||typeof a!=='object'||Array.isArray(a))throw 0;}catch(e){throw new Error('Audio/settings data is damaged.');}}
@@ -1576,6 +1612,7 @@ function retryPendingMusic(){
 function startBootAnthem(){playMusic('anthem',MUSIC.anthem,{crossfade:false});}
 function startMenuMusic(){playMusic('menu',MUSIC.menu);}
 function startCreditsMusic(){playMusic('credits',MUSIC.credits);}
+function startOutroMusic(){playMusic('outro',MUSIC.outro);}
 // V0.13.2: match music chooses randomly whenever a track ends, while
 // preventing the track that just played from being selected immediately again.
 // A track becomes eligible again after any different match track has played.
@@ -1601,10 +1638,10 @@ if(backToTitle)backToTitle.onclick=showTitleScreen;
 if(titleSettings)titleSettings.onclick=()=>{audioReady();refreshAudioSettings();settingsModal.hidden=false;};
 function refreshCosmeticsUI(){
   validateEquippedCue();
-  document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>b.classList.toggle('equipped',b.dataset.theme===equippedTableTheme));
+  document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>{const locked=b.dataset.theme==='privates'&&!career.piratesDefeated['5'];b.classList.toggle('equipped',b.dataset.theme===equippedTableTheme&&!locked);b.classList.toggle('locked',locked);b.disabled=locked;const state=b.querySelector('.cosmetic-state');if(state&&b.dataset.theme==='privates')state.textContent=locked?'LOCKED 🔒':'AVAILABLE';});
   document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>{const id=b.dataset.cue,unlocked=cueUnlocked(id);b.classList.toggle('equipped',id===equippedCue);b.classList.toggle('locked',!unlocked);b.disabled=!unlocked;const state=b.querySelector('.cosmetic-state');if(state)state.textContent=id===equippedCue?'EQUIPPED':(unlocked?'AVAILABLE':`LOCKED • Defeat ${b.dataset.owner||'this pirate'}`);});
 }
-document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>b.addEventListener('click',()=>{equippedTableTheme=b.dataset.theme;try{localStorage.setItem('seamenTableTheme',equippedTableTheme)}catch(e){}refreshCosmeticsUI();}));
+document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.theme==='privates'&&!career.piratesDefeated['5'])return;equippedTableTheme=b.dataset.theme;try{localStorage.setItem('seamenTableTheme',equippedTableTheme)}catch(e){}refreshCosmeticsUI();}));
 document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>b.addEventListener('click',()=>{if(!cueUnlocked(b.dataset.cue))return;equippedCue=b.dataset.cue;try{localStorage.setItem('seamenCue',equippedCue)}catch(e){}refreshCosmeticsUI();}));
 if(titleCosmetics)titleCosmetics.onclick=()=>{if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;cosmeticsScreen.hidden=false;refreshCosmeticsUI();};
 document.querySelectorAll('[data-cosmetic-tab]').forEach(tab=>tab.addEventListener('click',()=>{const key=tab.dataset.cosmeticTab;document.querySelectorAll('[data-cosmetic-tab]').forEach(t=>t.classList.toggle('active',t===tab));document.querySelectorAll('[data-cosmetic-panel]').forEach(p=>{const on=p.dataset.cosmeticPanel===key;p.classList.toggle('active',on);p.hidden=!on;});}));
