@@ -958,3 +958,15 @@ html.seamen-phone-landscape main#gameApp:not([hidden]) .landscape-mobile-notice{
 /* V0.14.1c: win/log modals are portalled to body by game.js, escaping the split-pane stacking context. */
 body>#winModal.rules-modal,body>#gameLogModal.rules-modal{z-index:15000!important}
 body>#winModal.rules-modal>.rules-modal-card,body>#gameLogModal.rules-modal>.rules-modal-card{z-index:2!important}
+
+
+/* V0.14.2 achievement system v2 */
+.trophy-grid{display:block}
+.achievement-category{margin:0 0 18px}.achievement-category>h3{margin:12px 0 8px;padding-bottom:5px;border-bottom:1px solid #5e452d;color:#f0cf82;letter-spacing:.12em;font-size:.82rem}
+.achievement-category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px}
+.trophy-tier{display:inline-block;margin-bottom:7px;padding:3px 7px;border:1px solid #6b5940;border-radius:999px;font-size:.62rem;font-weight:900;letter-spacing:.11em;color:#d7c5a5;background:#211711}
+.trophy-item.unlocked .trophy-tier{border-color:#b58a3e;color:#ffe5a0;background:#332410}
+.trophy-item .tier-prestige-i{border-color:#9c78c7;color:#d9c2ff;background:#281d35}
+.trophy-item.unlocked .tier-prestige-i{box-shadow:0 0 12px rgba(191,145,255,.18)}
+.trophy-item .tier-platinum,.trophy-item .tier-platinum-ii,.trophy-item .tier-platinum-iii{border-color:#8b9ca8;color:#dce8ef;background:#20282c}
+@media(max-width:560px){.achievement-category-grid{grid-template-columns:1fr}}

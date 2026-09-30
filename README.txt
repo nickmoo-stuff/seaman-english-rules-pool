@@ -1,4 +1,4 @@
-SEAMEN ENGLISH RULES POOL — V0.14.1c
+SEAMEN ENGLISH RULES POOL — V0.14.2
 ====================================
 
 A pirate-themed, portrait-first browser pool game built around English Pool Association international eightball rules. Designed for desktop and mobile browsers and installable as a Progressive Web App (PWA).
@@ -45,17 +45,17 @@ Developer test scenarios and AI-vs-AI simulation remain available through the De
 
 Some additional QA keyboard shortcuts remain in the source/build for testing.
 
-V0.14.1c MILESTONE
+V0.14.2 MILESTONE
 -----------------
-V0.14.1c is a release-polish milestone promoted from the passing V0.13.5 baseline. It does not retune pool physics, EPA rules, AI behaviour, soundtrack logic, progression, cosmetics or the Captain Blackball sequence.
+V0.14.2 is a release-polish milestone promoted from the passing V0.13.5 baseline. It does not retune pool physics, EPA rules, AI behaviour, soundtrack logic, progression, cosmetics or the Captain Blackball sequence.
 
 Changes in this milestone:
 • Replaced the historical prototype README with current game documentation.
 • Removed Test scenarios and AI vs AI from the ordinary player-facing Play menu.
 • Retained both QA modes through the Developer test panel.
-• Advanced visible version and PWA cache generation to V0.14.1c.
+• Advanced visible version and PWA cache generation to V0.14.2.
 
-FUTURE / DELIBERATELY NOT PART OF V0.14.1c
+FUTURE / DELIBERATELY NOT PART OF V0.14.2
 ------------------------------------------
 • Online multiplayer.
 • Supporter/reward functionality.
@@ -66,9 +66,21 @@ ABOUT / CREDITS
 See About / credits inside the game for the current creator, testing, tools and soundtrack credits and music links.
 
 
-V0.14.1c — PROGRESSION & REWARD INTEGRATION
+V0.14.2 — PROGRESSION & REWARD INTEGRATION
 • First-time pirate victories now present the trophy, cue cosmetic and next-opponent unlock together on the result screen.
 • Captain Blackball's first victory presents his cue, private table and campaign-completion milestone after the ending scene.
 • Career > Pirates defeated now shows each pirate's reward and progression relationship.
 • Portable save metadata now reports the current game version (0.14.1) instead of the stale 0.13.4 value.
 • No pool physics, EPA rules, AI behaviour or soundtrack logic changed.
+
+
+V0.14.2 — ACHIEVEMENT SYSTEM V2
+
+• Replaces the short 1/5/20/50 win ladder with long-term 1/10/25/50/100/250/500/1000 milestones.
+• Adds category and tier metadata: Career, Skill, Special Wins, Pirates and Exploration; Bronze through Prestige.
+• Adds uninterrupted legal pot-streak achievements at 2, 3, 5 and 7, plus a strict Prestige one-visit clearance for all seven colours followed by the black.
+• Keeps 7-balling separate from pot streaks.
+• Adds foul-free-win tracking and achievement.
+• Persists stable achievement IDs and silently migrates historical achievements from existing career statistics on first load.
+• Achievement definitions include optional reward hooks for future cosmetics; V0.14.2 adds no new cosmetic rewards.
+• Career schema advanced to 2; portable saves remain version-checked and include the new fields.
