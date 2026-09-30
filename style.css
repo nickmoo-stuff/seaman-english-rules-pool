@@ -933,3 +933,24 @@ html.seamen-phone-landscape main#gameApp:not([hidden]) .landscape-mobile-notice{
 .progression-rewards>div:first-of-type{border-top:0}.progression-rewards>div>span{width:30px;text-align:center;font-size:1.25rem}.progression-rewards p{margin:0;min-width:0}.progression-rewards small,.progression-rewards b{display:block}.progression-rewards small{color:#bca98c;font-size:.68rem;letter-spacing:.08em}.progression-rewards b{color:#f5ead5;margin-top:2px}
 .progression-reward-card{width:min(92vw,520px);text-align:center}.progression-reward-card>small{color:#e8c477;letter-spacing:.12em;font-weight:900}.progression-rewards.standalone{margin:14px 0}
 .pirate-progress-item span{display:block;margin-top:5px;color:#bca98c;font-size:.72rem;line-height:1.25}.pirate-progress-item.defeated span{color:#cdbb9f}
+
+/* V0.14.1b — end-of-frame result modal must always sit above the frozen table.
+   The split-pane match layout creates its own stacking layers, so promote the
+   result/log overlays explicitly without moving or altering the table. */
+#winModal.rules-modal,
+#gameLogModal.rules-modal{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:15000 !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  padding-top:max(14px,env(safe-area-inset-top)) !important;
+  isolation:isolate;
+}
+#winModal.rules-modal>.rules-modal-card,
+#gameLogModal.rules-modal>.rules-modal-card{
+  position:relative !important;
+  z-index:1 !important;
+  margin-top:0 !important;
+  max-height:calc(100dvh - 28px) !important;
+}
