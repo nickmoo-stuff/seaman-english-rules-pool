@@ -591,7 +591,26 @@ function drawBallPolish(b){
 }
 function draw(now=performance.now()){const pal=tableThemePalette();ctx.clearRect(0,0,W,H);ctx.fillStyle=pal.rail;ctx.fillRect(0,0,W,H);ctx.fillStyle=pal.cloth;ctx.fillRect(L,T,R-L,B-T);if(pal.ambience){ctx.fillStyle=pal.ambience;ctx.fillRect(L,T,R-L,B-T);}drawCushionShadows();drawTableAtmosphere(now,pal);ctx.strokeStyle=pal.edge;ctx.lineWidth=8;ctx.strokeRect(L,T,R-L,B-T);ctx.strokeStyle='#d8d0b755';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(BAULK_X,T);ctx.lineTo(BAULK_X,B);ctx.stroke();for(const p of pockets)drawPocket(p);guide();for(const b of balls){if(b.potted)continue;ctx.save();ctx.globalAlpha=1;ctx.fillStyle=colors[b.type];ctx.beginPath();ctx.arc(b.x,b.y,ballR,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#0007';ctx.lineWidth=2;ctx.stroke();drawBallPolish(b);if(b.type==='black'){ctx.fillStyle='#eee';ctx.font='bold 15px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('8',b.x,b.y)}ctx.restore()}drawPotFadeVisuals(now);drawLegalPotSparkles(now);drawCueStick(now);}
 let gamePaused=false;
-function loop(now){let dt=Math.min((now-last)/1000,.025);last=now;if(!gamePaused&&moving){step(dt);if(allStopped())endShot()}draw();requestAnimationFrame(loop)}
+function loop(now){
+  // Browsers already throttle requestAnimationFrame in the background, but explicitly
+  // avoid canvas work while hidden. Resetting `last` on return prevents a backgrounded
+  // tab/PWA from feeding a stale elapsed time into the physics engine.
+  if(document.hidden){last=now;requestAnimationFrame(loop);return;}
+  let dt=Math.min((now-last)/1000,.025);last=now;
+  if(!gamePaused&&moving){step(dt);if(allStopped())endShot()}
+  draw();requestAnimationFrame(loop)
+}
+// V0.14.9 lifecycle hardening: backgrounding/locking a phone must not let an AI
+// decision or watchdog complete behind the player's back. This is a temporary
+// lifecycle suspension only; it does not open the Game menu or alter the frame.
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){
+    clearTimeout(aiTimer);clearTimeout(aiWatchdogTimer);aiTimer=aiWatchdogTimer=null;
+    return;
+  }
+  last=performance.now();
+  if(gameApp&&!gameApp.hidden&&state&&!state.frameOver&&!gamePaused){setTimeout(maybeScheduleAI,80);}
+});
 // V0.14.6: the former New Frame control now opens the in-match Game menu.
 document.getElementById('rack').onclick=()=>restartCurrentGame(state?.breaker||1);document.getElementById('clear').onclick=()=>{balls.slice(1).forEach(b=>{if(b.type!=='black')b.potted=true});updateHUD();};document.getElementById('soft').onclick=()=>{powerEl.value=25;powerText.textContent='25%'};document.getElementById('hard').onclick=()=>{powerEl.value=100;powerText.textContent='100%'};
 document.getElementById('toggleAngleGuide').onclick=e=>{devAngleGuide=!devAngleGuide;saveAimGuidePreference();syncAimGuideSwitch();e.currentTarget.textContent=`Toggle guide Ian angle: ${devAngleGuide?'ON':'OFF'}`;};
@@ -1626,14 +1645,14 @@ if(musicMute)musicMute.onclick=()=>{musicMuted=!musicMuted;refreshAudioSettings(
 if(portraitMotionToggle)portraitMotionToggle.onclick=()=>{reducedCharacterPortraitMotion=!reducedCharacterPortraitMotion;refreshAudioSettings();saveAudioSettings();};
 const replayTutorial=document.getElementById('replayTutorial');if(replayTutorial)replayTutorial.onclick=()=>{try{localStorage.removeItem(TUTORIAL_KEY)}catch(e){}tutorialActive=false;tutorialSteps.clear();closeTutorialStep();settingsModal.hidden=true;if(settingsOpenedFromGameMenu){settingsOpenedFromGameMenu=false;gameMenuModal.hidden=false;}};
 
-/* V0.14.8bb hardened portable save-data framework. Only owned Seamen keys are exported/imported. */
+/* V0.14.9 hardened portable save-data framework. Only owned Seamen keys are exported/imported. */
 const SAVE_FILE_SCHEMA=2;
 const SAVE_KEYS=['seamenCareer','seamenPirateUnlocked','seamenTableTheme','seamenCue','seamenTutorialSeen','seamenAudioSettings','seamenAudio091Music50Migrated','seamenAimGuide','seamenDaveFirstSelectionSeen','seamenFirstRunPathComplete'];
 const PLAYER_PROGRESS_KEYS=['seamenCareer','seamenPirateUnlocked','seamenTableTheme','seamenCue','seamenTutorialSeen','seamenDaveFirstSelectionSeen','seamenFirstRunPathComplete'];
 const exportSaveBtn=document.getElementById('exportSave'),importSaveBtn=document.getElementById('importSave'),importSaveFile=document.getElementById('importSaveFile'),resetPlayerDataBtn=document.getElementById('resetPlayerData'),saveDataStatus=document.getElementById('saveDataStatus');
 function setSaveDataStatus(text,isError=false){if(!saveDataStatus)return;saveDataStatus.textContent=text||'';saveDataStatus.style.color=isError?'#f0a49a':'';}
 function collectStorage(keys=SAVE_KEYS){const data={};for(const key of keys){const value=localStorage.getItem(key);if(value!==null)data[key]=value;}return data;}
-function collectPortableSave(){return{game:'Seamen English Rules Pool',saveSchema:SAVE_FILE_SCHEMA,gameVersion:'0.14.8b',exportedAt:new Date().toISOString(),data:collectStorage()};}
+function collectPortableSave(){return{game:'Seamen English Rules Pool',saveSchema:SAVE_FILE_SCHEMA,gameVersion:'0.14.9',exportedAt:new Date().toISOString(),data:collectStorage()};}
 function validFlag(v){return v==='0'||v==='1';}
 function validateCareerData(c){if(!c||typeof c!=='object'||Array.isArray(c))throw new Error('Career data is damaged.');if(Number(c.schema||1)>CAREER_SCHEMA)throw new Error('This career save was made by a newer incompatible version.');for(const key of ['framesPlayed','framesWon','framesLost','shotsTaken','legalBallsPotted','foulsCommitted','bestPotStreak','sevenBallWins','blackOnBlackWins','foulFreeWins','oneVisitClearances']){if(c[key]!==undefined&&(!Number.isFinite(Number(c[key]))||Number(c[key])<0))throw new Error('Career data contains an invalid statistic.');}if(c.earnedAchievements!==undefined&&!Array.isArray(c.earnedAchievements))throw new Error('Career achievement data is damaged.');if(c.seenCosmetics!==undefined&&!Array.isArray(c.seenCosmetics))throw new Error('Career cosmetic data is damaged.');if(c.piratesDefeated!==undefined&&(!c.piratesDefeated||typeof c.piratesDefeated!=='object'||Array.isArray(c.piratesDefeated)))throw new Error('Career pirate data is damaged.');if(c.pirateRecords!==undefined&&(!c.pirateRecords||typeof c.pirateRecords!=='object'||Array.isArray(c.pirateRecords)))throw new Error('Career pirate record data is damaged.');}
 function validatePortableSave(obj){if(!obj||typeof obj!=='object'||Array.isArray(obj))throw new Error('This is not a valid Seamen save file.');if(obj.game!=='Seamen English Rules Pool')throw new Error('This file does not appear to be a Seamen save.');if(!Number.isInteger(obj.saveSchema)||obj.saveSchema<1||obj.saveSchema>SAVE_FILE_SCHEMA)throw new Error('This save uses an unsupported save-file version.');if(!obj.data||typeof obj.data!=='object'||Array.isArray(obj.data))throw new Error('The save file has no valid data section.');for(const key of Object.keys(obj.data)){if(!SAVE_KEYS.includes(key))throw new Error('The save contains an unexpected data field.');if(typeof obj.data[key]!=='string')throw new Error('The save contains malformed data.');}
@@ -1875,7 +1894,7 @@ newFrame=function(breaker=1){customGameActive=false;customGameCountsStats=false;
 })();
 
 
-/* V0.14.8bb PWA/app presentation --------------------------------------------
+/* V0.14.9 PWA/app presentation --------------------------------------------
    Installation remains optional and non-nagging. The browser decides whether
    an install prompt is available; installed/standalone sessions never show it.
    Service-worker controller changes are surfaced as a restart choice instead
