@@ -987,3 +987,12 @@ body>#winModal.rules-modal>.rules-modal-card,body>#gameLogModal.rules-modal>.rul
 .cosmetic-tab{border-radius:8px 8px 0 0!important}.cosmetic-tab[aria-selected="true"]{background:linear-gradient(180deg,#272116,#171713)!important}
 
 .cosmetic-status-filters{display:flex;flex-wrap:wrap;gap:7px;margin:-5px 0 15px}.cosmetic-status-filter{min-height:34px;padding:6px 10px;border:1px solid #5f533d;border-radius:999px;background:#12110e;color:#bdb39d;font-size:.66rem;font-weight:900;letter-spacing:.09em}.cosmetic-status-filter.active{border-color:#e1bd62;color:#fff0b6;background:#211c12;box-shadow:0 0 10px rgba(221,183,89,.12)}.cosmetic-filter-empty{grid-column:1/-1;margin:8px 0 2px;padding:14px;border:1px dashed #5f533d;border-radius:9px;text-align:center;color:#a99e87;font-style:italic}.cosmetic-filter-hidden{display:none!important}
+
+/* V0.14.5 in-match Game menu */
+#gameMenuModal,#rulesHelpModal{z-index:12000}
+.game-menu-card{max-width:520px}
+.game-paused-note{margin:-4px 0 16px;text-align:center;color:#d9c8aa;font-style:italic;font-size:.92rem}
+.game-menu-actions{display:grid;gap:10px}
+.game-menu-actions>.button-link{display:block;text-align:center;box-sizing:border-box;width:100%}
+.game-menu-aim{margin:2px 0;padding:12px 14px;border:1px solid #5b4228;border-radius:10px;background:#17100bcc}
+.game-menu-aim small{display:block;margin-top:7px;color:#bcae98}
