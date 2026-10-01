@@ -156,7 +156,7 @@ const phaseEl=document.getElementById('phase'),lastShotEl=document.getElementByI
 // V0.14.2: result/log overlays live at document root so the split-pane scroll layer cannot trap them beneath the frozen header/table.
 if(winModal)document.body.appendChild(winModal);
 if(gameLogModal)document.body.appendChild(gameLogModal);
-// V0.14.6c: tutorial overlay also lives at document root so the frozen table cannot cover it.
+// V0.14.6d: tutorial overlay also lives at document root so the frozen table cannot cover it.
 if(tutorialModal)document.body.appendChild(tutorialModal);
 const PLAY_W=1600,PLAY_H=800,rail=90,W=PLAY_W+rail*2,H=PLAY_H+rail*2,L=rail,R=L+PLAY_W,T=rail,B=T+PLAY_H;
 const ballR=25.4,pocketR=41,BAULK_X=L+PLAY_W*.8,CENTRE_X=(L+R)/2;
@@ -1633,7 +1633,7 @@ const SAVE_FILE_SCHEMA=1;
 const SAVE_KEYS=['seamenCareer','seamenPirateUnlocked','seamenTableTheme','seamenCue','seamenTutorialSeen','seamenAudioSettings','seamenAudio091Music50Migrated','seamenAimGuide','seamenDaveFirstSelectionSeen','seamenFirstRunPathComplete'];
 const exportSaveBtn=document.getElementById('exportSave'),importSaveBtn=document.getElementById('importSave'),importSaveFile=document.getElementById('importSaveFile'),resetPlayerDataBtn=document.getElementById('resetPlayerData'),saveDataStatus=document.getElementById('saveDataStatus');
 function setSaveDataStatus(text,isError=false){if(!saveDataStatus)return;saveDataStatus.textContent=text||'';saveDataStatus.style.color=isError?'#f0a49a':'';}
-function collectPortableSave(){const data={};for(const key of SAVE_KEYS){try{const value=localStorage.getItem(key);if(value!==null)data[key]=value;}catch(e){}}return{game:'Seamen English Rules Pool',saveSchema:SAVE_FILE_SCHEMA,gameVersion:'0.14.6c',exportedAt:new Date().toISOString(),data};}
+function collectPortableSave(){const data={};for(const key of SAVE_KEYS){try{const value=localStorage.getItem(key);if(value!==null)data[key]=value;}catch(e){}}return{game:'Seamen English Rules Pool',saveSchema:SAVE_FILE_SCHEMA,gameVersion:'0.14.6d',exportedAt:new Date().toISOString(),data};}
 function validatePortableSave(obj){if(!obj||typeof obj!=='object')throw new Error('This is not a valid Seamen save file.');if(obj.game!=='Seamen English Rules Pool')throw new Error('This file does not appear to be a Seamen save.');if(!Number.isInteger(obj.saveSchema)||obj.saveSchema<1||obj.saveSchema>SAVE_FILE_SCHEMA)throw new Error('This save uses an unsupported save-file version.');if(!obj.data||typeof obj.data!=='object'||Array.isArray(obj.data))throw new Error('The save file has no valid data section.');for(const key of Object.keys(obj.data)){if(!SAVE_KEYS.includes(key))throw new Error('The save contains an unexpected data field.');if(typeof obj.data[key]!=='string')throw new Error('The save contains malformed data.');}
  if(obj.data.seamenCareer){let c;try{c=JSON.parse(obj.data.seamenCareer)}catch(e){throw new Error('Career data is damaged.');}if(!c||typeof c!=='object'||Array.isArray(c))throw new Error('Career data is damaged.');if(Number(c.schema||1)>CAREER_SCHEMA)throw new Error('This career save was made by a newer incompatible version.');}
  if(obj.data.seamenAudioSettings){try{const a=JSON.parse(obj.data.seamenAudioSettings);if(!a||typeof a!=='object'||Array.isArray(a))throw 0;}catch(e){throw new Error('Audio/settings data is damaged.');}}

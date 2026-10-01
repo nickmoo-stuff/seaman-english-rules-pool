@@ -1010,3 +1010,17 @@ body>#winModal.rules-modal>.rules-modal-card,body>#gameLogModal.rules-modal>.rul
 /* V0.14.6c: document-root tutorial portal, above frozen table/header. */
 body>#tutorialModal.rules-modal{position:fixed!important;inset:0!important;z-index:13000!important}
 body>#tutorialModal.rules-modal>.rules-modal-card{position:relative;z-index:2!important}
+
+
+/* V0.14.6d: keep startup splash independent of document-level gameplay modals.
+   The splash owns an opaque app backdrop until ENTER THE TAVERN completes,
+   while tutorial/result/game-menu overlays can remain document-root modals. */
+body>.boot-splash{
+  position:fixed!important;
+  inset:0!important;
+  z-index:20000!important;
+  isolation:isolate;
+  background:radial-gradient(circle at 50% 12%,#4b301b 0,#24170f 28%,#100c09 66%,#080604 100%)!important;
+}
+body>.boot-splash>.boot-splash-inner{position:relative;z-index:2}
+body>#tutorialModal.rules-modal{z-index:13000!important}

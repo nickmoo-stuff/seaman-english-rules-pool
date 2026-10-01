@@ -1,4 +1,4 @@
-SEAMEN ENGLISH RULES POOL — V0.14.6c
+SEAMEN ENGLISH RULES POOL — V0.14.6d
 ====================================
 
 A pirate-themed, portrait-first browser pool game built around English Pool Association international eightball rules. Designed for desktop and mobile browsers and installable as a Progressive Web App (PWA).
@@ -45,17 +45,17 @@ Developer test scenarios and AI-vs-AI simulation remain available through the De
 
 Some additional QA keyboard shortcuts remain in the source/build for testing.
 
-V0.14.6c MILESTONE
+V0.14.6d MILESTONE
 -----------------
-V0.14.6c is a release-polish milestone promoted from the passing V0.13.5 baseline. It does not retune pool physics, EPA rules, AI behaviour, soundtrack logic, progression, cosmetics or the Captain Blackball sequence.
+V0.14.6d is a release-polish milestone promoted from the passing V0.13.5 baseline. It does not retune pool physics, EPA rules, AI behaviour, soundtrack logic, progression, cosmetics or the Captain Blackball sequence.
 
 Changes in this milestone:
 • Replaced the historical prototype README with current game documentation.
 • Removed Test scenarios and AI vs AI from the ordinary player-facing Play menu.
 • Retained both QA modes through the Developer test panel.
-• Advanced visible version and PWA cache generation to V0.14.6c.
+• Advanced visible version and PWA cache generation to V0.14.6d.
 
-FUTURE / DELIBERATELY NOT PART OF V0.14.6c
+FUTURE / DELIBERATELY NOT PART OF V0.14.6d
 ------------------------------------------
 • Online multiplayer.
 • Supporter/reward functionality.
@@ -66,7 +66,7 @@ ABOUT / CREDITS
 See About / credits inside the game for the current creator, testing, tools and soundtrack credits and music links.
 
 
-V0.14.6c — PROGRESSION & REWARD INTEGRATION
+V0.14.6d — PROGRESSION & REWARD INTEGRATION
 • First-time pirate victories now present the trophy, cue cosmetic and next-opponent unlock together on the result screen.
 • Captain Blackball's first victory presents his cue, private table and campaign-completion milestone after the ending scene.
 • Career > Pirates defeated now shows each pirate's reward and progression relationship.
@@ -74,7 +74,7 @@ V0.14.6c — PROGRESSION & REWARD INTEGRATION
 • No pool physics, EPA rules, AI behaviour or soundtrack logic changed.
 
 
-V0.14.6c — ACHIEVEMENT SYSTEM V2
+V0.14.6d — ACHIEVEMENT SYSTEM V2
 
 • Replaces the short 1/5/20/50 win ladder with long-term 1/10/25/50/100/250/500/1000 milestones.
 • Adds category and tier metadata: Career, Skill, Special Wins, Pirates and Exploration; Bronze through Prestige.
@@ -82,16 +82,16 @@ V0.14.6c — ACHIEVEMENT SYSTEM V2
 • Keeps 7-balling separate from pot streaks.
 • Adds foul-free-win tracking and achievement.
 • Persists stable achievement IDs and silently migrates historical achievements from existing career statistics on first load.
-• Achievement definitions include optional reward hooks for future cosmetics; V0.14.6c adds no new cosmetic rewards.
+• Achievement definitions include optional reward hooks for future cosmetics; V0.14.6d adds no new cosmetic rewards.
 • Career schema advanced to 2; portable saves remain version-checked and include the new fields.
 
 
-V0.14.6c — ACHIEVEMENT QA / WORLDBUILDING TEXT
+V0.14.6d — ACHIEVEMENT QA / WORLDBUILDING TEXT
 • Renames the Chapter I completion milestone to ‘Definitive Pool Shark of Captain Blackball’s Domain’.
 • Adds a Developer-panel achievement preview selector that can display any achievement toast without altering career statistics or earned-achievement state.
 
 
-V0.14.6c — STATISTICS & PLAYER HISTORY
+V0.14.6d — STATISTICS & PLAYER HISTORY
 • Career schema v3 adds per-pirate win/loss records and player-history landmarks.
 • Statistics are grouped into Career Record, Potting & Performance, Discipline and Special Victories.
 • Adds pots per 100 shots, fouls per frame, foul-free wins and one-visit clearances to the visible statistics screen.
@@ -100,7 +100,7 @@ V0.14.6c — STATISTICS & PLAYER HISTORY
 • No pool physics, EPA rules, AI behaviour, achievement thresholds, cosmetics or soundtrack logic changed.
 
 
-V0.14.6c — COSMETICS & UNLOCK PRESENTATION
+V0.14.6d — COSMETICS & UNLOCK PRESENTATION
 • Cosmetics remain split into TABLES and CUES tabs, now with clearer tab semantics.
 • Cosmetic definitions now carry stable ownership-source metadata: Default, Campaign, Achievement, Supporter or Special.
 • Locked campaign cosmetics state their unlock requirement directly on the card.
@@ -109,7 +109,7 @@ V0.14.6c — COSMETICS & UNLOCK PRESENTATION
 • No new cosmetic rewards were added; the architecture is ready for future achievement/supporter rewards without diluting the current catalogue.
 
 
-V0.14.6c — DEVELOPER WIN TRIGGER
+V0.14.6d — DEVELOPER WIN TRIGGER
 • Added DEV: Trigger Player Win during an active player-controlled frame.
 • Uses the normal frame-win/progression pipeline, so ordinary win statistics, pirate records, first-defeat progression, opponent unlocks and campaign cosmetic rewards are recorded normally.
 • Does not fabricate special-win achievements such as 7-ball, black-on-black or foul-free victory merely because the developer trigger was used.
