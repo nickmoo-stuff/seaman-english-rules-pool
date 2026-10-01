@@ -976,3 +976,12 @@ body>#winModal.rules-modal>.rules-modal-card,body>#gameLogModal.rules-modal>.rul
 
 /* V0.14.3 — richer career statistics and player history */
 .career-stats-grid{display:block}.career-stat-section{margin:0 0 14px}.career-stat-section>h3,.career-history>h3{margin:12px 0 7px;color:#e8c477;font-family:Georgia,serif;font-size:.9rem;letter-spacing:.08em}.career-stat-section-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pirate-record{display:block;margin:7px 0;color:#e8c477;font-size:.82rem}.career-history{margin-top:15px}.career-history-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.career-history-grid>div{padding:9px;border:1px solid #57422e;border-radius:8px;background:#17100c}.career-history-grid small,.career-history-grid b{display:block}.career-history-grid small{color:#a9987e;margin-bottom:3px}.career-history-grid b{color:#e8c477;font-size:.9rem}@media(max-width:560px){.career-stat-section-grid{grid-template-columns:repeat(2,1fr)}.career-history-grid{grid-template-columns:1fr}}
+
+/* V0.14.4 cosmetics ownership + unlock presentation */
+.cosmetic-source{display:inline-flex;align-items:center;width:max-content;margin-bottom:6px;padding:3px 7px;border:1px solid #65583f;border-radius:999px;font-size:.56rem;font-weight:900;letter-spacing:.11em;color:#cdbf9f;background:#15130f}
+.cosmetic-source[data-source="campaign"]{border-color:#9a7435;color:#efd18b}.cosmetic-source[data-source="achievement"]{border-color:#8a6aa4;color:#dec0f2}.cosmetic-source[data-source="supporter"]{border-color:#9b5e72;color:#f0b8c9}.cosmetic-source[data-source="special"]{border-color:#4f8a82;color:#a9e0d8}
+.cosmetic-card-choice.new,.cue-preview-card.new{border-color:#e8c75d;box-shadow:0 0 0 1px rgba(232,199,93,.5) inset,0 0 20px rgba(232,199,93,.18)}
+.cosmetic-card-choice.new::after,.cue-preview-card.new::after{content:'NEW';position:absolute;top:8px;right:8px;padding:4px 7px;border-radius:999px;background:#e4bd4f;color:#1b1408;font-size:.58rem;font-weight:1000;letter-spacing:.12em;box-shadow:0 2px 8px #0008}
+.cosmetic-card-choice.locked .cosmetic-state,.cue-preview-card.locked .cosmetic-state{white-space:normal;max-width:100%;line-height:1.25;border-color:#665348;color:#bfae99}
+.cosmetic-card-choice.locked,.cue-preview-card.locked{filter:saturate(.7)}
+.cosmetic-tab{border-radius:8px 8px 0 0!important}.cosmetic-tab[aria-selected="true"]{background:linear-gradient(180deg,#272116,#171713)!important}

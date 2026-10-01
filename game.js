@@ -45,12 +45,35 @@ function setUnlockedPirateLevel(level){try{localStorage.setItem('seamenPirateUnl
 
 /* V0.12.0: versioned, extensible local career record. This is deliberately separate
    from settings and premium entitlement so future save migrations can preserve both. */
-const CAREER_KEY='seamenCareer',CAREER_SCHEMA=3;
-function defaultCareer(){return{schema:CAREER_SCHEMA,framesPlayed:0,framesWon:0,framesLost:0,shotsTaken:0,legalBallsPotted:0,foulsCommitted:0,bestPotStreak:0,sevenBallWins:0,blackOnBlackWins:0,foulFreeWins:0,oneVisitClearances:0,creditsRead:false,lifetimePremium:false,blackballIntroSeen:false,blackballEndingSeen:false,piratesDefeated:{},earnedAchievements:[],pirateRecords:{},history:{careerStarted:new Date().toISOString(),firstWin:null,firstPirateDefeated:null,chapterOneCompleted:null}};}
-function loadCareer(){let c=defaultCareer();try{const raw=JSON.parse(localStorage.getItem(CAREER_KEY)||'null');if(raw&&typeof raw==='object')c={...c,...raw,piratesDefeated:{...c.piratesDefeated,...(raw.piratesDefeated||{})},earnedAchievements:Array.isArray(raw.earnedAchievements)?[...new Set(raw.earnedAchievements.filter(x=>typeof x==='string'))]:[],pirateRecords:{...(raw.pirateRecords||{})},history:{...c.history,...(raw.history||{})},schema:CAREER_SCHEMA};}catch(e){}return c;}
+const CAREER_KEY='seamenCareer',CAREER_SCHEMA=4;
+function defaultCareer(){return{schema:CAREER_SCHEMA,framesPlayed:0,framesWon:0,framesLost:0,shotsTaken:0,legalBallsPotted:0,foulsCommitted:0,bestPotStreak:0,sevenBallWins:0,blackOnBlackWins:0,foulFreeWins:0,oneVisitClearances:0,creditsRead:false,lifetimePremium:false,blackballIntroSeen:false,blackballEndingSeen:false,piratesDefeated:{},earnedAchievements:[],pirateRecords:{},history:{careerStarted:new Date().toISOString(),firstWin:null,firstPirateDefeated:null,chapterOneCompleted:null},seenCosmetics:[],cosmeticSeenInitialized:false};}
+function loadCareer(){let c=defaultCareer();try{const raw=JSON.parse(localStorage.getItem(CAREER_KEY)||'null');if(raw&&typeof raw==='object')c={...c,...raw,piratesDefeated:{...c.piratesDefeated,...(raw.piratesDefeated||{})},earnedAchievements:Array.isArray(raw.earnedAchievements)?[...new Set(raw.earnedAchievements.filter(x=>typeof x==='string'))]:[],pirateRecords:{...(raw.pirateRecords||{})},history:{...c.history,...(raw.history||{})},seenCosmetics:Array.isArray(raw.seenCosmetics)?[...new Set(raw.seenCosmetics.filter(x=>typeof x==='string'))]:[],cosmeticSeenInitialized:!!raw.cosmeticSeenInitialized,schema:CAREER_SCHEMA};}catch(e){}return c;}
 let career=loadCareer(),frameObjectPots={1:0,2:0},frameFouls={1:0,2:0},frameStatsEligible=false,frameRecorded=false,pendingBlackOnBlackWin=false,pendingOneVisitClearance=false;
 const PIRATE_CUE_REWARDS={1:'dave',2:'simon',3:'holly',4:'mick',5:'blackball',7:'vaper'};
 const PIRATE_CUE_NAMES={1:"Deckhand Dave's Cue",2:"Sweaty Simon's Cue",3:"Holly's Cue",4:"First Mate Mick's Cue",5:"Captain Blackball's Cue"};
+const COSMETICS={
+  tables:{
+    classic:{name:'Classic Tavern',source:'default',sourceId:null,unlock:'Available from the beginning.'},
+    captain:{name:"Captain's Table",source:'default',sourceId:null,unlock:'Available from the beginning.'},
+    spectral:{name:'Spectral Table',source:'default',sourceId:null,unlock:'Available from the beginning.'},
+    privates:{name:"Captain Blackball's Privates",source:'campaign',sourceId:'pirate_blackball',unlock:'Defeat Captain Blackball to unlock.'}
+  },
+  cues:{
+    classic:{name:'Tavern Cue',source:'default',sourceId:null,unlock:'Available from the beginning.'},
+    dave:{name:"Deckhand Dave's Cue",source:'campaign',sourceId:'pirate_dave',unlock:'Defeat Deckhand Dave to unlock.'},
+    simon:{name:"Sweaty Simon's Cue",source:'campaign',sourceId:'pirate_simon',unlock:'Defeat Sweaty Simon to unlock.'},
+    holly:{name:"Holly's Cue",source:'campaign',sourceId:'pirate_holly',unlock:'Defeat Holly to unlock.'},
+    mick:{name:"First Mate Mick's Cue",source:'campaign',sourceId:'pirate_mick',unlock:'Defeat First Mate Mick to unlock.'},
+    blackball:{name:"Captain Blackball's Cue",source:'campaign',sourceId:'pirate_blackball',unlock:'Defeat Captain Blackball to unlock.'},
+    vaper:{name:"Darth Vaper's Cue",source:'campaign',sourceId:'pirate_vaper',unlock:'Defeat Darth Vaper to unlock.'}
+  }
+};
+const COSMETIC_SOURCE_LABELS={default:'DEFAULT',campaign:'CAMPAIGN',achievement:'ACHIEVEMENT',supporter:'SUPPORTER',special:'SPECIAL'};
+function cosmeticKey(type,id){return `${type}:${id}`;}
+function cosmeticIsUnlocked(type,id){if(type==='tables'){if(id!=='privates')return true;return !!career.piratesDefeated['5'];}if(type==='cues')return cueUnlocked(id);return false;}
+function unlockedCosmeticKeys(){const out=[];for(const [type,items] of Object.entries(COSMETICS))for(const id of Object.keys(items))if(cosmeticIsUnlocked(type,id))out.push(cosmeticKey(type,id));return out;}
+function initialiseCosmeticSeenState(){if(career.cosmeticSeenInitialized)return;career.seenCosmetics=[...new Set([...(career.seenCosmetics||[]),...unlockedCosmeticKeys()])];career.cosmeticSeenInitialized=true;career.schema=CAREER_SCHEMA;try{localStorage.setItem(CAREER_KEY,JSON.stringify(career));}catch(e){}}
+function markVisibleCosmeticsSeen(panelKey){const type=panelKey==='tables'?'tables':'cues',seen=new Set(career.seenCosmetics||[]);let changed=false;document.querySelectorAll(`[data-cosmetic-panel="${panelKey}"] [data-theme], [data-cosmetic-panel="${panelKey}"] [data-cue]`).forEach(el=>{const id=el.dataset.theme||el.dataset.cue;if(id&&cosmeticIsUnlocked(type,id)){const key=cosmeticKey(type,id);if(!seen.has(key)){seen.add(key);changed=true;}}});if(changed){career.seenCosmetics=[...seen];try{localStorage.setItem(CAREER_KEY,JSON.stringify(career));}catch(e){}}}
 const PIRATE_TROPHY_IDS={1:'pirate_dave',2:'pirate_simon',3:'pirate_holly',4:'pirate_mick',5:'pirate_blackball'};
 const ACHIEVEMENT_CATEGORIES={career:'CAREER',skill:'SKILL',special:'SPECIAL WINS',pirates:'PIRATES',exploration:'EXPLORATION'};
 const ACHIEVEMENTS=[
@@ -83,6 +106,7 @@ function achievementById(id){return ACHIEVEMENTS.find(a=>a.id===id)||null;}
 function qualifyingAchievementSet(c=career){return new Set(ACHIEVEMENTS.filter(a=>!!a.test(c)).map(a=>a.id));}
 function migrateHistoricalAchievements(){const earned=new Set(career.earnedAchievements||[]);for(const id of qualifyingAchievementSet(career))earned.add(id);career.earnedAchievements=[...earned];career.schema=CAREER_SCHEMA;try{localStorage.setItem(CAREER_KEY,JSON.stringify(career));}catch(e){}}
 migrateHistoricalAchievements();
+initialiseCosmeticSeenState();
 let pendingPirateReward=null;
 function pirateRewardInfo(level){
   const trophy=achievementById(PIRATE_TROPHY_IDS[level]);
@@ -1575,7 +1599,7 @@ const SAVE_FILE_SCHEMA=1;
 const SAVE_KEYS=['seamenCareer','seamenPirateUnlocked','seamenTableTheme','seamenCue','seamenTutorialSeen','seamenAudioSettings','seamenAudio091Music50Migrated'];
 const exportSaveBtn=document.getElementById('exportSave'),importSaveBtn=document.getElementById('importSave'),importSaveFile=document.getElementById('importSaveFile'),resetPlayerDataBtn=document.getElementById('resetPlayerData'),saveDataStatus=document.getElementById('saveDataStatus');
 function setSaveDataStatus(text,isError=false){if(!saveDataStatus)return;saveDataStatus.textContent=text||'';saveDataStatus.style.color=isError?'#f0a49a':'';}
-function collectPortableSave(){const data={};for(const key of SAVE_KEYS){try{const value=localStorage.getItem(key);if(value!==null)data[key]=value;}catch(e){}}return{game:'Seamen English Rules Pool',saveSchema:SAVE_FILE_SCHEMA,gameVersion:'0.14.3b',exportedAt:new Date().toISOString(),data};}
+function collectPortableSave(){const data={};for(const key of SAVE_KEYS){try{const value=localStorage.getItem(key);if(value!==null)data[key]=value;}catch(e){}}return{game:'Seamen English Rules Pool',saveSchema:SAVE_FILE_SCHEMA,gameVersion:'0.14.4',exportedAt:new Date().toISOString(),data};}
 function validatePortableSave(obj){if(!obj||typeof obj!=='object')throw new Error('This is not a valid Seamen save file.');if(obj.game!=='Seamen English Rules Pool')throw new Error('This file does not appear to be a Seamen save.');if(!Number.isInteger(obj.saveSchema)||obj.saveSchema<1||obj.saveSchema>SAVE_FILE_SCHEMA)throw new Error('This save uses an unsupported save-file version.');if(!obj.data||typeof obj.data!=='object'||Array.isArray(obj.data))throw new Error('The save file has no valid data section.');for(const key of Object.keys(obj.data)){if(!SAVE_KEYS.includes(key))throw new Error('The save contains an unexpected data field.');if(typeof obj.data[key]!=='string')throw new Error('The save contains malformed data.');}
  if(obj.data.seamenCareer){let c;try{c=JSON.parse(obj.data.seamenCareer)}catch(e){throw new Error('Career data is damaged.');}if(!c||typeof c!=='object'||Array.isArray(c))throw new Error('Career data is damaged.');if(Number(c.schema||1)>CAREER_SCHEMA)throw new Error('This career save was made by a newer incompatible version.');}
  if(obj.data.seamenAudioSettings){try{const a=JSON.parse(obj.data.seamenAudioSettings);if(!a||typeof a!=='object'||Array.isArray(a))throw 0;}catch(e){throw new Error('Audio/settings data is damaged.');}}
@@ -1678,15 +1702,27 @@ function showWhoIsPlaying(){if(titleScreen)titleScreen.hidden=true;if(gameApp)ga
 if(titlePlay)titlePlay.onclick=()=>{audioReady();showWhoIsPlaying();};
 if(backToTitle)backToTitle.onclick=showTitleScreen;
 if(titleSettings)titleSettings.onclick=()=>{audioReady();refreshAudioSettings();settingsModal.hidden=false;};
+function cosmeticStateText(type,id,unlocked,equipped){
+  const def=COSMETICS[type]?.[id],key=cosmeticKey(type,id),isNew=unlocked&&!(career.seenCosmetics||[]).includes(key);
+  if(equipped)return 'EQUIPPED';
+  if(isNew)return 'NEW';
+  if(unlocked)return 'OWNED';
+  return `LOCKED • ${def?.unlock||'Requirement not met.'}`;
+}
+function decorateCosmeticCard(card,type,id){
+  const def=COSMETICS[type]?.[id];if(!def)return;let badge=card.querySelector('.cosmetic-source');if(!badge){badge=document.createElement('span');badge.className='cosmetic-source';const copy=card.querySelector('.cosmetic-copy')||card;copy.insertBefore(badge,copy.firstChild);}
+  badge.textContent=COSMETIC_SOURCE_LABELS[def.source]||String(def.source||'').toUpperCase();badge.dataset.source=def.source;card.dataset.source=def.source;card.dataset.sourceId=def.sourceId||'';
+}
 function refreshCosmeticsUI(){
   validateEquippedCue();
-  document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>{const locked=b.dataset.theme==='privates'&&!career.piratesDefeated['5'];b.classList.toggle('equipped',b.dataset.theme===equippedTableTheme&&!locked);b.classList.toggle('locked',locked);b.disabled=locked;const state=b.querySelector('.cosmetic-state');if(state&&b.dataset.theme==='privates')state.textContent=locked?'LOCKED 🔒':'AVAILABLE';});
-  document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>{const id=b.dataset.cue,unlocked=cueUnlocked(id);b.classList.toggle('equipped',id===equippedCue);b.classList.toggle('locked',!unlocked);b.disabled=!unlocked;const state=b.querySelector('.cosmetic-state');if(state)state.textContent=id===equippedCue?'EQUIPPED':(unlocked?'AVAILABLE':`LOCKED • Defeat ${b.dataset.owner||'this pirate'}`);});
+  document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>{const id=b.dataset.theme,unlocked=cosmeticIsUnlocked('tables',id),equipped=id===equippedTableTheme&&unlocked,key=cosmeticKey('tables',id),isNew=unlocked&&!(career.seenCosmetics||[]).includes(key);decorateCosmeticCard(b,'tables',id);b.classList.toggle('equipped',equipped);b.classList.toggle('locked',!unlocked);b.classList.toggle('new',isNew);b.disabled=!unlocked;const state=b.querySelector('.cosmetic-state');if(state)state.textContent=cosmeticStateText('tables',id,unlocked,equipped);});
+  document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>{const id=b.dataset.cue,unlocked=cosmeticIsUnlocked('cues',id),equipped=id===equippedCue&&unlocked,key=cosmeticKey('cues',id),isNew=unlocked&&!(career.seenCosmetics||[]).includes(key);decorateCosmeticCard(b,'cues',id);b.classList.toggle('equipped',equipped);b.classList.toggle('locked',!unlocked);b.classList.toggle('new',isNew);b.disabled=!unlocked;const state=b.querySelector('.cosmetic-state');if(state)state.textContent=cosmeticStateText('cues',id,unlocked,equipped);});
 }
-document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.theme==='privates'&&!career.piratesDefeated['5'])return;equippedTableTheme=b.dataset.theme;try{localStorage.setItem('seamenTableTheme',equippedTableTheme)}catch(e){}refreshCosmeticsUI();}));
-document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>b.addEventListener('click',()=>{if(!cueUnlocked(b.dataset.cue))return;equippedCue=b.dataset.cue;try{localStorage.setItem('seamenCue',equippedCue)}catch(e){}refreshCosmeticsUI();}));
-if(titleCosmetics)titleCosmetics.onclick=()=>{if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;cosmeticsScreen.hidden=false;refreshCosmeticsUI();};
-document.querySelectorAll('[data-cosmetic-tab]').forEach(tab=>tab.addEventListener('click',()=>{const key=tab.dataset.cosmeticTab;document.querySelectorAll('[data-cosmetic-tab]').forEach(t=>t.classList.toggle('active',t===tab));document.querySelectorAll('[data-cosmetic-panel]').forEach(p=>{const on=p.dataset.cosmeticPanel===key;p.classList.toggle('active',on);p.hidden=!on;});}));
+function acknowledgeCosmetic(type,id){const key=cosmeticKey(type,id),seen=new Set(career.seenCosmetics||[]);if(!seen.has(key)){seen.add(key);career.seenCosmetics=[...seen];try{localStorage.setItem(CAREER_KEY,JSON.stringify(career));}catch(e){}}}
+document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.theme;if(!cosmeticIsUnlocked('tables',id))return;acknowledgeCosmetic('tables',id);equippedTableTheme=id;try{localStorage.setItem('seamenTableTheme',equippedTableTheme)}catch(e){}refreshCosmeticsUI();}));
+document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.cue;if(!cosmeticIsUnlocked('cues',id))return;acknowledgeCosmetic('cues',id);equippedCue=id;try{localStorage.setItem('seamenCue',equippedCue)}catch(e){}refreshCosmeticsUI();}));
+if(titleCosmetics)titleCosmetics.onclick=()=>{if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;cosmeticsScreen.hidden=false;refreshCosmeticsUI();setTimeout(()=>{markVisibleCosmeticsSeen('tables');},900);};
+document.querySelectorAll('[data-cosmetic-tab]').forEach(tab=>tab.addEventListener('click',()=>{const key=tab.dataset.cosmeticTab;document.querySelectorAll('[data-cosmetic-tab]').forEach(t=>{const active=t===tab;t.classList.toggle('active',active);t.setAttribute('aria-selected',active?'true':'false');});document.querySelectorAll('[data-cosmetic-panel]').forEach(p=>{const on=p.dataset.cosmeticPanel===key;p.classList.toggle('active',on);p.hidden=!on;});refreshCosmeticsUI();setTimeout(()=>{markVisibleCosmeticsSeen(key);},900);}));
 if(cosmeticsBack)cosmeticsBack.onclick=()=>{cosmeticsScreen.hidden=true;titleScreen.hidden=false;};
 refreshCosmeticsUI();
 if(titleTrophies)titleTrophies.onclick=()=>{renderCareer();if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;trophiesScreen.hidden=false;};if(trophiesBack)trophiesBack.onclick=()=>{trophiesScreen.hidden=true;titleScreen.hidden=false;};
