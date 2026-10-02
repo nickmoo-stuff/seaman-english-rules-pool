@@ -135,3 +135,12 @@ Permanent application identity locked for future native/store packaging:
 • Internal build number: 1503
 
 The human-readable APP_VERSION and monotonically increasing APP_BUILD_NUMBER are now separate constants in game.js. APP_BUILD_NUMBER is intended for native/store packaging and must only move upwards. The existing PWA manifest id remains './' deliberately so this technical metadata change does not create a second web-app identity for existing installs. Future Android/iOS wrappers should use com.seamenpool.game as their native package/bundle identifier.
+
+
+V0.15.4 privacy & data foundation
+--------------------------------
+• Added a player-facing Privacy & data page based on an audit of the current game.
+• Clarifies local career/progression storage, preferences, portable save files, PWA cache/offline behaviour, soundtrack/network requests and supporter entitlement separation.
+• Clarifies exactly what Reset player data removes and what it intentionally preserves.
+• No analytics, advertising, user account or payment collection has been added.
+• Application ID remains com.seamenpool.game; human-readable version 0.15.4; internal build 1504.

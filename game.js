@@ -1,12 +1,12 @@
 'use strict';
-// V0.15.3: permanent app identity + release/development build foundation.
+// V0.15.4: privacy & data foundation on the established app identity/build foundation.
 // APP_ID is the package/application identifier for future native wrappers and store builds.
 // APP_VERSION is the human-readable release version. APP_BUILD_NUMBER must only increase for packaged releases.
 const APP_ID='com.seamenpool.game';
 const APP_NAME='Seamen English Rules Pool';
 const APP_SHORT_NAME='Seamen Pool';
-const APP_VERSION='0.15.3';
-const APP_BUILD_NUMBER=1503;
+const APP_VERSION='0.15.4';
+const APP_BUILD_NUMBER=1504;
 const BUILD_MODE='development'; // 'development' | 'release'
 const IS_DEVELOPMENT_BUILD=BUILD_MODE==='development';
 document.documentElement.dataset.buildMode=BUILD_MODE;
@@ -63,7 +63,7 @@ let career=loadCareer(),frameObjectPots={1:0,2:0},frameFouls={1:0,2:0},frameStat
 const PIRATE_CUE_REWARDS={1:'dave',2:'simon',3:'holly',4:'mick',5:'blackball',7:'vaper'};
 const PIRATE_CUE_NAMES={1:"Deckhand Dave's Cue",2:"Sweaty Simon's Cue",3:"Holly's Cue",4:"First Mate Mick's Cue",5:"Captain Blackball's Cue"};
 
-/* V0.15.3 supporter entitlement foundation. Entitlements deliberately live outside
+/* Supporter entitlement foundation. Entitlements deliberately live outside
    career/progression data: resetting a career must never revoke something a store
    says the player owns. The local record is a cache/test provider only; future
    Google/Apple/web providers can replace the answer without touching gameplay. */
@@ -626,7 +626,7 @@ function loop(now){
   if(!gamePaused&&moving){step(dt);if(allStopped())endShot()}
   draw();requestAnimationFrame(loop)
 }
-// V0.15.3 lifecycle hardening: backgrounding/locking a phone must not let an AI
+// Lifecycle hardening: backgrounding/locking a phone must not let an AI
 // decision or watchdog complete behind the player's back. This is a temporary
 // lifecycle suspension only; it does not open the Game menu or alter the frame.
 document.addEventListener('visibilitychange',()=>{
@@ -1672,7 +1672,7 @@ if(musicMute)musicMute.onclick=()=>{musicMuted=!musicMuted;refreshAudioSettings(
 if(portraitMotionToggle)portraitMotionToggle.onclick=()=>{reducedCharacterPortraitMotion=!reducedCharacterPortraitMotion;refreshAudioSettings();saveAudioSettings();};
 const replayTutorial=document.getElementById('replayTutorial');if(replayTutorial)replayTutorial.onclick=()=>{try{localStorage.removeItem(TUTORIAL_KEY)}catch(e){}tutorialActive=false;tutorialSteps.clear();closeTutorialStep();settingsModal.hidden=true;if(settingsOpenedFromGameMenu){settingsOpenedFromGameMenu=false;gameMenuModal.hidden=false;}};
 
-/* V0.15.3 hardened portable save-data framework. Only owned Seamen keys are exported/imported. */
+/* Hardened portable save-data framework. Only owned Seamen keys are exported/imported. */
 const SAVE_FILE_SCHEMA=2;
 const SAVE_KEYS=['seamenCareer','seamenPirateUnlocked','seamenTableTheme','seamenCue','seamenTutorialSeen','seamenAudioSettings','seamenAudio091Music50Migrated','seamenAimGuide','seamenDaveFirstSelectionSeen','seamenFirstRunPathComplete'];
 const PLAYER_PROGRESS_KEYS=['seamenCareer','seamenPirateUnlocked','seamenTableTheme','seamenCue','seamenTutorialSeen','seamenDaveFirstSelectionSeen','seamenFirstRunPathComplete'];
@@ -1798,6 +1798,9 @@ function refreshCosmeticsUI(){validateEquippedCue();document.querySelectorAll('.
 function acknowledgeCosmetic(type,id){const key=cosmeticKey(type,id),seen=new Set(career.seenCosmetics||[]);if(!seen.has(key)){seen.add(key);career.seenCosmetics=[...seen];try{localStorage.setItem(CAREER_KEY,JSON.stringify(career));}catch(e){}}}
 document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.theme;if(!cosmeticIsUnlocked('tables',id))return;acknowledgeCosmetic('tables',id);equippedTableTheme=id;try{localStorage.setItem('seamenTableTheme',equippedTableTheme)}catch(e){}refreshCosmeticsUI();}));
 document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.cue;if(!cosmeticIsUnlocked('cues',id))return;acknowledgeCosmetic('cues',id);equippedCue=id;try{localStorage.setItem('seamenCue',equippedCue)}catch(e){}refreshCosmeticsUI();}));
+const titlePrivacy=document.getElementById('titlePrivacy'),privacyScreen=document.getElementById('privacyScreen'),privacyBack=document.getElementById('privacyBack');
+if(titlePrivacy)titlePrivacy.onclick=()=>{privacyScreen.hidden=false;};
+if(privacyBack)privacyBack.onclick=()=>{privacyScreen.hidden=true;};
 function refreshSupportArea(){if(supportEntitlementState){const owned=hasEntitlement('supporter_founder_test');supportEntitlementState.textContent=owned?'OWNED / YES':'NOT OWNED / NO';supportEntitlementState.classList.toggle('owned',owned);}if(supportAvailability){supportAvailability.textContent=IS_DEVELOPMENT_BUILD?'Development build: use the Developer panel to grant or revoke the test entitlement. No money or store service is involved.':'Supporter purchasing is not enabled in this build.';}}
 if(titleSupport)titleSupport.onclick=()=>{audioReady();if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;supportScreen.hidden=false;refreshSupportArea();};
 if(supportBack)supportBack.onclick=()=>{supportScreen.hidden=true;titleScreen.hidden=false;};
@@ -1927,7 +1930,7 @@ newFrame=function(breaker=1){customGameActive=false;customGameCountsStats=false;
 })();
 
 
-/* V0.15.3 release surface hardening. Developer controls are bound above so the
+/* Release surface hardening. Developer controls are bound above so the
    development build remains unchanged; public builds remove those surfaces only
    after setup, and all hidden developer keyboard shortcuts are gated centrally. */
 function applyBuildModeSurface(){
@@ -1940,7 +1943,7 @@ function applyBuildModeSurface(){
 }
 applyBuildModeSurface();
 
-/* V0.15.3 PWA/app presentation --------------------------------------------
+/* PWA/app presentation --------------------------------------------
    Installation remains optional and non-nagging. The browser decides whether
    an install prompt is available; installed/standalone sessions never show it.
    Service-worker controller changes are surfaced as a restart choice instead
