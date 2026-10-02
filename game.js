@@ -1,5 +1,5 @@
 'use strict';
-// V0.15.0: single release/development build gate. Change only this value when producing a public build.
+// V0.15.1: release/development build gate plus supporter entitlement foundation. Change only this value when producing a public build.
 const BUILD_MODE='development'; // 'development' | 'release'
 const IS_DEVELOPMENT_BUILD=BUILD_MODE==='development';
 document.documentElement.dataset.buildMode=BUILD_MODE;
@@ -55,6 +55,20 @@ function loadCareer(){let c=defaultCareer();try{const raw=JSON.parse(localStorag
 let career=loadCareer(),frameObjectPots={1:0,2:0},frameFouls={1:0,2:0},frameStatsEligible=false,frameRecorded=false,pendingBlackOnBlackWin=false,pendingOneVisitClearance=false;
 const PIRATE_CUE_REWARDS={1:'dave',2:'simon',3:'holly',4:'mick',5:'blackball',7:'vaper'};
 const PIRATE_CUE_NAMES={1:"Deckhand Dave's Cue",2:"Sweaty Simon's Cue",3:"Holly's Cue",4:"First Mate Mick's Cue",5:"Captain Blackball's Cue"};
+
+/* V0.15.1 supporter entitlement foundation. Entitlements deliberately live outside
+   career/progression data: resetting a career must never revoke something a store
+   says the player owns. The local record is a cache/test provider only; future
+   Google/Apple/web providers can replace the answer without touching gameplay. */
+const ENTITLEMENT_KEY='seamenEntitlements',ENTITLEMENT_SCHEMA=1;
+const ENTITLEMENTS={supporter_founder_test:{name:'Supporter Founder Test',kind:'supporter'}};
+function defaultEntitlements(){return{schema:ENTITLEMENT_SCHEMA,owned:{}};}
+function loadEntitlements(){let e=defaultEntitlements();try{const raw=JSON.parse(localStorage.getItem(ENTITLEMENT_KEY)||'null');if(raw&&typeof raw==='object'&&!Array.isArray(raw)){const owned={};for(const [id,value] of Object.entries(raw.owned||{}))if(Object.prototype.hasOwnProperty.call(ENTITLEMENTS,id)&&value===true)owned[id]=true;e={schema:ENTITLEMENT_SCHEMA,owned};}}catch(err){}return e;}
+let entitlements=loadEntitlements();
+function hasEntitlement(id){return !!(id&&entitlements.owned?.[id]===true);}
+function saveEntitlements(){entitlements.schema=ENTITLEMENT_SCHEMA;try{localStorage.setItem(ENTITLEMENT_KEY,JSON.stringify(entitlements));return true;}catch(e){return false;}}
+function setDevEntitlement(id,owned){if(!IS_DEVELOPMENT_BUILD||!Object.prototype.hasOwnProperty.call(ENTITLEMENTS,id))return false;entitlements.owned={...(entitlements.owned||{})};if(owned)entitlements.owned[id]=true;else delete entitlements.owned[id];saveEntitlements();validateEquippedCue();refreshCosmeticsUI?.();refreshDevEntitlementUI();renderCareer();return hasEntitlement(id);}
+function refreshDevEntitlementUI(){const out=document.getElementById('devEntitlementStatus');if(!out)return;const id='supporter_founder_test';out.textContent=`${ENTITLEMENTS[id].name}: ${hasEntitlement(id)?'OWNED / YES':'NOT OWNED / NO'}\nStorage: separate from career; Reset Player Data preserves it.`;}
 const COSMETICS={
   tables:{
     classic:{name:'Classic Tavern',source:'default',sourceId:null,unlock:'Available from the beginning.'},
@@ -69,12 +83,13 @@ const COSMETICS={
     holly:{name:"Holly's Cue",source:'campaign',sourceId:'pirate_holly',unlock:'Defeat Holly to unlock.'},
     mick:{name:"First Mate Mick's Cue",source:'campaign',sourceId:'pirate_mick',unlock:'Defeat First Mate Mick to unlock.'},
     blackball:{name:"Captain Blackball's Cue",source:'campaign',sourceId:'pirate_blackball',unlock:'Defeat Captain Blackball to unlock.'},
-    vaper:{name:"Darth Vaper's Cue",source:'campaign',sourceId:'pirate_vaper',unlock:'Defeat Darth Vaper to unlock.'}
+    vaper:{name:"Darth Vaper's Cue",source:'campaign',sourceId:'pirate_vaper',unlock:'Defeat Darth Vaper to unlock.'},
+    supporter_test:{name:"Supporter's Test Cue",source:'supporter',sourceId:'supporter_founder_test',unlock:'Supporter entitlement required. (Development test cosmetic.)'}
   }
 };
 const COSMETIC_SOURCE_LABELS={default:'DEFAULT',campaign:'CAMPAIGN',achievement:'ACHIEVEMENT',supporter:'SUPPORTER',special:'SPECIAL'};
 function cosmeticKey(type,id){return `${type}:${id}`;}
-function cosmeticIsUnlocked(type,id){if(type==='tables'){if(id!=='privates')return true;return !!career.piratesDefeated['5'];}if(type==='cues')return cueUnlocked(id);return false;}
+function cosmeticIsUnlocked(type,id){const def=COSMETICS[type]?.[id];if(!def)return false;if(def.source==='supporter')return hasEntitlement(def.sourceId);if(type==='tables'){if(id!=='privates')return true;return !!career.piratesDefeated['5'];}if(type==='cues')return cueUnlocked(id);return false;}
 function unlockedCosmeticKeys(){const out=[];for(const [type,items] of Object.entries(COSMETICS))for(const id of Object.keys(items))if(cosmeticIsUnlocked(type,id))out.push(cosmeticKey(type,id));return out;}
 function initialiseCosmeticSeenState(){if(career.cosmeticSeenInitialized)return;career.seenCosmetics=[...new Set([...(career.seenCosmetics||[]),...unlockedCosmeticKeys()])];career.cosmeticSeenInitialized=true;career.schema=CAREER_SCHEMA;try{localStorage.setItem(CAREER_KEY,JSON.stringify(career));}catch(e){}}
 function markVisibleCosmeticsSeen(panelKey){const type=panelKey==='tables'?'tables':'cues',seen=new Set(career.seenCosmetics||[]);let changed=false;document.querySelectorAll(`[data-cosmetic-panel="${panelKey}"] [data-theme], [data-cosmetic-panel="${panelKey}"] [data-cue]`).forEach(el=>{const id=el.dataset.theme||el.dataset.cue;if(id&&cosmeticIsUnlocked(type,id)){const key=cosmeticKey(type,id);if(!seen.has(key)){seen.add(key);changed=true;}}});if(changed){career.seenCosmetics=[...seen];try{localStorage.setItem(CAREER_KEY,JSON.stringify(career));}catch(e){}}}
@@ -117,7 +132,7 @@ function pirateRewardInfo(level){
   return {level,pirate:PIRATES[level]?.name||'Pirate',trophy:trophy?.name||'',cue:PIRATE_CUE_NAMES[level]||'',next:level<5?PIRATES[level+1]?.name||'':null,table:level===5?"Captain Blackball's Privates":null,campaign:level===5};
 }
 function rewardSummaryHTML(info){if(!info)return '';const rows=[];if(info.trophy)rows.push(`<div><span aria-hidden="true">🏆</span><p><small>TROPHY UNLOCKED</small><b>${info.trophy}</b></p></div>`);if(info.cue)rows.push(`<div><span aria-hidden="true">🎱</span><p><small>COSMETIC UNLOCKED</small><b>${info.cue}</b></p></div>`);if(info.table)rows.push(`<div><span aria-hidden="true">✨</span><p><small>TABLE UNLOCKED</small><b>${info.table}</b></p></div>`);if(info.next)rows.push(`<div><span aria-hidden="true">🔓</span><p><small>NEW OPPONENT</small><b>${info.next}</b></p></div>`);if(info.campaign)rows.push(`<div><span aria-hidden="true">🏴‍☠️</span><p><small>CAMPAIGN MILESTONE</small><b>Definitive Pool Shark of Captain Blackball's Domain</b></p></div>`);return `<h3>PIRATE DEFEATED — ${info.pirate}</h3>${rows.join('')}`;}
-function cueUnlocked(cueId){if(cueId==='classic')return true;const level=Object.entries(PIRATE_CUE_REWARDS).find(([,id])=>id===cueId)?.[0];return !!(level&&career.piratesDefeated[String(level)]);}
+function cueUnlocked(cueId){const def=COSMETICS.cues?.[cueId];if(def?.source==='supporter')return hasEntitlement(def.sourceId);if(cueId==='classic')return true;const level=Object.entries(PIRATE_CUE_REWARDS).find(([,id])=>id===cueId)?.[0];return !!(level&&career.piratesDefeated[String(level)]);}
 function validateEquippedCue(){if(!cueUnlocked(equippedCue)){equippedCue='classic';try{localStorage.setItem('seamenCue',equippedCue)}catch(e){}}}
 let trophyKnownUnlocked=new Set(career.earnedAchievements||[]),trophyToastQueue=[],trophyToastBusy=false;
 function trophyUnlockSet(c=career){return new Set(c.earnedAchievements||[]);}
@@ -142,7 +157,7 @@ function renderCareer(){
  const history=document.getElementById('careerHistory');if(history){const fmt=v=>{if(!v)return '—';try{return new Intl.DateTimeFormat(undefined,{year:'numeric',month:'short',day:'numeric'}).format(new Date(v));}catch(e){return '—';}},fp=career.history?.firstPirateDefeated,firstPirate=fp&&PIRATES[fp.level]?`${PIRATES[fp.level].name} • ${fmt(fp.at)}`:'—';history.innerHTML=`<h3>PLAYER HISTORY</h3><div class="career-history-grid"><div><small>Career started</small><b>${fmt(career.history?.careerStarted)}</b></div><div><small>First frame won</small><b>${fmt(career.history?.firstWin)}</b></div><div><small>First pirate defeated</small><b>${firstPirate}</b></div><div><small>Chapter I completed</small><b>${fmt(career.history?.chapterOneCompleted)}</b></div></div>`;}
  const completion=document.getElementById('campaignCompletion');if(completion){const conquered=!!career.piratesDefeated['5'];completion.hidden=!conquered;if(conquered)completion.innerHTML=`<div class="campaign-completion-crown" aria-hidden="true">🏆</div><div><small>MAIN PIRATE CAMPAIGN COMPLETE</small><h3>DEFINITIVE POOL SHARK OF CAPTAIN BLACKBALL'S DOMAIN</h3><p>Defeated Captain Blackball aboard his ship and conquered Pirates o' the Tavern.</p><div class="uncharted-waters-tease"><b>Uncharted Waters</b><span>Strange challengers are rumoured beyond the known seas...</span></div></div>`;}
  const tg=document.getElementById('trophyGrid');if(tg){const earned=new Set(career.earnedAchievements||[]);tg.innerHTML=Object.keys(ACHIEVEMENT_CATEGORIES).map(category=>{const items=ACHIEVEMENTS.filter(a=>a.category===category).map(a=>{const won=earned.has(a.id);return `<div class="trophy-item ${won?'unlocked':''}" data-trophy="${a.id}"><span class="trophy-tier tier-${a.tier.toLowerCase().replace(/\s+/g,'-')}">${a.tier}</span><b>${a.name}</b><small>${a.desc}</small><em>${won?'UNLOCKED ✓':'LOCKED'}</em></div>`}).join('');return `<section class="achievement-category" data-achievement-category="${category}"><h3>${ACHIEVEMENT_CATEGORIES[category]}</h3><div class="achievement-category-grid">${items}</div></section>`}).join('');}
- const dev=document.getElementById('devProgressStats');if(dev)dev.textContent=`Schema: ${career.schema}\nFrames: ${career.framesPlayed} | W ${career.framesWon} | L ${career.framesLost}\nShots: ${career.shotsTaken} | Legal pots: ${career.legalBallsPotted} | Fouls: ${career.foulsCommitted}\nBest pot streak: ${career.bestPotStreak} | 7-ball wins: ${career.sevenBallWins} | Black-on-black wins: ${career.blackOnBlackWins}\nFoul-free wins: ${career.foulFreeWins} | One-visit clearances: ${career.oneVisitClearances}\nAchievements earned: ${(career.earnedAchievements||[]).length}/${ACHIEVEMENTS.length}\nPirate records: ${JSON.stringify(career.pirateRecords||{})}\nCredits read: ${career.creditsRead} | Lifetime premium: ${career.lifetimePremium}\nBlackball intro: ${career.blackballIntroSeen} | ending: ${career.blackballEndingSeen}\nPirates defeated: ${Object.keys(career.piratesDefeated).filter(k=>career.piratesDefeated[k]).join(', ')||'none'}`;
+ const dev=document.getElementById('devProgressStats');if(dev)dev.textContent=`Schema: ${career.schema}\nFrames: ${career.framesPlayed} | W ${career.framesWon} | L ${career.framesLost}\nShots: ${career.shotsTaken} | Legal pots: ${career.legalBallsPotted} | Fouls: ${career.foulsCommitted}\nBest pot streak: ${career.bestPotStreak} | 7-ball wins: ${career.sevenBallWins} | Black-on-black wins: ${career.blackOnBlackWins}\nFoul-free wins: ${career.foulFreeWins} | One-visit clearances: ${career.oneVisitClearances}\nAchievements earned: ${(career.earnedAchievements||[]).length}/${ACHIEVEMENTS.length}\nPirate records: ${JSON.stringify(career.pirateRecords||{})}\nCredits read: ${career.creditsRead} | Legacy lifetime premium: ${career.lifetimePremium}\nSupporter test entitlement: ${hasEntitlement('supporter_founder_test')?'YES':'NO'}\nBlackball intro: ${career.blackballIntroSeen} | ending: ${career.blackballEndingSeen}\nPirates defeated: ${Object.keys(career.piratesDefeated).filter(k=>career.piratesDefeated[k]).join(', ')||'none'}`;
 }
 function pirateIsOpen(level){const isDev=level>=6;return isDev?devPiratesUnlocked:level<=getUnlockedPirateLevel();}
 const DAVE_FIRST_SELECTION_KEY='seamenDaveFirstSelectionSeen';
@@ -604,7 +619,7 @@ function loop(now){
   if(!gamePaused&&moving){step(dt);if(allStopped())endShot()}
   draw();requestAnimationFrame(loop)
 }
-// V0.15.0 lifecycle hardening: backgrounding/locking a phone must not let an AI
+// V0.15.1 lifecycle hardening: backgrounding/locking a phone must not let an AI
 // decision or watchdog complete behind the player's back. This is a temporary
 // lifecycle suspension only; it does not open the Game menu or alter the frame.
 document.addEventListener('visibilitychange',()=>{
@@ -1650,14 +1665,14 @@ if(musicMute)musicMute.onclick=()=>{musicMuted=!musicMuted;refreshAudioSettings(
 if(portraitMotionToggle)portraitMotionToggle.onclick=()=>{reducedCharacterPortraitMotion=!reducedCharacterPortraitMotion;refreshAudioSettings();saveAudioSettings();};
 const replayTutorial=document.getElementById('replayTutorial');if(replayTutorial)replayTutorial.onclick=()=>{try{localStorage.removeItem(TUTORIAL_KEY)}catch(e){}tutorialActive=false;tutorialSteps.clear();closeTutorialStep();settingsModal.hidden=true;if(settingsOpenedFromGameMenu){settingsOpenedFromGameMenu=false;gameMenuModal.hidden=false;}};
 
-/* V0.15.0 hardened portable save-data framework. Only owned Seamen keys are exported/imported. */
+/* V0.15.1 hardened portable save-data framework. Only owned Seamen keys are exported/imported. */
 const SAVE_FILE_SCHEMA=2;
 const SAVE_KEYS=['seamenCareer','seamenPirateUnlocked','seamenTableTheme','seamenCue','seamenTutorialSeen','seamenAudioSettings','seamenAudio091Music50Migrated','seamenAimGuide','seamenDaveFirstSelectionSeen','seamenFirstRunPathComplete'];
 const PLAYER_PROGRESS_KEYS=['seamenCareer','seamenPirateUnlocked','seamenTableTheme','seamenCue','seamenTutorialSeen','seamenDaveFirstSelectionSeen','seamenFirstRunPathComplete'];
 const exportSaveBtn=document.getElementById('exportSave'),importSaveBtn=document.getElementById('importSave'),importSaveFile=document.getElementById('importSaveFile'),resetPlayerDataBtn=document.getElementById('resetPlayerData'),saveDataStatus=document.getElementById('saveDataStatus');
 function setSaveDataStatus(text,isError=false){if(!saveDataStatus)return;saveDataStatus.textContent=text||'';saveDataStatus.style.color=isError?'#f0a49a':'';}
 function collectStorage(keys=SAVE_KEYS){const data={};for(const key of keys){const value=localStorage.getItem(key);if(value!==null)data[key]=value;}return data;}
-function collectPortableSave(){return{game:'Seamen English Rules Pool',saveSchema:SAVE_FILE_SCHEMA,gameVersion:'0.15.0',exportedAt:new Date().toISOString(),data:collectStorage()};}
+function collectPortableSave(){return{game:'Seamen English Rules Pool',saveSchema:SAVE_FILE_SCHEMA,gameVersion:'0.15.1',exportedAt:new Date().toISOString(),data:collectStorage()};}
 function validFlag(v){return v==='0'||v==='1';}
 function validateCareerData(c){if(!c||typeof c!=='object'||Array.isArray(c))throw new Error('Career data is damaged.');if(Number(c.schema||1)>CAREER_SCHEMA)throw new Error('This career save was made by a newer incompatible version.');for(const key of ['framesPlayed','framesWon','framesLost','shotsTaken','legalBallsPotted','foulsCommitted','bestPotStreak','sevenBallWins','blackOnBlackWins','foulFreeWins','oneVisitClearances']){if(c[key]!==undefined&&(!Number.isFinite(Number(c[key]))||Number(c[key])<0))throw new Error('Career data contains an invalid statistic.');}if(c.earnedAchievements!==undefined&&!Array.isArray(c.earnedAchievements))throw new Error('Career achievement data is damaged.');if(c.seenCosmetics!==undefined&&!Array.isArray(c.seenCosmetics))throw new Error('Career cosmetic data is damaged.');if(c.piratesDefeated!==undefined&&(!c.piratesDefeated||typeof c.piratesDefeated!=='object'||Array.isArray(c.piratesDefeated)))throw new Error('Career pirate data is damaged.');if(c.pirateRecords!==undefined&&(!c.pirateRecords||typeof c.pirateRecords!=='object'||Array.isArray(c.pirateRecords)))throw new Error('Career pirate record data is damaged.');}
 function validatePortableSave(obj){if(!obj||typeof obj!=='object'||Array.isArray(obj))throw new Error('This is not a valid Seamen save file.');if(obj.game!=='Seamen English Rules Pool')throw new Error('This file does not appear to be a Seamen save.');if(!Number.isInteger(obj.saveSchema)||obj.saveSchema<1||obj.saveSchema>SAVE_FILE_SCHEMA)throw new Error('This save uses an unsupported save-file version.');if(!obj.data||typeof obj.data!=='object'||Array.isArray(obj.data))throw new Error('The save file has no valid data section.');for(const key of Object.keys(obj.data)){if(!SAVE_KEYS.includes(key))throw new Error('The save contains an unexpected data field.');if(typeof obj.data[key]!=='string')throw new Error('The save contains malformed data.');}
@@ -1795,6 +1810,9 @@ if(devTestScenarios)devTestScenarios.onclick=()=>{audioReady();currentScenario=n
 const devAiVsAi=document.getElementById('devAiVsAi');
 if(devAiVsAi)devAiVsAi.onclick=()=>{audioReady();currentScenario=null;populateAiVsAi();if(titleScreen)titleScreen.hidden=true;if(gameApp)gameApp.hidden=false;playersModal.hidden=false;modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=true;if(testScenarioMenu)testScenarioMenu.hidden=true;if(aiVsAiMenu)aiVsAiMenu.hidden=false;};
 const devTriggerPlayerWin=document.getElementById('devTriggerPlayerWin');if(devTriggerPlayerWin)devTriggerPlayerWin.onclick=()=>{if(!gameApp||gameApp.hidden||!state||state.frameOver){msg.textContent='DEV: Start an active frame before triggering a player win.';return;}if(gameMode==='aivai'){msg.textContent='DEV: Trigger Player Win is for player-controlled frames, not AI vs AI.';return;}devForcedWin=true;try{finishFrame(1,`DEV: ${pname(1)} awarded the frame. ${pname(1)} beat off ${pname(2)}!`,`DEV WIN — ${pname(1)} wins`);}finally{devForcedWin=false;}};
+const devGrantSupporter=document.getElementById('devGrantSupporter');if(devGrantSupporter)devGrantSupporter.onclick=()=>{setDevEntitlement('supporter_founder_test',true);msg.textContent='DEV: supporter test entitlement granted. Test cosmetic is now available.';};
+const devRevokeSupporter=document.getElementById('devRevokeSupporter');if(devRevokeSupporter)devRevokeSupporter.onclick=()=>{setDevEntitlement('supporter_founder_test',false);msg.textContent='DEV: supporter test entitlement revoked. Any equipped supporter test cue falls back safely.';};
+refreshDevEntitlementUI();
 const devResetProgress=document.getElementById('devResetProgress');if(devResetProgress)devResetProgress.onclick=()=>{if(!confirm('Reset ALL saved progression and lifetime statistics? This cannot be undone.'))return;career=defaultCareer();trophyKnownUnlocked=new Set();try{localStorage.removeItem(CAREER_KEY);localStorage.setItem('seamenPirateUnlocked','1');}catch(e){}devPiratesUnlocked=false;saveCareer();refreshPirateButtons();msg.textContent='DEV: progression and statistics reset.';};
 const devAchievementSelect=document.getElementById('devAchievementSelect');
 if(devAchievementSelect){devAchievementSelect.innerHTML=ACHIEVEMENTS.map(a=>`<option value="${a.id}">${a.tier} — ${a.name}</option>`).join('');}
@@ -1899,7 +1917,7 @@ newFrame=function(breaker=1){customGameActive=false;customGameCountsStats=false;
 })();
 
 
-/* V0.15.0 release surface hardening. Developer controls are bound above so the
+/* V0.15.1 release surface hardening. Developer controls are bound above so the
    development build remains unchanged; public builds remove those surfaces only
    after setup, and all hidden developer keyboard shortcuts are gated centrally. */
 function applyBuildModeSurface(){
@@ -1912,7 +1930,7 @@ function applyBuildModeSurface(){
 }
 applyBuildModeSurface();
 
-/* V0.15.0 PWA/app presentation --------------------------------------------
+/* V0.15.1 PWA/app presentation --------------------------------------------
    Installation remains optional and non-nagging. The browser decides whether
    an install prompt is available; installed/standalone sessions never show it.
    Service-worker controller changes are surfaced as a restart choice instead

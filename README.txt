@@ -115,6 +115,6 @@ V0.14.6e — DEVELOPER WIN TRIGGER
 • Does not fabricate special-win achievements such as 7-ball, black-on-black or foul-free victory merely because the developer trigger was used.
 
 
-V0.15.0 build modes
+V0.15.1 build modes
 -------------------
 game.js contains the single BUILD_MODE constant. Use 'development' for QA builds and 'release' for public builds. Release mode removes the developer panel/test-mode entries and disables hidden developer keyboard shortcuts while leaving normal gameplay unchanged.
