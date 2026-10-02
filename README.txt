@@ -123,3 +123,15 @@ game.js contains the single BUILD_MODE constant. Use 'development' for QA builds
 V0.15.2 player-facing Support / Extras area
 --------------------------------------------
 The title screen now has a Support the game & extras area. It explains the no-ads/no-pay-to-win philosophy, presents supporter rewards as cosmetic-only, and reads ownership from the entitlement layer introduced in V0.15.1. Purchasing remains deliberately disabled. In development mode the page reflects the Supporter's Test Cue entitlement granted/revoked through the Developer panel.
+
+
+V0.15.3 app identity & packaging foundation
+--------------------------------------------
+Permanent application identity locked for future native/store packaging:
+• Full name: Seamen English Rules Pool
+• Short/launcher name: Seamen Pool
+• Package/application ID: com.seamenpool.game
+• Human-readable version: 0.15.3
+• Internal build number: 1503
+
+The human-readable APP_VERSION and monotonically increasing APP_BUILD_NUMBER are now separate constants in game.js. APP_BUILD_NUMBER is intended for native/store packaging and must only move upwards. The existing PWA manifest id remains './' deliberately so this technical metadata change does not create a second web-app identity for existing installs. Future Android/iOS wrappers should use com.seamenpool.game as their native package/bundle identifier.
