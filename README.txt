@@ -113,3 +113,8 @@ V0.14.6e — DEVELOPER WIN TRIGGER
 • Added DEV: Trigger Player Win during an active player-controlled frame.
 • Uses the normal frame-win/progression pipeline, so ordinary win statistics, pirate records, first-defeat progression, opponent unlocks and campaign cosmetic rewards are recorded normally.
 • Does not fabricate special-win achievements such as 7-ball, black-on-black or foul-free victory merely because the developer trigger was used.
+
+
+V0.15.0 build modes
+-------------------
+game.js contains the single BUILD_MODE constant. Use 'development' for QA builds and 'release' for public builds. Release mode removes the developer panel/test-mode entries and disables hidden developer keyboard shortcuts while leaving normal gameplay unchanged.

@@ -1008,7 +1008,7 @@ body>#winModal.rules-modal>.rules-modal-card,body>#gameLogModal.rules-modal>.rul
 @media(prefers-reduced-motion:reduce){.first-run-attention{animation:none;outline:2px solid #efcc7c;outline-offset:3px}}
 
 
-/* V0.14.9 PWA/app presentation */
+/* V0.15.0 PWA/app presentation */
 .install-game-button{border-color:#8b6b35!important;box-shadow:inset 0 0 0 1px #d4aa5a33}
 .pwa-notice{position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:4200;width:min(92vw,520px);box-sizing:border-box;padding:10px 12px;border:1px solid #8b6b35;border-radius:10px;background:#17100bf2;color:#ead9bc;box-shadow:0 8px 28px #000a;display:flex;gap:10px;align-items:center;justify-content:space-between;font-size:13px}
 .pwa-notice[hidden]{display:none!important}.pwa-notice button{flex:0 0 auto;padding:7px 10px;min-height:36px}

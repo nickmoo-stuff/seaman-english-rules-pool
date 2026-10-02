@@ -1,4 +1,8 @@
 'use strict';
+// V0.15.0: single release/development build gate. Change only this value when producing a public build.
+const BUILD_MODE='development'; // 'development' | 'release'
+const IS_DEVELOPMENT_BUILD=BUILD_MODE==='development';
+document.documentElement.dataset.buildMode=BUILD_MODE;
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
 const piratePlayerName=document.getElementById('piratePlayerName');
 const aiVsAiMode=document.getElementById('aiVsAiMode'),aiVsAiMenu=document.getElementById('aiVsAiMenu'),aiVsAiP1=document.getElementById('aiVsAiP1'),aiVsAiP2=document.getElementById('aiVsAiP2'),startAiVsAi=document.getElementById('startAiVsAi'),aiVsAiBack=document.getElementById('aiVsAiBack');
@@ -149,7 +153,7 @@ function firstRunGuideActive(){return !firstRunPathComplete()&&!daveFirstSelecti
 function completeFirstRunPath(){try{localStorage.setItem(FIRST_RUN_PATH_KEY,'1');localStorage.setItem(DAVE_FIRST_SELECTION_KEY,'1')}catch(e){}refreshFirstRunGuidance();}
 function refreshFirstRunGuidance(){const active=firstRunGuideActive();document.getElementById('titlePlay')?.classList.toggle('first-run-attention',active&&!document.getElementById('titleScreen')?.hidden);document.getElementById('pirateMode')?.classList.toggle('first-run-attention',active&&!document.getElementById('modeMenu')?.hidden);document.querySelector('.pirate-choice[data-level="1"]')?.classList.toggle('first-pirate-attention',active&&!document.getElementById('piratePlaceholder')?.hidden);document.getElementById('challengePirate')?.classList.toggle('first-run-attention',active&&!document.getElementById('pirateProfileModal')?.hidden&&profiledPirateLevel===1);document.getElementById('startPirateMatch')?.classList.toggle('first-run-attention',active&&!document.getElementById('pirateIntroModal')?.hidden&&pendingPirateStart?.level===1);}
 function shouldHighlightDave(){return firstRunGuideActive();}
-function renderPirateRoster(){const list=document.getElementById('pirateList');if(!list)return;list.innerHTML=PIRATES.slice(1).map((p,i)=>{const level=i+1,nick=p.nickname?` <em>${p.nickname}</em>`:'';return `<button class="pirate-choice" data-level="${level}" type="button"><b>${p.name}${nick}</b><small></small></button>`}).join('');refreshPirateButtons();}
+function renderPirateRoster(){const list=document.getElementById('pirateList');if(!list)return;const roster=IS_DEVELOPMENT_BUILD?PIRATES.slice(1):PIRATES.slice(1,6);list.innerHTML=roster.map((p,i)=>{const level=i+1,nick=p.nickname?` <em>${p.nickname}</em>`:'';return `<button class="pirate-choice" data-level="${level}" type="button"><b>${p.name}${nick}</b><small></small></button>`}).join('');refreshPirateButtons();}
 function refreshPirateButtons(){document.querySelectorAll('.pirate-choice[data-level]').forEach(btn=>{const level=Number(btn.dataset.level),p=PIRATES[level],open=pirateIsOpen(level),isDev=level>=6;btn.disabled=false;btn.classList.toggle('unlocked',open);btn.classList.toggle('locked',!open);btn.classList.toggle('first-pirate-attention',level===1&&open&&shouldHighlightDave());btn.setAttribute('aria-disabled',String(!open));const small=btn.querySelector('small');if(small)small.textContent=isDev?`${p.role} • ${open?'Available':'Locked 🔒'}`:`Difficulty ${level} • ${open?p.role:'Locked 🔒'}`;});}
 const shootBtn=document.getElementById('shoot'),confirmCue=document.getElementById('confirmCue'),cuePlacementControls=document.getElementById('cuePlacementControls'),tableWrap=document.querySelector('.table-wrap'),powerEl=document.getElementById('power'),powerText=document.getElementById('powerText'),angleEl=document.getElementById('angle'),angleText=document.getElementById('angleText'),msg=document.getElementById('message'),turnEl=document.getElementById('turn');
 const phaseEl=document.getElementById('phase'),lastShotEl=document.getElementById('lastShot'),choice=document.getElementById('choice'),choiceText=document.getElementById('choiceText'),choiceA=document.getElementById('choiceA'),choiceB=document.getElementById('choiceB'),turnOverlay=document.getElementById('turnOverlay'),breakHelp=document.getElementById('breakHelp'),breakRules=document.getElementById('breakRules'),closeBreakRules=document.getElementById('closeBreakRules'),winModal=document.getElementById('winModal'),winTitle=document.getElementById('winTitle'),winText=document.getElementById('winText'),playAgain=document.getElementById('playAgain'),returnMenu=document.getElementById('returnMenu');
@@ -600,7 +604,7 @@ function loop(now){
   if(!gamePaused&&moving){step(dt);if(allStopped())endShot()}
   draw();requestAnimationFrame(loop)
 }
-// V0.14.9 lifecycle hardening: backgrounding/locking a phone must not let an AI
+// V0.15.0 lifecycle hardening: backgrounding/locking a phone must not let an AI
 // decision or watchdog complete behind the player's back. This is a temporary
 // lifecycle suspension only; it does not open the Game menu or alter the frame.
 document.addEventListener('visibilitychange',()=>{
@@ -614,7 +618,7 @@ document.addEventListener('visibilitychange',()=>{
 // V0.14.6: the former New Frame control now opens the in-match Game menu.
 document.getElementById('rack').onclick=()=>restartCurrentGame(state?.breaker||1);document.getElementById('clear').onclick=()=>{balls.slice(1).forEach(b=>{if(b.type!=='black')b.potted=true});updateHUD();};document.getElementById('soft').onclick=()=>{powerEl.value=25;powerText.textContent='25%'};document.getElementById('hard').onclick=()=>{powerEl.value=100;powerText.textContent='100%'};
 document.getElementById('toggleAngleGuide').onclick=e=>{devAngleGuide=!devAngleGuide;saveAimGuidePreference();syncAimGuideSwitch();e.currentTarget.textContent=`Toggle guide Ian angle: ${devAngleGuide?'ON':'OFF'}`;};
-document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const tag=(e.target?.tagName||'').toLowerCase();if(tag==='input'||tag==='textarea'||tag==='select'||tag==='button')return;const k=e.key.toLowerCase();if(k==='a'){e.preventDefault();nudgeAngle(-.1);}else if(k==='d'){e.preventDefault();nudgeAngle(.1);}else if(k==='w'){e.preventDefault();nudgePower(5);}else if(k==='s'){e.preventDefault();nudgePower(-5);}else if(k==='g'){e.preventDefault();devAngleGuide=!devAngleGuide;saveAimGuidePreference();syncAimGuideSwitch();const btn=document.getElementById('toggleAngleGuide');if(btn)btn.textContent=`Toggle guide Ian angle: ${devAngleGuide?'ON':'OFF'}`;}else if(k==='e'){e.preventDefault();if(!shootBtn.disabled&&!moving&&!state.frameOver&&!pendingChoice&&placementMode==='none')beginShot();}else if(k==='h'){e.preventDefault();devScenariosUnlocked=true;nightmareScenario.disabled=false;cannonScenario.disabled=false;if(fiveFrameScenario)fiveFrameScenario.disabled=false;nightmareScenario.querySelector('small').textContent='Captain Blackball • 3 reds vs 6-yellow blockade';cannonScenario.querySelector('small').textContent='Captain Blackball • oversized 28-ball rack';if(fiveFrameScenario)fiveFrameScenario.querySelector('small').textContent='Captain Blackball vs Darth Vaper • 5 automatic frames';msg.textContent='DEV: Test scenarios unlocked for this session.';}else if(k==='j'){e.preventDefault();setUnlockedPirateLevel(5);devPiratesUnlocked=true;refreshPirateButtons();msg.textContent="DEV: all five standard pirates plus Ol' Cyclops and Darth Vaper unlocked for testing.";}else if(k==='r'&&state?.frameOver&&!winModal.hidden){e.preventDefault();playAgain.click();}});
+document.addEventListener('keydown',e=>{if(!IS_DEVELOPMENT_BUILD)return;if(e.ctrlKey||e.metaKey||e.altKey)return;const tag=(e.target?.tagName||'').toLowerCase();if(tag==='input'||tag==='textarea'||tag==='select'||tag==='button')return;const k=e.key.toLowerCase();if(k==='a'){e.preventDefault();nudgeAngle(-.1);}else if(k==='d'){e.preventDefault();nudgeAngle(.1);}else if(k==='w'){e.preventDefault();nudgePower(5);}else if(k==='s'){e.preventDefault();nudgePower(-5);}else if(k==='g'){e.preventDefault();devAngleGuide=!devAngleGuide;saveAimGuidePreference();syncAimGuideSwitch();const btn=document.getElementById('toggleAngleGuide');if(btn)btn.textContent=`Toggle guide Ian angle: ${devAngleGuide?'ON':'OFF'}`;}else if(k==='e'){e.preventDefault();if(!shootBtn.disabled&&!moving&&!state.frameOver&&!pendingChoice&&placementMode==='none')beginShot();}else if(k==='h'){e.preventDefault();devScenariosUnlocked=true;nightmareScenario.disabled=false;cannonScenario.disabled=false;if(fiveFrameScenario)fiveFrameScenario.disabled=false;nightmareScenario.querySelector('small').textContent='Captain Blackball • 3 reds vs 6-yellow blockade';cannonScenario.querySelector('small').textContent='Captain Blackball • oversized 28-ball rack';if(fiveFrameScenario)fiveFrameScenario.querySelector('small').textContent='Captain Blackball vs Darth Vaper • 5 automatic frames';msg.textContent='DEV: Test scenarios unlocked for this session.';}else if(k==='j'){e.preventDefault();setUnlockedPirateLevel(5);devPiratesUnlocked=true;refreshPirateButtons();msg.textContent="DEV: all five standard pirates plus Ol' Cyclops and Darth Vaper unlocked for testing.";}else if(k==='r'&&state?.frameOver&&!winModal.hidden){e.preventDefault();playAgain.click();}});
 document.getElementById('pickupCue').onclick=()=>{if(moving||state.frameOver||pendingChoice)return;restoreCue('anywhere');msg.textContent=`DEV: ${pname(state.player)} may tap or drag anywhere on the table to reposition the cue ball, then confirm.`;updateHUD();};
 document.getElementById('unlockPirates').onclick=()=>{setUnlockedPirateLevel(5);devPiratesUnlocked=true;refreshPirateButtons();msg.textContent="DEV: all five standard pirates plus Ol' Cyclops and Darth Vaper unlocked for testing.";};
 document.getElementById('unlockScenarios').onclick=()=>{devScenariosUnlocked=true;nightmareScenario.disabled=false;cannonScenario.disabled=false;if(fiveFrameScenario)fiveFrameScenario.disabled=false;nightmareScenario.querySelector('small').textContent='Captain Blackball • 3 reds vs 6-yellow blockade';cannonScenario.querySelector('small').textContent='Captain Blackball • oversized 28-ball rack';if(fiveFrameScenario)fiveFrameScenario.querySelector('small').textContent='Captain Blackball vs Darth Vaper • 5 automatic frames';msg.textContent='DEV: Test scenarios unlocked for this session.';};
@@ -1624,6 +1628,7 @@ if(closeSettings)closeSettings.onclick=()=>{settingsModal.hidden=true;if(setting
    pressing K jumps straight into the existing developer panel. Deliberately
    undiscoverable in the normal UI. */
 document.addEventListener('keydown',e=>{
+  if(!IS_DEVELOPMENT_BUILD)return;
   if(e.ctrlKey||e.metaKey||e.altKey||e.repeat)return;
   if((e.key||'').toLowerCase()!=='k')return;
   const titleSettingsOpen=settingsModal && !settingsModal.hidden && titleScreen && !titleScreen.hidden;
@@ -1645,14 +1650,14 @@ if(musicMute)musicMute.onclick=()=>{musicMuted=!musicMuted;refreshAudioSettings(
 if(portraitMotionToggle)portraitMotionToggle.onclick=()=>{reducedCharacterPortraitMotion=!reducedCharacterPortraitMotion;refreshAudioSettings();saveAudioSettings();};
 const replayTutorial=document.getElementById('replayTutorial');if(replayTutorial)replayTutorial.onclick=()=>{try{localStorage.removeItem(TUTORIAL_KEY)}catch(e){}tutorialActive=false;tutorialSteps.clear();closeTutorialStep();settingsModal.hidden=true;if(settingsOpenedFromGameMenu){settingsOpenedFromGameMenu=false;gameMenuModal.hidden=false;}};
 
-/* V0.14.9 hardened portable save-data framework. Only owned Seamen keys are exported/imported. */
+/* V0.15.0 hardened portable save-data framework. Only owned Seamen keys are exported/imported. */
 const SAVE_FILE_SCHEMA=2;
 const SAVE_KEYS=['seamenCareer','seamenPirateUnlocked','seamenTableTheme','seamenCue','seamenTutorialSeen','seamenAudioSettings','seamenAudio091Music50Migrated','seamenAimGuide','seamenDaveFirstSelectionSeen','seamenFirstRunPathComplete'];
 const PLAYER_PROGRESS_KEYS=['seamenCareer','seamenPirateUnlocked','seamenTableTheme','seamenCue','seamenTutorialSeen','seamenDaveFirstSelectionSeen','seamenFirstRunPathComplete'];
 const exportSaveBtn=document.getElementById('exportSave'),importSaveBtn=document.getElementById('importSave'),importSaveFile=document.getElementById('importSaveFile'),resetPlayerDataBtn=document.getElementById('resetPlayerData'),saveDataStatus=document.getElementById('saveDataStatus');
 function setSaveDataStatus(text,isError=false){if(!saveDataStatus)return;saveDataStatus.textContent=text||'';saveDataStatus.style.color=isError?'#f0a49a':'';}
 function collectStorage(keys=SAVE_KEYS){const data={};for(const key of keys){const value=localStorage.getItem(key);if(value!==null)data[key]=value;}return data;}
-function collectPortableSave(){return{game:'Seamen English Rules Pool',saveSchema:SAVE_FILE_SCHEMA,gameVersion:'0.14.9',exportedAt:new Date().toISOString(),data:collectStorage()};}
+function collectPortableSave(){return{game:'Seamen English Rules Pool',saveSchema:SAVE_FILE_SCHEMA,gameVersion:'0.15.0',exportedAt:new Date().toISOString(),data:collectStorage()};}
 function validFlag(v){return v==='0'||v==='1';}
 function validateCareerData(c){if(!c||typeof c!=='object'||Array.isArray(c))throw new Error('Career data is damaged.');if(Number(c.schema||1)>CAREER_SCHEMA)throw new Error('This career save was made by a newer incompatible version.');for(const key of ['framesPlayed','framesWon','framesLost','shotsTaken','legalBallsPotted','foulsCommitted','bestPotStreak','sevenBallWins','blackOnBlackWins','foulFreeWins','oneVisitClearances']){if(c[key]!==undefined&&(!Number.isFinite(Number(c[key]))||Number(c[key])<0))throw new Error('Career data contains an invalid statistic.');}if(c.earnedAchievements!==undefined&&!Array.isArray(c.earnedAchievements))throw new Error('Career achievement data is damaged.');if(c.seenCosmetics!==undefined&&!Array.isArray(c.seenCosmetics))throw new Error('Career cosmetic data is damaged.');if(c.piratesDefeated!==undefined&&(!c.piratesDefeated||typeof c.piratesDefeated!=='object'||Array.isArray(c.piratesDefeated)))throw new Error('Career pirate data is damaged.');if(c.pirateRecords!==undefined&&(!c.pirateRecords||typeof c.pirateRecords!=='object'||Array.isArray(c.pirateRecords)))throw new Error('Career pirate record data is damaged.');}
 function validatePortableSave(obj){if(!obj||typeof obj!=='object'||Array.isArray(obj))throw new Error('This is not a valid Seamen save file.');if(obj.game!=='Seamen English Rules Pool')throw new Error('This file does not appear to be a Seamen save.');if(!Number.isInteger(obj.saveSchema)||obj.saveSchema<1||obj.saveSchema>SAVE_FILE_SCHEMA)throw new Error('This save uses an unsupported save-file version.');if(!obj.data||typeof obj.data!=='object'||Array.isArray(obj.data))throw new Error('The save file has no valid data section.');for(const key of Object.keys(obj.data)){if(!SAVE_KEYS.includes(key))throw new Error('The save contains an unexpected data field.');if(typeof obj.data[key]!=='string')throw new Error('The save contains malformed data.');}
@@ -1894,7 +1899,20 @@ newFrame=function(breaker=1){customGameActive=false;customGameCountsStats=false;
 })();
 
 
-/* V0.14.9 PWA/app presentation --------------------------------------------
+/* V0.15.0 release surface hardening. Developer controls are bound above so the
+   development build remains unchanged; public builds remove those surfaces only
+   after setup, and all hidden developer keyboard shortcuts are gated centrally. */
+function applyBuildModeSurface(){
+  if(IS_DEVELOPMENT_BUILD)return;
+  document.querySelector('details')?.remove();
+  testMode?.remove();
+  aiVsAiMode?.remove();
+  const note=document.querySelector('.pirate-note');
+  if(note)note.textContent='Beat each pirate to unlock the next difficulty.';
+}
+applyBuildModeSurface();
+
+/* V0.15.0 PWA/app presentation --------------------------------------------
    Installation remains optional and non-nagging. The browser decides whether
    an install prompt is available; installed/standalone sessions never show it.
    Service-worker controller changes are surfaced as a restart choice instead
