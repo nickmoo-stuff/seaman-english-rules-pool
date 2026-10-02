@@ -1,0 +1,29 @@
+SEAMEN POOL — NATIVE PACKAGING READINESS (V0.15.6)
+===================================================
+
+Chosen wrapper target: Capacitor 8 stable
+Application ID: com.seamenpool.game
+App name: Seamen English Rules Pool
+Short name: Seamen Pool
+Web/PWA remains a supported target.
+
+WHAT V0.15.6 PREPARES
+---------------------
+• Adds a tiny runtime bridge that can distinguish a future native Capacitor container from browser/PWA play.
+• Browser-only Install Game behaviour is suppressed in a native container.
+• Service-worker registration/update presentation is suppressed in a native container; native packages ship their web bundle through the app instead.
+• Existing offline/online status, localStorage save behaviour, lifecycle handling, safe-area CSS and responsive layout remain shared.
+• No Capacitor package, plugin or native Android/iOS project is bundled yet.
+
+AUDIT FINDINGS
+--------------
+• Core runtime assets use relative paths, which is suitable for a packaged web directory.
+• localStorage access is already substantially guarded with try/catch.
+• Safe-area CSS already uses env(safe-area-inset-*).
+• Background/resume handling already suspends rendering/AI work and resets physics timing.
+• External EPA/music links are explicit user actions. Their final native opening behaviour should be tested once the native shell exists.
+• Soundtrack and portrait files referenced under assets/ are not in this compact development ZIP; a self-contained native package must deliberately include the release assets or define an intentional remote strategy.
+
+NEXT NATIVE STAGE
+-----------------
+Create the first Capacitor Android development project from a self-contained web bundle, then test on an Android emulator/physical device before adding store/payment SDKs. iOS can use the same web code and app identity later, but local iOS builds require macOS/Xcode.

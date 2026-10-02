@@ -1,12 +1,12 @@
 'use strict';
-// V0.15.5: credits, licensing and attribution foundation; no gameplay changes.
+// V0.15.6: credits, licensing and attribution foundation; no gameplay changes.
 // APP_ID is the package/application identifier for future native wrappers and store builds.
 // APP_VERSION is the human-readable release version. APP_BUILD_NUMBER must only increase for packaged releases.
 const APP_ID='com.seamenpool.game';
 const APP_NAME='Seamen English Rules Pool';
 const APP_SHORT_NAME='Seamen Pool';
-const APP_VERSION='0.15.5';
-const APP_BUILD_NUMBER=1506;
+const APP_VERSION='0.15.6';
+const APP_BUILD_NUMBER=1507;
 const BUILD_MODE='development'; // 'development' | 'release'
 const IS_DEVELOPMENT_BUILD=BUILD_MODE==='development';
 document.documentElement.dataset.buildMode=BUILD_MODE;
@@ -1954,7 +1954,8 @@ applyBuildModeSurface();
   const noticeText=document.getElementById('pwaNoticeText');
   const noticeAction=document.getElementById('pwaNoticeAction');
   let deferredInstallPrompt=null;
-  const isStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+  const isNativeContainer=()=>!!(window.SeamenRuntime&&window.SeamenRuntime.isNativeContainer());
+  const isStandalone=()=>isNativeContainer()||window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
   function hideInstall(){if(installBtn)installBtn.hidden=true;}
   function showNotice(text,actionLabel,onAction){
     if(!notice||!noticeText)return;
@@ -1963,6 +1964,7 @@ applyBuildModeSurface();
   }
   function hideNotice(){if(notice)notice.hidden=true;}
   window.addEventListener('beforeinstallprompt',e=>{
+    if(isNativeContainer())return;
     e.preventDefault();deferredInstallPrompt=e;
     if(installBtn&&!isStandalone())installBtn.hidden=false;
   });
@@ -1985,7 +1987,7 @@ applyBuildModeSurface();
   window.addEventListener('offline',reflectConnection);window.addEventListener('online',reflectConnection);
   if(!navigator.onLine)reflectConnection();
 
-  if('serviceWorker' in navigator){
+  if(!isNativeContainer()&&'serviceWorker' in navigator){
     let hadController=!!navigator.serviceWorker.controller;
     navigator.serviceWorker.addEventListener('controllerchange',()=>{
       if(hadController){showNotice('Game update ready.', 'Restart game', ()=>location.reload());}

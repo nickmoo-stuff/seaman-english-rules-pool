@@ -1,4 +1,4 @@
-SEAMEN ENGLISH RULES POOL — V0.15.5
+SEAMEN ENGLISH RULES POOL — V0.15.6
 ===================================
 
 A pirate-themed, portrait-first English pool game for desktop/mobile browsers and installable as a PWA.
@@ -8,8 +8,8 @@ APP IDENTITY
 Full name: Seamen English Rules Pool
 Short name: Seamen Pool
 Package/application ID: com.seamenpool.game
-Game version: 0.15.5
-Internal build number: 1506
+Game version: 0.15.6
+Internal build number: 1507
 Build mode: controlled by the BUILD_MODE constant in game.js ('development' or 'release').
 
 CURRENT RELEASE-FOUNDATION STATUS
@@ -21,7 +21,7 @@ CURRENT RELEASE-FOUNDATION STATUS
 • Development and release modes share one codebase; release mode removes developer UI/shortcuts.
 • PWA uses network-first core files with offline fallback. Large soundtrack files are not deliberately cached.
 
-V0.15.5 — CREDITS, LICENSING AND ATTRIBUTION FOUNDATION
+V0.15.6 — CREDITS, LICENSING AND ATTRIBUTION FOUNDATION
 --------------------------------------------------------
 • Audited the shipped source archive for runtime dependencies and external links.
 • About / credits now contains a clear independent-rules-reference statement and a licensing/attribution section.
@@ -48,3 +48,13 @@ The source archive references assets/portraits/*.webp and assets/music/*.m4a pat
 ABOUT / CREDITS
 ---------------
 The player-facing About / credits screen remains the editable public credit surface. about.js intentionally keeps this text separate from the gameplay engine.
+
+
+V0.15.6 — NATIVE PACKAGING READINESS
+-------------------------------------
+• Selected Capacitor 8 stable as the planned native wrapper.
+• Added shared native-container detection without adding a runtime dependency to the existing PWA.
+• Native containers suppress browser-only install prompting and service-worker registration/update UI.
+• Audited relative assets, storage, safe areas, lifecycle handling and external-link assumptions.
+• Added NATIVE-PACKAGING-READINESS.txt with the handoff checklist for the first Android project.
+• No gameplay/rules/physics/AI/progression changes.
