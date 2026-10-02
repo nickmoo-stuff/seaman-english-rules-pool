@@ -1,5 +1,5 @@
 'use strict';
-// V0.15.1: release/development build gate plus supporter entitlement foundation. Change only this value when producing a public build.
+// V0.15.2: release/development build gate plus supporter entitlement and player-facing support-area foundation. Change only this value when producing a public build.
 const BUILD_MODE='development'; // 'development' | 'release'
 const IS_DEVELOPMENT_BUILD=BUILD_MODE==='development';
 document.documentElement.dataset.buildMode=BUILD_MODE;
@@ -56,7 +56,7 @@ let career=loadCareer(),frameObjectPots={1:0,2:0},frameFouls={1:0,2:0},frameStat
 const PIRATE_CUE_REWARDS={1:'dave',2:'simon',3:'holly',4:'mick',5:'blackball',7:'vaper'};
 const PIRATE_CUE_NAMES={1:"Deckhand Dave's Cue",2:"Sweaty Simon's Cue",3:"Holly's Cue",4:"First Mate Mick's Cue",5:"Captain Blackball's Cue"};
 
-/* V0.15.1 supporter entitlement foundation. Entitlements deliberately live outside
+/* V0.15.2 supporter entitlement foundation. Entitlements deliberately live outside
    career/progression data: resetting a career must never revoke something a store
    says the player owns. The local record is a cache/test provider only; future
    Google/Apple/web providers can replace the answer without touching gameplay. */
@@ -67,7 +67,7 @@ function loadEntitlements(){let e=defaultEntitlements();try{const raw=JSON.parse
 let entitlements=loadEntitlements();
 function hasEntitlement(id){return !!(id&&entitlements.owned?.[id]===true);}
 function saveEntitlements(){entitlements.schema=ENTITLEMENT_SCHEMA;try{localStorage.setItem(ENTITLEMENT_KEY,JSON.stringify(entitlements));return true;}catch(e){return false;}}
-function setDevEntitlement(id,owned){if(!IS_DEVELOPMENT_BUILD||!Object.prototype.hasOwnProperty.call(ENTITLEMENTS,id))return false;entitlements.owned={...(entitlements.owned||{})};if(owned)entitlements.owned[id]=true;else delete entitlements.owned[id];saveEntitlements();validateEquippedCue();refreshCosmeticsUI?.();refreshDevEntitlementUI();renderCareer();return hasEntitlement(id);}
+function setDevEntitlement(id,owned){if(!IS_DEVELOPMENT_BUILD||!Object.prototype.hasOwnProperty.call(ENTITLEMENTS,id))return false;entitlements.owned={...(entitlements.owned||{})};if(owned)entitlements.owned[id]=true;else delete entitlements.owned[id];saveEntitlements();validateEquippedCue();refreshCosmeticsUI?.();refreshDevEntitlementUI();refreshSupportArea?.();renderCareer();return hasEntitlement(id);}
 function refreshDevEntitlementUI(){const out=document.getElementById('devEntitlementStatus');if(!out)return;const id='supporter_founder_test';out.textContent=`${ENTITLEMENTS[id].name}: ${hasEntitlement(id)?'OWNED / YES':'NOT OWNED / NO'}\nStorage: separate from career; Reset Player Data preserves it.`;}
 const COSMETICS={
   tables:{
@@ -619,7 +619,7 @@ function loop(now){
   if(!gamePaused&&moving){step(dt);if(allStopped())endShot()}
   draw();requestAnimationFrame(loop)
 }
-// V0.15.1 lifecycle hardening: backgrounding/locking a phone must not let an AI
+// V0.15.2 lifecycle hardening: backgrounding/locking a phone must not let an AI
 // decision or watchdog complete behind the player's back. This is a temporary
 // lifecycle suspension only; it does not open the Game menu or alter the frame.
 document.addEventListener('visibilitychange',()=>{
@@ -1665,14 +1665,14 @@ if(musicMute)musicMute.onclick=()=>{musicMuted=!musicMuted;refreshAudioSettings(
 if(portraitMotionToggle)portraitMotionToggle.onclick=()=>{reducedCharacterPortraitMotion=!reducedCharacterPortraitMotion;refreshAudioSettings();saveAudioSettings();};
 const replayTutorial=document.getElementById('replayTutorial');if(replayTutorial)replayTutorial.onclick=()=>{try{localStorage.removeItem(TUTORIAL_KEY)}catch(e){}tutorialActive=false;tutorialSteps.clear();closeTutorialStep();settingsModal.hidden=true;if(settingsOpenedFromGameMenu){settingsOpenedFromGameMenu=false;gameMenuModal.hidden=false;}};
 
-/* V0.15.1 hardened portable save-data framework. Only owned Seamen keys are exported/imported. */
+/* V0.15.2 hardened portable save-data framework. Only owned Seamen keys are exported/imported. */
 const SAVE_FILE_SCHEMA=2;
 const SAVE_KEYS=['seamenCareer','seamenPirateUnlocked','seamenTableTheme','seamenCue','seamenTutorialSeen','seamenAudioSettings','seamenAudio091Music50Migrated','seamenAimGuide','seamenDaveFirstSelectionSeen','seamenFirstRunPathComplete'];
 const PLAYER_PROGRESS_KEYS=['seamenCareer','seamenPirateUnlocked','seamenTableTheme','seamenCue','seamenTutorialSeen','seamenDaveFirstSelectionSeen','seamenFirstRunPathComplete'];
 const exportSaveBtn=document.getElementById('exportSave'),importSaveBtn=document.getElementById('importSave'),importSaveFile=document.getElementById('importSaveFile'),resetPlayerDataBtn=document.getElementById('resetPlayerData'),saveDataStatus=document.getElementById('saveDataStatus');
 function setSaveDataStatus(text,isError=false){if(!saveDataStatus)return;saveDataStatus.textContent=text||'';saveDataStatus.style.color=isError?'#f0a49a':'';}
 function collectStorage(keys=SAVE_KEYS){const data={};for(const key of keys){const value=localStorage.getItem(key);if(value!==null)data[key]=value;}return data;}
-function collectPortableSave(){return{game:'Seamen English Rules Pool',saveSchema:SAVE_FILE_SCHEMA,gameVersion:'0.15.1',exportedAt:new Date().toISOString(),data:collectStorage()};}
+function collectPortableSave(){return{game:'Seamen English Rules Pool',saveSchema:SAVE_FILE_SCHEMA,gameVersion:'0.15.2',exportedAt:new Date().toISOString(),data:collectStorage()};}
 function validFlag(v){return v==='0'||v==='1';}
 function validateCareerData(c){if(!c||typeof c!=='object'||Array.isArray(c))throw new Error('Career data is damaged.');if(Number(c.schema||1)>CAREER_SCHEMA)throw new Error('This career save was made by a newer incompatible version.');for(const key of ['framesPlayed','framesWon','framesLost','shotsTaken','legalBallsPotted','foulsCommitted','bestPotStreak','sevenBallWins','blackOnBlackWins','foulFreeWins','oneVisitClearances']){if(c[key]!==undefined&&(!Number.isFinite(Number(c[key]))||Number(c[key])<0))throw new Error('Career data contains an invalid statistic.');}if(c.earnedAchievements!==undefined&&!Array.isArray(c.earnedAchievements))throw new Error('Career achievement data is damaged.');if(c.seenCosmetics!==undefined&&!Array.isArray(c.seenCosmetics))throw new Error('Career cosmetic data is damaged.');if(c.piratesDefeated!==undefined&&(!c.piratesDefeated||typeof c.piratesDefeated!=='object'||Array.isArray(c.piratesDefeated)))throw new Error('Career pirate data is damaged.');if(c.pirateRecords!==undefined&&(!c.pirateRecords||typeof c.pirateRecords!=='object'||Array.isArray(c.pirateRecords)))throw new Error('Career pirate record data is damaged.');}
 function validatePortableSave(obj){if(!obj||typeof obj!=='object'||Array.isArray(obj))throw new Error('This is not a valid Seamen save file.');if(obj.game!=='Seamen English Rules Pool')throw new Error('This file does not appear to be a Seamen save.');if(!Number.isInteger(obj.saveSchema)||obj.saveSchema<1||obj.saveSchema>SAVE_FILE_SCHEMA)throw new Error('This save uses an unsupported save-file version.');if(!obj.data||typeof obj.data!=='object'||Array.isArray(obj.data))throw new Error('The save file has no valid data section.');for(const key of Object.keys(obj.data)){if(!SAVE_KEYS.includes(key))throw new Error('The save contains an unexpected data field.');if(typeof obj.data[key]!=='string')throw new Error('The save contains malformed data.');}
@@ -1775,9 +1775,9 @@ refreshAudioSettings();
 
 /* V0.8.6 title screen / outer menu. Presentation only; gameplay engine unchanged. */
 if(settingsModal&&settingsModal.parentElement?.id==='gameApp')document.body.appendChild(settingsModal);
-const gameApp=document.getElementById('gameApp'),titleScreen=document.getElementById('titleScreen'),titlePlay=document.getElementById('titlePlay'),titleSettings=document.getElementById('titleSettings'),titleAbout=document.getElementById('titleAbout'),titleTrophies=document.getElementById('titleTrophies'),titleCosmetics=document.getElementById('titleCosmetics'),cosmeticsScreen=document.getElementById('cosmeticsScreen'),cosmeticsBack=document.getElementById('cosmeticsBack'),trophiesScreen=document.getElementById('trophiesScreen'),trophiesBack=document.getElementById('trophiesBack'),titleSoundToggle=document.getElementById('titleSoundToggle'),aboutScreen=document.getElementById('aboutScreen'),aboutContent=document.getElementById('aboutContent'),aboutBack=document.getElementById('aboutBack'),backToTitle=document.getElementById('backToTitle');
+const gameApp=document.getElementById('gameApp'),titleScreen=document.getElementById('titleScreen'),titlePlay=document.getElementById('titlePlay'),titleSettings=document.getElementById('titleSettings'),titleAbout=document.getElementById('titleAbout'),titleTrophies=document.getElementById('titleTrophies'),titleCosmetics=document.getElementById('titleCosmetics'),titleSupport=document.getElementById('titleSupport'),supportScreen=document.getElementById('supportScreen'),supportBack=document.getElementById('supportBack'),supportEntitlementState=document.getElementById('supportEntitlementState'),supportAvailability=document.getElementById('supportAvailability'),cosmeticsScreen=document.getElementById('cosmeticsScreen'),cosmeticsBack=document.getElementById('cosmeticsBack'),trophiesScreen=document.getElementById('trophiesScreen'),trophiesBack=document.getElementById('trophiesBack'),titleSoundToggle=document.getElementById('titleSoundToggle'),aboutScreen=document.getElementById('aboutScreen'),aboutContent=document.getElementById('aboutContent'),aboutBack=document.getElementById('aboutBack'),backToTitle=document.getElementById('backToTitle');
 function renderAbout(){if(!aboutContent)return;const sections=window.SeamenAbout?.sections||[];aboutContent.innerHTML='';for(const s of sections){const section=document.createElement('section'),h=document.createElement('h3'),p=document.createElement('p');h.textContent=s.title||'';p.textContent=s.body||'';section.append(h,p);if(Array.isArray(s.links)&&s.links.length){const links=document.createElement('p');links.className='about-links';s.links.forEach((item,i)=>{if(i)links.append(document.createTextNode(' | '));const a=document.createElement('a');a.href=item.url;a.textContent=item.label;a.target='_blank';a.rel='noopener noreferrer';links.append(a);});section.append(links);}aboutContent.append(section);}}
-function showTitleScreen(){gamePaused=false;if(gameMenuModal)gameMenuModal.hidden=true;if(rulesHelpModal)rulesHelpModal.hidden=true;pendingPirateStart=null;if(gameApp)gameApp.hidden=true;if(playersModal)playersModal.hidden=true;if(pirateProfileModal)pirateProfileModal.hidden=true;if(pirateIntroModal)pirateIntroModal.hidden=true;if(winModal)winModal.hidden=true;if(gameLogModal)gameLogModal.hidden=true;if(aboutScreen)aboutScreen.hidden=true;if(trophiesScreen)trophiesScreen.hidden=true;if(cosmeticsScreen)cosmeticsScreen.hidden=true;if(progressionRewardModal)progressionRewardModal.hidden=true;if(titleScreen)titleScreen.hidden=false;refreshFirstRunGuidance();}
+function showTitleScreen(){gamePaused=false;if(gameMenuModal)gameMenuModal.hidden=true;if(rulesHelpModal)rulesHelpModal.hidden=true;pendingPirateStart=null;if(gameApp)gameApp.hidden=true;if(playersModal)playersModal.hidden=true;if(pirateProfileModal)pirateProfileModal.hidden=true;if(pirateIntroModal)pirateIntroModal.hidden=true;if(winModal)winModal.hidden=true;if(gameLogModal)gameLogModal.hidden=true;if(aboutScreen)aboutScreen.hidden=true;if(trophiesScreen)trophiesScreen.hidden=true;if(cosmeticsScreen)cosmeticsScreen.hidden=true;if(supportScreen)supportScreen.hidden=true;if(progressionRewardModal)progressionRewardModal.hidden=true;if(titleScreen)titleScreen.hidden=false;refreshFirstRunGuidance();}
 function showWhoIsPlaying(){if(titleScreen)titleScreen.hidden=true;if(gameApp)gameApp.hidden=true;showModeMenu();refreshFirstRunGuidance();}
 if(titlePlay)titlePlay.onclick=()=>{audioReady();showWhoIsPlaying();};
 if(backToTitle)backToTitle.onclick=showTitleScreen;
@@ -1791,6 +1791,9 @@ function refreshCosmeticsUI(){validateEquippedCue();document.querySelectorAll('.
 function acknowledgeCosmetic(type,id){const key=cosmeticKey(type,id),seen=new Set(career.seenCosmetics||[]);if(!seen.has(key)){seen.add(key);career.seenCosmetics=[...seen];try{localStorage.setItem(CAREER_KEY,JSON.stringify(career));}catch(e){}}}
 document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.theme;if(!cosmeticIsUnlocked('tables',id))return;acknowledgeCosmetic('tables',id);equippedTableTheme=id;try{localStorage.setItem('seamenTableTheme',equippedTableTheme)}catch(e){}refreshCosmeticsUI();}));
 document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.cue;if(!cosmeticIsUnlocked('cues',id))return;acknowledgeCosmetic('cues',id);equippedCue=id;try{localStorage.setItem('seamenCue',equippedCue)}catch(e){}refreshCosmeticsUI();}));
+function refreshSupportArea(){if(supportEntitlementState){const owned=hasEntitlement('supporter_founder_test');supportEntitlementState.textContent=owned?'OWNED / YES':'NOT OWNED / NO';supportEntitlementState.classList.toggle('owned',owned);}if(supportAvailability){supportAvailability.textContent=IS_DEVELOPMENT_BUILD?'Development build: use the Developer panel to grant or revoke the test entitlement. No money or store service is involved.':'Supporter purchasing is not enabled in this build.';}}
+if(titleSupport)titleSupport.onclick=()=>{audioReady();if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;supportScreen.hidden=false;refreshSupportArea();};
+if(supportBack)supportBack.onclick=()=>{supportScreen.hidden=true;titleScreen.hidden=false;};
 if(titleCosmetics)titleCosmetics.onclick=()=>{if(gameApp)gameApp.hidden=true;titleScreen.hidden=true;cosmeticsScreen.hidden=false;refreshCosmeticsUI();};
 document.querySelectorAll('[data-cosmetic-tab]').forEach(tab=>tab.addEventListener('click',()=>{const key=tab.dataset.cosmeticTab;document.querySelectorAll('[data-cosmetic-tab]').forEach(t=>{const active=t===tab;t.classList.toggle('active',active);t.setAttribute('aria-selected',active?'true':'false');});document.querySelectorAll('[data-cosmetic-panel]').forEach(p=>{const on=p.dataset.cosmeticPanel===key;p.classList.toggle('active',on);p.hidden=!on;});refreshCosmeticsUI();}));
 document.querySelectorAll('[data-cosmetic-filter]').forEach(btn=>btn.addEventListener('click',()=>{activeCosmeticFilter=btn.dataset.cosmeticFilter||'all';document.querySelectorAll('[data-cosmetic-filter]').forEach(b=>{const active=b===btn;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active?'true':'false');});applyCosmeticFilter();}));
@@ -1917,7 +1920,7 @@ newFrame=function(breaker=1){customGameActive=false;customGameCountsStats=false;
 })();
 
 
-/* V0.15.1 release surface hardening. Developer controls are bound above so the
+/* V0.15.2 release surface hardening. Developer controls are bound above so the
    development build remains unchanged; public builds remove those surfaces only
    after setup, and all hidden developer keyboard shortcuts are gated centrally. */
 function applyBuildModeSurface(){
@@ -1930,7 +1933,7 @@ function applyBuildModeSurface(){
 }
 applyBuildModeSurface();
 
-/* V0.15.1 PWA/app presentation --------------------------------------------
+/* V0.15.2 PWA/app presentation --------------------------------------------
    Installation remains optional and non-nagging. The browser decides whether
    an install prompt is available; installed/standalone sessions never show it.
    Service-worker controller changes are surfaced as a restart choice instead
