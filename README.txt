@@ -1,146 +1,50 @@
-SEAMEN ENGLISH RULES POOL — V0.14.6e
-====================================
+SEAMEN ENGLISH RULES POOL — V0.15.5
+===================================
 
-A pirate-themed, portrait-first browser pool game built around English Pool Association international eightball rules. Designed for desktop and mobile browsers and installable as a Progressive Web App (PWA).
+A pirate-themed, portrait-first English pool game for desktop/mobile browsers and installable as a PWA.
 
-CURRENT GAME
+APP IDENTITY
 ------------
-• 2 players locally on the same device.
-• Pirates o' the Tavern single-player campaign with sequential opponent progression.
-• Five standard pirate difficulty levels, plus developer/special opponents used for advanced QA.
-• Captain Blackball campaign finale, private-quarters showdown, ending sequence and unlockable "Captain Blackball's Privates" table.
-• Career statistics, trophies and persistent pirate progression.
-• Table and cue cosmetics, including unlockable opponent rewards.
-• First-time tutorial with replay option in Settings.
-• Export/import save data and reset-player-data controls.
-• Original soundtrack, contextual pirate dialogue and game sound effects.
-• Master/music volume, mute controls and reduced character portrait motion setting.
+Full name: Seamen English Rules Pool
+Short name: Seamen Pool
+Package/application ID: com.seamenpool.game
+Game version: 0.15.5
+Internal build number: 1506
+Build mode: controlled by the BUILD_MODE constant in game.js ('development' or 'release').
 
-RULES & GAMEPLAY
-----------------
-The game uses the EPA International Eightball rules framework implemented by the existing rules engine, including the three-point legal-break system, open-table/group assignment, fouls, ball-in-hand handling and black-ball frame outcomes.
+CURRENT RELEASE-FOUNDATION STATUS
+---------------------------------
+• Career, achievements, statistics, campaign progression and cosmetics are persistent.
+• Portable JSON save export/import is supported.
+• Supporter entitlements are separate from career saves and cosmetic-only.
+• Privacy and data information is available from the title screen.
+• Development and release modes share one codebase; release mode removes developer UI/shortcuts.
+• PWA uses network-first core files with offline fallback. Large soundtrack files are not deliberately cached.
 
-The physics, rules and AI are shared by human and computer-controlled play. AI opponents do not receive hidden physics advantages. Higher-level AI can evaluate pots, safeties, escapes and frame-ball decisions using the same table state and physics engine.
+V0.15.5 — CREDITS, LICENSING AND ATTRIBUTION FOUNDATION
+--------------------------------------------------------
+• Audited the shipped source archive for runtime dependencies and external links.
+• About / credits now contains a clear independent-rules-reference statement and a licensing/attribution section.
+• The shipped HTML loads only local dialogue.js, about.js and game.js; no third-party JavaScript framework/library is bundled in this archive.
+• Current external player-facing links are the English Pool Association rules page and soundtrack pages on Spotify, Apple Music, Amazon Music and YouTube Music.
+• No gameplay, physics, AI, progression, entitlement or save behaviour changed.
 
-CONTROLS
---------
-Aim with the angle slider/buttons and choose shot strength with the power slider/buttons, then press PLAY SHOT. During cue-ball-in-hand placement, tap/drag the white or use the directional controls and confirm its position.
+PRE-STORE ASSET / LICENSING CHECKLIST
+-------------------------------------
+This is an audit checklist, not a claim that every release right has already been verified.
 
-Useful desktop keys during play:
-A / D  fine aim
-W / S  power
-E      play shot
-G      developer angle guide
-R      rematch from the result screen
+[ ] Keep source/provenance records for the two app icons and any future store artwork.
+[ ] Verify commercial-use rights/provenance for every generated or externally-created visual asset before store submission.
+[ ] Verify commercial-use rights/provenance for every soundtrack master and sound asset before bundling/distribution.
+[ ] Keep any attribution text required by the tools/services used to create final assets.
+[ ] Review character names/artwork for third-party trademark/copyright resemblance before public store submission; the development-only 'Darth Vaper' special opponent deserves an explicit review if ever exposed or shipped as public content.
+[ ] Keep the English Pool Association reference descriptive and independent; do not imply endorsement or official affiliation.
+[ ] Re-run this audit when native wrappers, SDKs, analytics, payments, ads or other third-party libraries are introduced, because those may add notices/licences/data disclosures.
 
-PWA / INSTALLATION
-------------------
-The game can be installed from a supported browser as a standalone PWA. Core game code, portraits and icons are cached for fallback/offline use. Large soundtrack files are deliberately not stored in the service-worker cache. Core HTML/CSS/JavaScript uses network-first loading so deployed updates are preferred when online.
-
-DEVELOPER / QA TOOLS
---------------------
-The normal Play menu intentionally shows only the two player-facing modes: local two-player and Pirates o' the Tavern.
-
-Developer test scenarios and AI-vs-AI simulation remain available through the Developer test panel. From the title screen, open Settings and press K to jump to the developer panel. The panel also contains progression unlocks, custom tables, Blackball showdown triggering and other QA controls.
-
-Some additional QA keyboard shortcuts remain in the source/build for testing.
-
-V0.14.6e MILESTONE
------------------
-V0.14.6e is a release-polish milestone promoted from the passing V0.13.5 baseline. It does not retune pool physics, EPA rules, AI behaviour, soundtrack logic, progression, cosmetics or the Captain Blackball sequence.
-
-Changes in this milestone:
-• Replaced the historical prototype README with current game documentation.
-• Removed Test scenarios and AI vs AI from the ordinary player-facing Play menu.
-• Retained both QA modes through the Developer test panel.
-• Advanced visible version and PWA cache generation to V0.14.6e.
-
-FUTURE / DELIBERATELY NOT PART OF V0.14.6e
-------------------------------------------
-• Online multiplayer.
-• Supporter/reward functionality.
-• Further "Uncharted Waters" post-campaign opponents and content.
+PACKAGING NOTE
+--------------
+The source archive references assets/portraits/*.webp and assets/music/*.m4a paths, but those asset files are not contained in this compact ZIP. Existing hosted deployments may provide them separately. A native/store package must include or deliberately fetch every required release asset and must carry the matching provenance/licensing record.
 
 ABOUT / CREDITS
 ---------------
-See About / credits inside the game for the current creator, testing, tools and soundtrack credits and music links.
-
-
-V0.14.6e — PROGRESSION & REWARD INTEGRATION
-• First-time pirate victories now present the trophy, cue cosmetic and next-opponent unlock together on the result screen.
-• Captain Blackball's first victory presents his cue, private table and campaign-completion milestone after the ending scene.
-• Career > Pirates defeated now shows each pirate's reward and progression relationship.
-• Portable save metadata now reports the current game version (0.14.1) instead of the stale 0.13.4 value.
-• No pool physics, EPA rules, AI behaviour or soundtrack logic changed.
-
-
-V0.14.6e — ACHIEVEMENT SYSTEM V2
-
-• Replaces the short 1/5/20/50 win ladder with long-term 1/10/25/50/100/250/500/1000 milestones.
-• Adds category and tier metadata: Career, Skill, Special Wins, Pirates and Exploration; Bronze through Prestige.
-• Adds uninterrupted legal pot-streak achievements at 2, 3, 5 and 7, plus a strict Prestige one-visit clearance for all seven colours followed by the black.
-• Keeps 7-balling separate from pot streaks.
-• Adds foul-free-win tracking and achievement.
-• Persists stable achievement IDs and silently migrates historical achievements from existing career statistics on first load.
-• Achievement definitions include optional reward hooks for future cosmetics; V0.14.6e adds no new cosmetic rewards.
-• Career schema advanced to 2; portable saves remain version-checked and include the new fields.
-
-
-V0.14.6e — ACHIEVEMENT QA / WORLDBUILDING TEXT
-• Renames the Chapter I completion milestone to ‘Definitive Pool Shark of Captain Blackball’s Domain’.
-• Adds a Developer-panel achievement preview selector that can display any achievement toast without altering career statistics or earned-achievement state.
-
-
-V0.14.6e — STATISTICS & PLAYER HISTORY
-• Career schema v3 adds per-pirate win/loss records and player-history landmarks.
-• Statistics are grouped into Career Record, Potting & Performance, Discipline and Special Victories.
-• Adds pots per 100 shots, fouls per frame, foul-free wins and one-visit clearances to the visible statistics screen.
-• Pirates o' the Tavern cards now show persistent W/L records.
-• Player History records career start, first win, first pirate defeated and Chapter I completion dates.
-• No pool physics, EPA rules, AI behaviour, achievement thresholds, cosmetics or soundtrack logic changed.
-
-
-V0.14.6e — COSMETICS & UNLOCK PRESENTATION
-• Cosmetics remain split into TABLES and CUES tabs, now with clearer tab semantics.
-• Cosmetic definitions now carry stable ownership-source metadata: Default, Campaign, Achievement, Supporter or Special.
-• Locked campaign cosmetics state their unlock requirement directly on the card.
-• Newly unlocked cosmetics can display a NEW marker until their relevant catalogue tab has been viewed or the item selected.
-• Career schema advanced to v4 to persist cosmetic seen/unseen state. Existing unlocked items are treated as already seen on migration.
-• No new cosmetic rewards were added; the architecture is ready for future achievement/supporter rewards without diluting the current catalogue.
-
-
-V0.14.6e — DEVELOPER WIN TRIGGER
-• Added DEV: Trigger Player Win during an active player-controlled frame.
-• Uses the normal frame-win/progression pipeline, so ordinary win statistics, pirate records, first-defeat progression, opponent unlocks and campaign cosmetic rewards are recorded normally.
-• Does not fabricate special-win achievements such as 7-ball, black-on-black or foul-free victory merely because the developer trigger was used.
-
-
-V0.15.2 release/support foundation
--------------------
-game.js contains the single BUILD_MODE constant. Use 'development' for QA builds and 'release' for public builds. Release mode removes the developer panel/test-mode entries and disables hidden developer keyboard shortcuts while leaving normal gameplay unchanged.
-
-
-V0.15.2 player-facing Support / Extras area
---------------------------------------------
-The title screen now has a Support the game & extras area. It explains the no-ads/no-pay-to-win philosophy, presents supporter rewards as cosmetic-only, and reads ownership from the entitlement layer introduced in V0.15.1. Purchasing remains deliberately disabled. In development mode the page reflects the Supporter's Test Cue entitlement granted/revoked through the Developer panel.
-
-
-V0.15.3 app identity & packaging foundation
---------------------------------------------
-Permanent application identity locked for future native/store packaging:
-• Full name: Seamen English Rules Pool
-• Short/launcher name: Seamen Pool
-• Package/application ID: com.seamenpool.game
-• Human-readable version: 0.15.3
-• Internal build number: 1503
-
-The human-readable APP_VERSION and monotonically increasing APP_BUILD_NUMBER are now separate constants in game.js. APP_BUILD_NUMBER is intended for native/store packaging and must only move upwards. The existing PWA manifest id remains './' deliberately so this technical metadata change does not create a second web-app identity for existing installs. Future Android/iOS wrappers should use com.seamenpool.game as their native package/bundle identifier.
-
-
-V0.15.4 privacy & data foundation
---------------------------------
-• Added a player-facing Privacy & data page based on an audit of the current game.
-• Clarifies local career/progression storage, preferences, portable save files, PWA cache/offline behaviour, soundtrack/network requests and supporter entitlement separation.
-• Clarifies exactly what Reset player data removes and what it intentionally preserves.
-• No analytics, advertising, user account or payment collection has been added.
-• Application ID remains com.seamenpool.game; human-readable version 0.15.4; internal build 1504.
+The player-facing About / credits screen remains the editable public credit surface. about.js intentionally keeps this text separate from the gameplay engine.
