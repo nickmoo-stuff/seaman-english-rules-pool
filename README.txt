@@ -1,4 +1,4 @@
-SEAMEN ENGLISH RULES POOL — V0.15.6
+SEAMEN ENGLISH RULES POOL — V0.15.7aa
 ===================================
 
 A pirate-themed, portrait-first English pool game for desktop/mobile browsers and installable as a PWA.
@@ -8,8 +8,8 @@ APP IDENTITY
 Full name: Seamen English Rules Pool
 Short name: Seamen Pool
 Package/application ID: com.seamenpool.game
-Game version: 0.15.6
-Internal build number: 1507
+Game version: 0.15.7aa
+Internal build number: 1509
 Build mode: controlled by the BUILD_MODE constant in game.js ('development' or 'release').
 
 CURRENT RELEASE-FOUNDATION STATUS
@@ -20,6 +20,13 @@ CURRENT RELEASE-FOUNDATION STATUS
 • Privacy and data information is available from the title screen.
 • Development and release modes share one codebase; release mode removes developer UI/shortcuts.
 • PWA uses network-first core files with offline fallback. Large soundtrack files are not deliberately cached.
+
+V0.15.7b — FIRST NATIVE ANDROID FIX
+----------------------------------
+- The unsupported/embedded-browser warning now explicitly bypasses a confirmed Capacitor native container.
+- Android WebView's normal `wv` user-agent marker no longer causes a false unsupported-browser warning inside the packaged app.
+- Ordinary embedded social/in-app browsers remain covered by the existing warning.
+- No gameplay, physics, AI, audio or layout changes.
 
 V0.15.6 — CREDITS, LICENSING AND ATTRIBUTION FOUNDATION
 --------------------------------------------------------

@@ -1017,3 +1017,80 @@ body>#winModal.rules-modal>.rules-modal-card,body>#gameLogModal.rules-modal>.rul
 
 /* V0.15.2 player-facing Support / Extras area */
 .support-menu-button small{display:block;margin-top:3px;color:#c8b895;font-size:.72em}.support-card{max-width:620px}.support-kicker{display:block;text-align:center;color:#d7ad5b;font-weight:900;letter-spacing:.16em;margin-bottom:5px}.support-card>h2{text-align:center}.support-lead{text-align:center;color:#e3d4ba;line-height:1.45}.support-section{margin:15px 0;padding:14px;border:1px solid #5b4228;border-radius:10px;background:#17100bcc}.support-section h3{margin:0 0 7px;color:#e8c477;font-family:Georgia,serif}.support-section p{line-height:1.45}.support-reward-card{display:grid;gap:6px;margin:12px 0;padding:12px;border:1px solid #705345;border-radius:9px;background:#211610}.support-reward-card b{color:#f0d69a}.support-reward-card small{color:#bcae98;line-height:1.35}.support-reward-card em{width:max-content;max-width:100%;padding:4px 8px;border:1px solid #665348;border-radius:999px;color:#bfae99;font-size:.68rem;font-weight:900;font-style:normal;letter-spacing:.08em}.support-reward-card em.owned{border-color:#9b5e72;color:#f0b8c9}.support-availability{margin-bottom:0!important;color:#cdbf9f;font-size:.86rem}
+\n\n/* V0.15.7a — physical Android title-menu polish.\n   Keep desktop/tablet presentation intact; give phone menus smaller type and\n   more breathing room. Native wrappers never expose the browser/PWA installer. */\n.seamen-native #installGame{display:none!important}\n@media(max-width:460px){\n  .title-screen .title-menu-actions{gap:11px}\n  .title-screen .title-menu-actions button,\n  .title-screen .title-menu-actions .button-link{font-size:12px;line-height:1.22}\n  .title-screen .title-menu-actions .rules-link-button>span{font-size:11px;line-height:1.25}\n}\n
+/* V0.15.7b — hidden must beat generic authored button display rules. */
+#installGame[hidden],html.seamen-native #installGame{display:none!important}
+
+/* V0.15.7b: first-run opponent profile stability on Android/mobile.
+   Suspend the roster pulse while its modal is open, and keep Challenge highlighted
+   without running a second competing animation. Keep profile identity left-aligned
+   beside the portrait on narrow native screens. */
+#pirateProfileModal #challengePirate.first-run-attention{
+  animation:none;
+  outline:2px solid #efcc7c;
+  outline-offset:3px;
+  box-shadow:inset 0 1px #fff8,0 3px 9px #0005,0 0 14px rgba(239,204,124,.42);
+  filter:none;
+}
+.pirate-profile-title{min-width:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
+.pirate-profile-title small,.pirate-profile-title h2,.pirate-profile-title .pirate-difficulty{text-align:left}
+
+/* V0.15.7bb — opponent profile header: repair the 7ba stylesheet block and
+   make the portrait/text columns explicit on phones. */
+@media(max-width:520px){
+  #pirateProfileModal .pirate-profile-top{
+    display:grid !important;
+    grid-template-columns:84px minmax(0,1fr) !important;
+    column-gap:14px !important;
+    align-items:center !important;
+  }
+  #pirateProfileModal .pirate-portrait{
+    width:84px !important;
+    min-width:84px !important;
+    height:84px !important;
+    aspect-ratio:auto !important;
+    align-self:center !important;
+  }
+  #pirateProfileModal .pirate-profile-title{
+    min-width:0 !important;
+    width:100%;
+    overflow:visible;
+    margin:0 !important;
+    padding:0 !important;
+  }
+  #pirateProfileModal .pirate-profile-title small{
+    display:block;
+    margin:0 0 3px !important;
+    font-size:10px;
+    line-height:1.15;
+    letter-spacing:.05em;
+  }
+  #pirateProfileModal .pirate-profile-title h2{
+    display:block;
+    width:100%;
+    max-width:100%;
+    margin:0 0 7px !important;
+    font-size:22px !important;
+    line-height:1.02;
+    overflow-wrap:normal;
+    word-break:normal;
+  }
+  #pirateProfileModal .pirate-difficulty{
+    display:inline-block;
+    max-width:100%;
+    box-sizing:border-box;
+    padding:4px 7px;
+    font-size:9px;
+    line-height:1.15;
+    white-space:normal;
+  }
+}
+
+
+/* V0.15.8 — touch/mobile precision slider locks retained from frozen Android baseline. */
+.touch-slider-lock{display:none!important}
+@media(pointer:coarse){
+  .controls .touch-slider-lock{display:block!important;margin:-2px 0 10px;min-height:38px;background:#3a2a1c;color:#f5ead5;border:1px solid #6b5033;font-size:13px;letter-spacing:.035em}
+  .controls .touch-slider-lock[aria-pressed='true']{background:#c9963c;color:#17120d}
+  .controls input.touch-slider-locked{opacity:.48}
+}

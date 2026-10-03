@@ -1,13 +1,13 @@
 'use strict';
-// V0.15.6: credits, licensing and attribution foundation; no gameplay changes.
+// V0.15.8: Android release-foundation test from frozen v0.15.7da native baseline.
 // APP_ID is the package/application identifier for future native wrappers and store builds.
 // APP_VERSION is the human-readable release version. APP_BUILD_NUMBER must only increase for packaged releases.
 const APP_ID='com.seamenpool.game';
 const APP_NAME='Seamen English Rules Pool';
 const APP_SHORT_NAME='Seamen Pool';
-const APP_VERSION='0.15.6';
-const APP_BUILD_NUMBER=1507;
-const BUILD_MODE='development'; // 'development' | 'release'
+const APP_VERSION='0.15.8';
+const APP_BUILD_NUMBER=1518;
+const BUILD_MODE='release'; // 'development' | 'release'
 const IS_DEVELOPMENT_BUILD=BUILD_MODE==='development';
 document.documentElement.dataset.buildMode=BUILD_MODE;
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
@@ -173,7 +173,7 @@ function daveFirstSelectionSeen(){try{return localStorage.getItem(DAVE_FIRST_SEL
 function firstRunPathComplete(){try{return localStorage.getItem(FIRST_RUN_PATH_KEY)==='1'}catch(e){return false}}
 function firstRunGuideActive(){return !firstRunPathComplete()&&!daveFirstSelectionSeen()&&career.framesPlayed===0&&!career.piratesDefeated?.['1'];}
 function completeFirstRunPath(){try{localStorage.setItem(FIRST_RUN_PATH_KEY,'1');localStorage.setItem(DAVE_FIRST_SELECTION_KEY,'1')}catch(e){}refreshFirstRunGuidance();}
-function refreshFirstRunGuidance(){const active=firstRunGuideActive();document.getElementById('titlePlay')?.classList.toggle('first-run-attention',active&&!document.getElementById('titleScreen')?.hidden);document.getElementById('pirateMode')?.classList.toggle('first-run-attention',active&&!document.getElementById('modeMenu')?.hidden);document.querySelector('.pirate-choice[data-level="1"]')?.classList.toggle('first-pirate-attention',active&&!document.getElementById('piratePlaceholder')?.hidden);document.getElementById('challengePirate')?.classList.toggle('first-run-attention',active&&!document.getElementById('pirateProfileModal')?.hidden&&profiledPirateLevel===1);document.getElementById('startPirateMatch')?.classList.toggle('first-run-attention',active&&!document.getElementById('pirateIntroModal')?.hidden&&pendingPirateStart?.level===1);}
+function refreshFirstRunGuidance(){const active=firstRunGuideActive();document.getElementById('titlePlay')?.classList.toggle('first-run-attention',active&&!document.getElementById('titleScreen')?.hidden);document.getElementById('pirateMode')?.classList.toggle('first-run-attention',active&&!document.getElementById('modeMenu')?.hidden);document.querySelector('.pirate-choice[data-level="1"]')?.classList.toggle('first-pirate-attention',active&&!document.getElementById('piratePlaceholder')?.hidden&&document.getElementById('pirateProfileModal')?.hidden);document.getElementById('challengePirate')?.classList.toggle('first-run-attention',active&&!document.getElementById('pirateProfileModal')?.hidden&&profiledPirateLevel===1);document.getElementById('startPirateMatch')?.classList.toggle('first-run-attention',active&&!document.getElementById('pirateIntroModal')?.hidden&&pendingPirateStart?.level===1);}
 function shouldHighlightDave(){return firstRunGuideActive();}
 function renderPirateRoster(){const list=document.getElementById('pirateList');if(!list)return;const roster=IS_DEVELOPMENT_BUILD?PIRATES.slice(1):PIRATES.slice(1,6);list.innerHTML=roster.map((p,i)=>{const level=i+1,nick=p.nickname?` <em>${p.nickname}</em>`:'';return `<button class="pirate-choice" data-level="${level}" type="button"><b>${p.name}${nick}</b><small></small></button>`}).join('');refreshPirateButtons();}
 function refreshPirateButtons(){document.querySelectorAll('.pirate-choice[data-level]').forEach(btn=>{const level=Number(btn.dataset.level),p=PIRATES[level],open=pirateIsOpen(level),isDev=level>=6;btn.disabled=false;btn.classList.toggle('unlocked',open);btn.classList.toggle('locked',!open);btn.classList.toggle('first-pirate-attention',level===1&&open&&shouldHighlightDave());btn.setAttribute('aria-disabled',String(!open));const small=btn.querySelector('small');if(small)small.textContent=isDev?`${p.role} • ${open?'Available':'Locked 🔒'}`:`Difficulty ${level} • ${open?p.role:'Locked 🔒'}`;});}
@@ -358,12 +358,31 @@ function addCueNudge(id,dx,dy){const el=document.getElementById(id);addPressHold
 addCueNudge('cueUp',0,-1);addCueNudge('cueLeft',-1,0);addCueNudge('cueDown',0,1);addCueNudge('cueRight',1,0);
 canvas.addEventListener('pointerdown',e=>{if(moving||state.frameOver||pendingChoice||cue().potted)return;canvas.setPointerCapture(e.pointerId);if(placementMode!=='none'){e.preventDefault();draggingCue=true;placeCueAt(e);return;}draggingCue=false;aimAt(e);});
 canvas.addEventListener('pointermove',e=>{if(!canvas.hasPointerCapture(e.pointerId))return;if(draggingCue)placeCueAt(e);else aimAt(e)});canvas.addEventListener('pointerup',()=>draggingCue=false);canvas.addEventListener('pointercancel',()=>draggingCue=false);
+// V0.15.7d — coarse-pointer/mobile slider safety. Sliders start locked so a
+// vertical page scroll cannot jump aim or power. Fine-adjust buttons remain live.
+const angleTouchLock=document.getElementById('angleTouchLock'),powerTouchLock=document.getElementById('powerTouchLock');
+const touchSliderMode=()=>window.matchMedia?.('(pointer: coarse)').matches===true;
+let angleSliderUnlocked=false,powerSliderUnlocked=false;
+function syncTouchSliderLocks(){
+  const touch=touchSliderMode();
+  if(angleTouchLock){angleTouchLock.hidden=!touch;angleTouchLock.textContent=angleSliderUnlocked?'Lock in aim slider':'Unlock aim slider';angleTouchLock.setAttribute('aria-pressed',String(angleSliderUnlocked));}
+  if(powerTouchLock){powerTouchLock.hidden=!touch;powerTouchLock.textContent=powerSliderUnlocked?'Lock in power slider':'Unlock shot power slider';powerTouchLock.setAttribute('aria-pressed',String(powerSliderUnlocked));}
+  angleEl.disabled=touch&&!angleSliderUnlocked;
+  powerEl.disabled=touch&&!powerSliderUnlocked;
+  angleEl.classList.toggle('touch-slider-locked',touch&&!angleSliderUnlocked);
+  powerEl.classList.toggle('touch-slider-locked',touch&&!powerSliderUnlocked);
+}
+function lockTouchShotSliders(){if(!touchSliderMode())return;angleSliderUnlocked=false;powerSliderUnlocked=false;syncTouchSliderLocks();}
+if(angleTouchLock)angleTouchLock.addEventListener('click',()=>{if(moving||state?.frameOver||pendingChoice)return;angleSliderUnlocked=!angleSliderUnlocked;syncTouchSliderLocks();});
+if(powerTouchLock)powerTouchLock.addEventListener('click',()=>{if(moving||state?.frameOver||pendingChoice)return;powerSliderUnlocked=!powerSliderUnlocked;syncTouchSliderLocks();});
+window.matchMedia?.('(pointer: coarse)').addEventListener?.('change',syncTouchSliderLocks);
+syncTouchSliderLocks();
 powerEl.addEventListener('input',()=>powerText.textContent=powerEl.value+'%');angleEl.addEventListener('input',()=>setAngleDeg(Number(angleEl.value)/10));function nudgeAngle(delta){if(!moving&&!state.frameOver&&!pendingChoice)setAngleDeg(angle*180/Math.PI+delta)}
 function addHoldNudge(id,delta){const el=document.getElementById(id);addPressHold(el,()=>nudgeAngle(delta),45);}addHoldNudge('angleMinus5',-5);addHoldNudge('angleMinus',-.1);addHoldNudge('anglePlus',.1);addHoldNudge('anglePlus5',5);
 function nudgePower(delta){if(moving||state.frameOver||pendingChoice)return;powerEl.value=clamp(Number(powerEl.value)+delta,Number(powerEl.min),Number(powerEl.max));powerText.textContent=powerEl.value+'%';}
 function addHoldPower(id,delta){const el=document.getElementById(id);addPressHold(el,()=>nudgePower(delta),90);}
 addHoldPower('powerMinus45',-45);addHoldPower('powerMinus5',-5);addHoldPower('powerPlus5',5);addHoldPower('powerPlus45',45);
-function beginShot(){clearTimeout(aiWatchdogTimer);aiWatchdogTimer=null;if(moving||state.frameOver||pendingChoice||cue().potted||placementMode!=='none')return;noteCareerShot(state.player);const p=Number(powerEl.value)/100,speed=150+5800*Math.pow(p,1.35),c=cue();shot={number:++shotNumber,player:state.player,isBreak:state.breakShot,startOn:onType(state.player),firstContact:null,firstContactId:null,pots:[],cuePotted:false,cushionAfterContact:false,objectCushions:new Set(),breakCrossers:new Set(),aiPlan:pendingAIPlan};pendingAIPlan=null;placementMode='none';draggingCue=false;cueStrikeVisual={started:performance.now(),angle,x:c.x,y:c.y,player:state.player,style:cueStyleForShooter(state.player)};c.vx=Math.cos(angle)*speed;c.vy=Math.sin(angle)*speed;soundShot(p);moving=true;shootBtn.disabled=true;breakHelp.hidden=true;breakRules.hidden=true;msg.textContent='Balls in motion…';}
+function beginShot(){clearTimeout(aiWatchdogTimer);aiWatchdogTimer=null;if(moving||state.frameOver||pendingChoice||cue().potted||placementMode!=='none')return;lockTouchShotSliders();noteCareerShot(state.player);const p=Number(powerEl.value)/100,speed=150+5800*Math.pow(p,1.35),c=cue();shot={number:++shotNumber,player:state.player,isBreak:state.breakShot,startOn:onType(state.player),firstContact:null,firstContactId:null,pots:[],cuePotted:false,cushionAfterContact:false,objectCushions:new Set(),breakCrossers:new Set(),aiPlan:pendingAIPlan};pendingAIPlan=null;placementMode='none';draggingCue=false;cueStrikeVisual={started:performance.now(),angle,x:c.x,y:c.y,player:state.player,style:cueStyleForShooter(state.player)};c.vx=Math.cos(angle)*speed;c.vy=Math.sin(angle)*speed;soundShot(p);moving=true;shootBtn.disabled=true;breakHelp.hidden=true;breakRules.hidden=true;msg.textContent='Balls in motion…';}
 shootBtn.addEventListener('click',()=>{hidePirateDialogue();beginShot();});
 function collide(a,b){let dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy,min=ballR*2;if(d2>=min*min||d2===0)return;let d=Math.sqrt(d2),nx=dx/d,ny=dy/d,over=min-d;a.x-=nx*over/2;a.y-=ny*over/2;b.x+=nx*over/2;b.y+=ny*over/2;if(shot&&!shot.firstContact){if(a.type==='white'&&b.type!=='white'&&!b.potted){shot.firstContact=b.type;shot.firstContactId=b.id;}else if(b.type==='white'&&a.type!=='white'&&!a.potted){shot.firstContact=a.type;shot.firstContactId=a.id;}}let rvx=b.vx-a.vx,rvy=b.vy-a.vy,sep=rvx*nx+rvy*ny;if(sep>=0)return;soundBall(Math.abs(sep));const j=-(1+.965)*sep/2,ix=j*nx,iy=j*ny;a.vx-=ix;a.vy-=iy;b.vx+=ix;b.vy+=iy;}
 function pocketBall(b,pocketIndex=null){soundPocketDrop();const potNow=performance.now();b.potted=true;b.potFadeStarted=potNow;b.vx=b.vy=0;potFadeVisuals.push({x:b.x,y:b.y,type:b.type,started:potNow});if(b.type!=='white'&&pocketIndex!=null){legalPotSparkles.push({pocketIndex,started:potNow,seed:Math.random()*Math.PI*2});}if(shot){shot.pots.push(b.type);shot.potEvents??=[];shot.potEvents.push({type:b.type,pocketIndex});if(b.type==='white')shot.cuePotted=true;}return true;}
@@ -635,6 +654,10 @@ document.addEventListener('visibilitychange',()=>{
     return;
   }
   last=performance.now();
+  // Android/WebView can defer an audio element's ended/play work while the app is
+  // backgrounded. Reconcile the soundtrack after the page is visible again so a
+  // match playlist cannot remain silent after its previous track finished off-screen.
+  setTimeout(reconcileMusicAfterResume,100);
   if(gameApp&&!gameApp.hidden&&state&&!state.frameOver&&!gamePaused){setTimeout(maybeScheduleAI,80);}
 });
 // V0.14.6: the former New Frame control now opens the in-match Game menu.
@@ -1584,11 +1607,16 @@ document.getElementById('pirateList')?.addEventListener('click',e=>{const btn=e.
 challengePirate?.addEventListener('click',startProfiledPirate);closePirateProfile?.addEventListener('click',()=>pirateProfileModal.hidden=true);
 renderPirateRoster();
 function detectUnsupportedBrowser(){
+  const warning=document.getElementById('browserWarning');
+  // Capacitor's Android WebView deliberately contains the normal Android `wv`
+  // user-agent marker. It is our supported native runtime, not an in-app browser.
+  const capacitorNative=!!(window.Capacitor&&typeof window.Capacitor.isNativePlatform==='function'&&window.Capacitor.isNativePlatform());
+  const nativeContainer=!!(window.SeamenRuntime&&window.SeamenRuntime.isNativeContainer())||capacitorNative;
+  if(nativeContainer){if(warning)warning.hidden=true;return;}
   const ua=navigator.userAgent||'';
   const embedded=/FBAN|FBAV|FB_IAB|Instagram|Messenger|Line\/|; wv\)|\bwv\b/i.test(ua);
   const obsolete=/MSIE|Trident\/|Edge\/[0-9]+/i.test(ua);
   const missing=!('PointerEvent' in window)||!document.createElement('canvas').getContext||!('requestAnimationFrame' in window);
-  const warning=document.getElementById('browserWarning');
   if(warning) warning.hidden=!(embedded||obsolete||missing);
 }
 detectUnsupportedBrowser();
@@ -1777,6 +1805,18 @@ function startMatchMusic(){
   lastMatchMusic=pick;
   playMusic(`match${pick+1}`,MUSIC.matches[pick]);
 }
+// V0.15.7c: if a match track reaches its end while Android has the WebView in the
+// background, its normal ended -> next-track transition may be deferred or its
+// play() call may be rejected. On resume, retry a queued request first; otherwise
+// restart the normal non-repeating match selector only when the active track has
+// genuinely ended/stopped. Menu/credits loops are left alone.
+function reconcileMusicAfterResume(){
+  if(masterMuted||musicMuted||masterLevel<=0||musicLevel<=0)return;
+  if(pendingMusicRequest){retryPendingMusic();return;}
+  const active=musicDeck[activeMusicDeck];
+  if(currentMusicKey.startsWith('match')&&(!active||active.ended||active.paused)){startMatchMusic();return;}
+  updateMusicVolume();
+}
 refreshAudioSettings();
 
 
@@ -1938,6 +1978,9 @@ function applyBuildModeSurface(){
   document.querySelector('details')?.remove();
   testMode?.remove();
   aiVsAiMode?.remove();
+  document.querySelector('[data-cue="supporter_test"]')?.remove();
+  const devSupportReward=document.querySelector('.support-reward-card');
+  if(devSupportReward?.textContent.includes("Supporter's Test Cue"))devSupportReward.remove();
   const note=document.querySelector('.pirate-note');
   if(note)note.textContent='Beat each pirate to unlock the next difficulty.';
 }
@@ -1956,7 +1999,8 @@ applyBuildModeSurface();
   let deferredInstallPrompt=null;
   const isNativeContainer=()=>!!(window.SeamenRuntime&&window.SeamenRuntime.isNativeContainer());
   const isStandalone=()=>isNativeContainer()||window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
-  function hideInstall(){if(installBtn)installBtn.hidden=true;}
+  function hideInstall(){if(installBtn){installBtn.hidden=true;installBtn.style.setProperty('display','none','important');}}
+  if(isNativeContainer()){document.documentElement.classList.add('seamen-native');hideInstall();}
   function showNotice(text,actionLabel,onAction){
     if(!notice||!noticeText)return;
     noticeText.textContent=text;notice.hidden=false;
