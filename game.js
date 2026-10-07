@@ -1,12 +1,12 @@
 'use strict';
-// V0.15.8: Android release-foundation test from frozen v0.15.7da native baseline.
+// V0.15.8b: native Android save export via Capacitor Filesystem; release foundation retained.
 // APP_ID is the package/application identifier for future native wrappers and store builds.
 // APP_VERSION is the human-readable release version. APP_BUILD_NUMBER must only increase for packaged releases.
 const APP_ID='com.seamenpool.game';
 const APP_NAME='Seamen English Rules Pool';
 const APP_SHORT_NAME='Seamen Pool';
-const APP_VERSION='0.15.8';
-const APP_BUILD_NUMBER=1518;
+const APP_VERSION='0.17.0';
+const APP_BUILD_NUMBER=1530;
 const BUILD_MODE='release'; // 'development' | 'release'
 const IS_DEVELOPMENT_BUILD=BUILD_MODE==='development';
 document.documentElement.dataset.buildMode=BUILD_MODE;
@@ -15,15 +15,51 @@ const piratePlayerName=document.getElementById('piratePlayerName');
 const aiVsAiMode=document.getElementById('aiVsAiMode'),aiVsAiMenu=document.getElementById('aiVsAiMenu'),aiVsAiP1=document.getElementById('aiVsAiP1'),aiVsAiP2=document.getElementById('aiVsAiP2'),startAiVsAi=document.getElementById('startAiVsAi'),aiVsAiBack=document.getElementById('aiVsAiBack');
 const playersModal=document.getElementById('playersModal'),modeMenu=document.getElementById('modeMenu'),localMode=document.getElementById('localMode'),pirateMode=document.getElementById('pirateMode'),testMode=document.getElementById('testMode'),testScenarioMenu=document.getElementById('testScenarioMenu'),testBack=document.getElementById('testBack'),testPlayerName=document.getElementById('testPlayerName'),nightmareScenario=document.getElementById('nightmareScenario'),cannonScenario=document.getElementById('cannonScenario'),fiveFrameScenario=document.getElementById('fiveFrameScenario'),backToMode=document.getElementById('backToMode'),piratePlaceholder=document.getElementById('piratePlaceholder'),pirateBack=document.getElementById('pirateBack'),playersForm=document.getElementById('playersForm'),player1Name=document.getElementById('player1Name'),player2Name=document.getElementById('player2Name'),showGameLog=document.getElementById('showGameLog'),gameLogModal=document.getElementById('gameLogModal'),gameLogModalText=document.getElementById('gameLogModalText'),closeGameLog=document.getElementById('closeGameLog'),copyGameLog=document.getElementById('copyGameLog'),copyGameLogStatus=document.getElementById('copyGameLogStatus');
 let playerNames={1:'Player 1',2:'Player 2'};
-let gameMode='local',aiPlayer=null,aiTimer=null,aiWatchdogTimer=null,aiThinking=false,currentPirateLevel=1,currentPirateName='Deckhand Dave',aiVsAiLevels={1:5,2:5};
+let gameMode='local',aiPlayer=null,aiTimer=null,aiWatchdogTimer=null,aiThinking=false,currentPirateLevel=1,currentPirateId='dave',currentPirateName='Deckhand Dave',aiVsAiLevels={1:5,2:5};
+/* V0.17.0: content catalogue foundation. Legacy numeric levels remain available so
+   existing dialogue, AI tuning and 0.16.x saves keep working while content gains
+   stable IDs, chapter membership and a main/bonus role independent of difficulty. */
+const CHAPTERS={
+  chapter_1:{id:'chapter_1',number:1,name:"Captain Blackball's Domain",mainPirates:['dave','simon','holly','mick','blackball'],bonusPirates:['cyclops','vaper'],boss:'blackball',unlockRule:{type:'default'},scenes:{intro:'chapter_1_intro',bossIntro:'blackball_intro',ending:'blackball_ending'},bonusUnlock:{type:'complete_chapter',chapter:'chapter_1'}},
+  chapter_2:{id:'chapter_2',number:2,name:'Uncharted Waters',mainPirates:['sandy','shelle','graham','papa_surf','chapter2_boss'],bonusPirates:[],boss:'chapter2_boss',unlockRule:{type:'complete_chapter',chapter:'chapter_1'},scenes:{intro:'chapter_2_intro',bossIntro:'chapter_2_boss_reveal',ending:'chapter_2_ending'},bonusUnlock:{type:'complete_chapter',chapter:'chapter_2'}},
+  chapter_3:{id:'chapter_3',number:3,name:'Coming soon...',mainPirates:[],bonusPirates:[],boss:null,unlockRule:{type:'complete_chapter',chapter:'chapter_2'},postRelease:true}
+};
 const PIRATES=[null,
-{name:'Deckhand Dave',fullName:'David Deckhand',role:'Deckhand',style:'Enthusiastic chaos',bio:'A hopeless beginner with almost no discernible talent, but plenty to say while he is missing.',reputation:'Knows the rules and can usually hit a ball. Proud of his big boat. Does not like small ones.',portrait:'DD',image:'assets/portraits/deckhand-dave.webp'},
-{name:'Sweaty Simon',fullName:'Simon White',role:'Crew hand',style:'Overeducated geometry',bio:'Upper-middle-class confidence, Latin education and anecdotes about his uncle’s marmalade. Common sense sold separately.',reputation:'Mediocre, but dangerous at an office Christmas night out where nobody else has played for a decade.',portrait:'SS',image:'assets/portraits/sweaty-simon.webp'},
-{name:'Holly',fullName:'Holly Beans-Ramekin',role:'Free spirit',style:'Focused amateur',bio:'A free spirit who is passionately absorbed in whatever she is doing right now. Pool included.',reputation:'A competent amateur who is cleverer than she lets on and happy to play a stranger for a quid.',portrait:'HB',image:'assets/portraits/holly.webp'},
-{name:'First Mate Mick',fullName:'First Mate Mick',nickname:'“The Tornado”',role:'First mate',style:'Confident all-rounder',bio:'Sunday pub-tournament regular. Own cue. Chalk holder clipped to his belt. Talks an excellent game.',reputation:'Above average, locally notorious and convinced The Tornado means more to the pool world than it probably does.',portrait:'TM',image:'assets/portraits/tornado-mick.webp'},
-{name:'Captain Blackball',fullName:'Captain Blackball',role:'Captain',style:'Veteran strategist',bio:'Calm, reserved and genuinely formidable. The quiet pirate in the corner who never needs to advertise what he can do.',reputation:'Sees several shots ahead. Knows that true skill begins when the current pot is also used to create the next one.',portrait:'CB',image:'assets/portraits/captain-blackball.webp'},
-{name:"Ol' Cyclops",fullName:"Ol' Cyclops",role:'Special opponent',style:'ABSOLUTE VIOLENCE',bio:'Quiet when left alone. Aggressive when annoyed. Usually annoyed.',reputation:'Technically capable, fundamentally insane: EVERYTHING MUST BE HIT AT 100% POWER. Sees himself with difficulty.',portrait:'OC',image:'assets/portraits/ol-cyclops.webp'},
-{name:'Darth Vaper',fullName:'DARTH VAPER',role:'Near-perfect superboss',style:'Relentless perfectionist',bio:'Fearful, angry, hateful, suffering, revengeful — and enormously intelligent. He wants ultimate power, then more.',reputation:'A terrifying positional player capable of absurd escapes and streaks. Still human, still beatable, and principled enough not to cheat.',portrait:'DV',image:'assets/portraits/darth-vaper.webp'}];
+{id:'dave',legacyLevel:1,chapter:'chapter_1',chapterPosition:1,campaignRole:'main',difficulty:1,name:'Deckhand Dave',fullName:'David Deckhand',role:'Deckhand',style:'Enthusiastic chaos',bio:'A hopeless beginner with almost no discernible talent, but plenty to say while he is missing.',reputation:'Knows the rules and can usually hit a ball. Proud of his big boat. Does not like small ones.',portrait:'DD',image:'assets/portraits/deckhand-dave.webp',achievementId:'pirate_dave',rewards:[{type:'cue',id:'dave'}]},
+{id:'simon',legacyLevel:2,chapter:'chapter_1',chapterPosition:2,campaignRole:'main',difficulty:2,name:'Sweaty Simon',fullName:'Simon White',role:'Crew hand',style:'Overeducated geometry',bio:'Upper-middle-class confidence, Latin education and anecdotes about his uncle’s marmalade. Common sense sold separately.',reputation:'Mediocre, but dangerous at an office Christmas night out where nobody else has played for a decade.',portrait:'SS',image:'assets/portraits/sweaty-simon.webp',achievementId:'pirate_simon',rewards:[{type:'cue',id:'simon'}]},
+{id:'holly',legacyLevel:3,chapter:'chapter_1',chapterPosition:3,campaignRole:'main',difficulty:3,name:'Holly',fullName:'Holly Beans-Ramekin',role:'Free spirit',style:'Focused amateur',bio:'A free spirit who is passionately absorbed in whatever she is doing right now. Pool included.',reputation:'A competent amateur who is cleverer than she lets on and happy to play a stranger for a quid.',portrait:'HB',image:'assets/portraits/holly.webp',achievementId:'pirate_holly',rewards:[{type:'cue',id:'holly'}]},
+{id:'mick',legacyLevel:4,chapter:'chapter_1',chapterPosition:4,campaignRole:'main',difficulty:4,name:'First Mate Mick',fullName:'First Mate Mick',nickname:'“The Tornado”',role:'First mate',style:'Confident all-rounder',bio:'Sunday pub-tournament regular. Own cue. Chalk holder clipped to his belt. Talks an excellent game.',reputation:'Above average, locally notorious and convinced The Tornado means more to the pool world than it probably does.',portrait:'TM',image:'assets/portraits/tornado-mick.webp',achievementId:'pirate_mick',rewards:[{type:'cue',id:'mick'}]},
+{id:'blackball',legacyLevel:5,chapter:'chapter_1',chapterPosition:5,campaignRole:'main',difficulty:5,name:'Captain Blackball',fullName:'Captain Blackball',role:'Captain',style:'Veteran strategist',bio:'Calm, reserved and genuinely formidable. The quiet pirate in the corner who never needs to advertise what he can do.',reputation:'Sees several shots ahead. Knows that true skill begins when the current pot is also used to create the next one.',portrait:'CB',image:'assets/portraits/captain-blackball.webp',achievementId:'pirate_blackball',rewards:[{type:'cue',id:'blackball'},{type:'table',id:'privates'}]},
+{id:'cyclops',legacyLevel:6,chapter:'chapter_1',chapterPosition:1,campaignRole:'bonus',difficulty:6,name:"Ol' Cyclops",fullName:"Ol' Cyclops",role:'Special opponent',style:'ABSOLUTE VIOLENCE',bio:'Quiet when left alone. Aggressive when annoyed. Usually annoyed.',reputation:'Technically capable, fundamentally insane: EVERYTHING MUST BE HIT AT 100% POWER. Sees himself with difficulty.',portrait:'OC',image:'assets/portraits/ol-cyclops.webp',rewards:[]},
+{id:'vaper',legacyLevel:7,chapter:'chapter_1',chapterPosition:2,campaignRole:'bonus',difficulty:7,name:'Darth Vaper',fullName:'DARTH VAPER',role:'Near-perfect superboss',style:'Relentless perfectionist',bio:'Fearful, angry, hateful, suffering, revengeful — and enormously intelligent. He wants ultimate power, then more.',reputation:'A terrifying positional player capable of absurd escapes and streaks. Still human, still beatable, and principled enough not to cheat.',portrait:'DV',image:'assets/portraits/darth-vaper.webp',rewards:[{type:'cue',id:'vaper'}]},
+{id:'sandy',legacyLevel:null,aiLevel:2,chapter:'chapter_2',chapterPosition:1,campaignRole:'main',difficulty:2,name:'Sandy Mandy',fullName:'Sandy Mandy',role:'Island player',style:'Elegant positional play',bio:'A sincerely profound-sounding thinker whose conclusions do not always survive inspection.',challengeQuote:'People say life is for living. Like, I basically do that when I wake up? Is that it?',reputation:'A showy positional player with moderate-to-low power and accuracy around Sweaty Simon territory.',portrait:'SM',image:'assets/portraits/sandy-mandy-main.png',unlockRule:{type:'default'},playable:true,rewards:[]},
+{id:'shelle',legacyLevel:null,aiLevel:3,chapter:'chapter_2',chapterPosition:2,campaignRole:'main',difficulty:3,name:'Shelle',fullName:'Shelle',role:'Island player',style:'Natural potter',bio:'Cheerfully self-obsessed, shallow and very pleased to be here.',challengeQuote:'If polishing a turd is impossible how can you polish a pool ball? Not during a game though?',reputation:'A better raw potter than Sandy, but much less convincing when position matters.',portrait:'SH',image:'assets/portraits/shelle-main.png',unlockRule:{type:'defeat_pirate',pirate:'sandy'},playable:true,rewards:[]},
+{id:'graham',legacyLevel:null,aiLevel:4,chapter:'chapter_2',chapterPosition:3,campaignRole:'main',difficulty:4,name:'Graham',fullName:'Graham',role:'Fossil obsessive',style:'Methodical planner',bio:'Scientifically intelligent, fossil obsessed and burdened with remarkably poor practical common sense.',challengeQuote:'The orbital trajectory of a meteorite that is yet to turn into a valuable material is surprisingly close to the calculations around pinpoint angular accuracy on a pool table.',reputation:'Strong at planning, cushions and positional play; his greatest opponent is his own tendency to overthink.',portrait:'GR',image:'assets/portraits/graham-main.png',unlockRule:{type:'defeat_pirate',pirate:'shelle'},playable:true,rewards:[]},
+{id:'papa_surf',legacyLevel:null,aiLevel:4,chapter:'chapter_2',chapterPosition:4,campaignRole:'main',difficulty:5,name:'Papa Surf',fullName:'Papa Surf',role:'Beachcomber',style:'Safety specialist',bio:'An elderly pirate beachcomber: friendly, welcoming and somehow deeply unnerving.',challengeQuote:'If my broth does not warm your heart as much as your belly, the summer waves here sure will. I beg that you let me watch as they gently flow across you.',reputation:'The strongest safety player of the ordinary Uncharted Waters four.',portrait:'PS',image:'assets/portraits/papa-surf-main.png',unlockRule:{type:'defeat_pirate',pirate:'graham'},playable:true,rewards:[]},
+{id:'chapter2_boss',legacyLevel:null,aiLevel:7,chapter:'chapter_2',chapterPosition:5,campaignRole:'main',difficulty:'?',name:'???',fullName:'???',role:'Unknown challenger',style:'Unknown',bio:'The final challenger has not yet revealed themselves.',reputation:'Defeat the island opponents to discover who issued the challenge.',portrait:'?',image:'',unlockRule:{type:'defeat_pirate',pirate:'papa_surf'},playable:true,rewards:[{type:'cue',id:'wiggles'}]}];
+function applyChapter2BossIdentity(forceReveal=false){const p=PIRATES.find(x=>x?.id==='chapter2_boss');if(!p)return;const revealed=forceReveal||!!career?.chapters?.chapter_2?.bossIntroSeen;if(revealed){Object.assign(p,{difficulty:'BOSS',name:'Mr Wiggles',fullName:'Mr Wiggles',role:'Island boss',style:'Mysterious worm',bio:"The loud-mouthed creature that summoned Blackball across the ocean. He's a worm. He's playing pool.",challengeQuote:'Slurrrrrp!',reputation:'The final challenger of Strangevoice Island.',portrait:'MW',image:'assets/scenes/mr-wiggles-main.png'});}}
+const PIRATES_BY_ID=Object.fromEntries(PIRATES.filter(Boolean).map(p=>[p.id,p]));
+function pirateById(id){return PIRATES_BY_ID[id]||null;}
+function pirateByLegacyLevel(level){return PIRATES[Number(level)]||null;}
+function activePirate(){return pirateById(currentPirateId)||pirateByLegacyLevel(currentPirateLevel);}
+function chapterById(id){return CHAPTERS[id]||null;}
+function chapterPirates(chapterId='chapter_1',role='main'){const chapter=chapterById(chapterId);if(!chapter)return[];const ids=role==='bonus'?chapter.bonusPirates:chapter.mainPirates;return ids.map(pirateById).filter(Boolean);}
+function isMainCampaignPirate(p){return !!p&&p.campaignRole==='main';}
+function isChapterBoss(p){return !!p&&chapterById(p.chapter)?.boss===p.id;}
+function pirateCareerKey(p){return String(p?.legacyLevel??p?.id??'');}
+function chapterState(chapterId){
+  career.chapters=career.chapters||{};
+  const existing=career.chapters[chapterId]||{};
+  return career.chapters[chapterId]={unlocked:false,introSeen:false,bossIntroSeen:false,endingSeen:false,endingPending:false,completed:false,...existing};
+}
+function chapterIsUnlocked(chapterId){const ch=chapterById(chapterId);if(!ch)return false;const state=chapterState(chapterId);return !!state.unlocked||unlockRuleMet(ch.unlockRule||{type:'default'});}
+function syncChapterUnlocks(){for(const ch of Object.values(CHAPTERS)){const state=chapterState(ch.id);if(!state.unlocked&&unlockRuleMet(ch.unlockRule||{type:'default'}))state.unlocked=true;}}
+function chapterMainComplete(chapterId){const ch=chapterById(chapterId);return !!ch&&chapterPirates(chapterId,'main').length>0&&chapterPirates(chapterId,'main').every(p=>pirateDefeated(p.id));}
+function chapterBonusAvailable(chapterId){const ch=chapterById(chapterId);return !!ch&&unlockRuleMet(ch.bonusUnlock||{type:'complete_chapter',chapter:chapterId});}
+function markChapterSceneSeen(chapterId,kind){const state=chapterState(chapterId),key=kind==='intro'?'introSeen':kind==='bossIntro'?'bossIntroSeen':'endingSeen';state[key]=true;saveCareer();}
+function runChapterScene(chapterId,kind,onDone){const ch=chapterById(chapterId),sceneId=ch?.scenes?.[kind];if(!sceneId||sceneId.endsWith('_legacy')){if(onDone)onDone();return false;}return showScene(sceneId,()=>{markChapterSceneSeen(chapterId,kind);if(onDone)onDone();});}
+function completeChapter(chapterId){const state=chapterState(chapterId);state.completed=true;syncChapterUnlocks();saveCareer();refreshPirateButtons();}
+
 let devPiratesUnlocked=false,devScenariosUnlocked=false,currentScenario=null;
 let fiveFrameTestActive=false,fiveFrameTestCompleted=0,pendingFiveFrameCelebration=null;
 // V0.7.16: iOS/WebKit rapid multi-tap + hold selection hardening without cancelling ordinary button taps.
@@ -56,12 +92,22 @@ function setUnlockedPirateLevel(level){try{localStorage.setItem('seamenPirateUnl
 
 /* V0.12.0: versioned, extensible local career record. This is deliberately separate
    from settings and premium entitlement so future save migrations can preserve both. */
-const CAREER_KEY='seamenCareer',CAREER_SCHEMA=4;
-function defaultCareer(){return{schema:CAREER_SCHEMA,framesPlayed:0,framesWon:0,framesLost:0,shotsTaken:0,legalBallsPotted:0,foulsCommitted:0,bestPotStreak:0,sevenBallWins:0,blackOnBlackWins:0,foulFreeWins:0,oneVisitClearances:0,creditsRead:false,lifetimePremium:false,blackballIntroSeen:false,blackballEndingSeen:false,piratesDefeated:{},earnedAchievements:[],pirateRecords:{},history:{careerStarted:new Date().toISOString(),firstWin:null,firstPirateDefeated:null,chapterOneCompleted:null},seenCosmetics:[],cosmeticSeenInitialized:false};}
-function loadCareer(){let c=defaultCareer();try{const raw=JSON.parse(localStorage.getItem(CAREER_KEY)||'null');if(raw&&typeof raw==='object')c={...c,...raw,piratesDefeated:{...c.piratesDefeated,...(raw.piratesDefeated||{})},earnedAchievements:Array.isArray(raw.earnedAchievements)?[...new Set(raw.earnedAchievements.filter(x=>typeof x==='string'))]:[],pirateRecords:{...(raw.pirateRecords||{})},history:{...c.history,...(raw.history||{})},seenCosmetics:Array.isArray(raw.seenCosmetics)?[...new Set(raw.seenCosmetics.filter(x=>typeof x==='string'))]:[],cosmeticSeenInitialized:!!raw.cosmeticSeenInitialized,schema:CAREER_SCHEMA};}catch(e){}return c;}
-let career=loadCareer(),frameObjectPots={1:0,2:0},frameFouls={1:0,2:0},frameStatsEligible=false,frameRecorded=false,pendingBlackOnBlackWin=false,pendingOneVisitClearance=false;
-const PIRATE_CUE_REWARDS={1:'dave',2:'simon',3:'holly',4:'mick',5:'blackball',7:'vaper'};
-const PIRATE_CUE_NAMES={1:"Deckhand Dave's Cue",2:"Sweaty Simon's Cue",3:"Holly's Cue",4:"First Mate Mick's Cue",5:"Captain Blackball's Cue"};
+const CAREER_KEY='seamenCareer',CAREER_SCHEMA=6;
+function defaultCareer(){return{schema:CAREER_SCHEMA,framesPlayed:0,framesWon:0,framesLost:0,shotsTaken:0,legalBallsPotted:0,foulsCommitted:0,bestPotStreak:0,sevenBallWins:0,blackOnBlackWins:0,foulFreeWins:0,oneVisitClearances:0,creditsRead:false,lifetimePremium:false,blackballIntroSeen:false,blackballEndingSeen:false,piratesDefeated:{},chapters:{chapter_1:{unlocked:true,introSeen:false,bossIntroSeen:false,endingSeen:false,completed:false},chapter_2:{unlocked:false,introSeen:false,bossIntroSeen:false,endingSeen:false,endingPending:false,completed:false}},earnedAchievements:[],pirateRecords:{},unlockedCosmetics:[],history:{careerStarted:new Date().toISOString(),firstWin:null,firstPirateDefeated:null,chapterOneCompleted:null},seenCosmetics:[],cosmeticSeenInitialized:false};}
+function loadCareer(){let c=defaultCareer();try{const raw=JSON.parse(localStorage.getItem(CAREER_KEY)||'null');if(raw&&typeof raw==='object')c={...c,...raw,piratesDefeated:{...c.piratesDefeated,...(raw.piratesDefeated||{})},chapters:{...c.chapters,...(raw.chapters||{})},earnedAchievements:Array.isArray(raw.earnedAchievements)?[...new Set(raw.earnedAchievements.filter(x=>typeof x==='string'))]:[],pirateRecords:{...(raw.pirateRecords||{})},unlockedCosmetics:Array.isArray(raw.unlockedCosmetics)?[...new Set(raw.unlockedCosmetics.filter(x=>typeof x==='string'))]:[],history:{...c.history,...(raw.history||{})},seenCosmetics:Array.isArray(raw.seenCosmetics)?[...new Set(raw.seenCosmetics.filter(x=>typeof x==='string'))]:[],cosmeticSeenInitialized:!!raw.cosmeticSeenInitialized,schema:CAREER_SCHEMA};}catch(e){}return c;}
+function migrateChapterProgress(c){
+  c.chapters={...(c.chapters||{})};
+  for(const chapter of Object.values(CHAPTERS)){
+    const existing=c.chapters[chapter.id]||{};
+    const completed=chapter.mainPirates.length>0&&chapter.mainPirates.every(id=>{const p=pirateById(id);return !!c.piratesDefeated[pirateCareerKey(p)];});
+    c.chapters[chapter.id]={unlocked:chapter.id==='chapter_1'||chapter.testOnly,introSeen:false,bossIntroSeen:false,endingSeen:false,endingPending:false,completed:false,...existing,completed:!!(existing.completed||completed)};
+  }
+  return c;
+}
+let career=migrateChapterProgress(loadCareer());
+syncChapterUnlocks();
+applyChapter2BossIdentity();
+let frameObjectPots={1:0,2:0},frameFouls={1:0,2:0},frameStatsEligible=false,frameRecorded=false,pendingBlackOnBlackWin=false,pendingOneVisitClearance=false;
 
 /* Supporter entitlement foundation. Entitlements deliberately live outside
    career/progression data: resetting a career must never revoke something a store
@@ -76,27 +122,47 @@ function hasEntitlement(id){return !!(id&&entitlements.owned?.[id]===true);}
 function saveEntitlements(){entitlements.schema=ENTITLEMENT_SCHEMA;try{localStorage.setItem(ENTITLEMENT_KEY,JSON.stringify(entitlements));return true;}catch(e){return false;}}
 function setDevEntitlement(id,owned){if(!IS_DEVELOPMENT_BUILD||!Object.prototype.hasOwnProperty.call(ENTITLEMENTS,id))return false;entitlements.owned={...(entitlements.owned||{})};if(owned)entitlements.owned[id]=true;else delete entitlements.owned[id];saveEntitlements();validateEquippedCue();refreshCosmeticsUI?.();refreshDevEntitlementUI();refreshSupportArea?.();renderCareer();return hasEntitlement(id);}
 function refreshDevEntitlementUI(){const out=document.getElementById('devEntitlementStatus');if(!out)return;const id='supporter_founder_test';out.textContent=`${ENTITLEMENTS[id].name}: ${hasEntitlement(id)?'OWNED / YES':'NOT OWNED / NO'}\nStorage: separate from career; Reset Player Data preserves it.`;}
+/* V0.17.0 build 1524: cosmetics declare their own unlock rule. The resolver below
+   is shared by every cosmetic type, so future chapters/content do not need bespoke
+   cue/table condition code. `unlock` remains player-facing copy; `unlockRule` is logic. */
 const COSMETICS={
   tables:{
-    classic:{name:'Classic Tavern',source:'default',sourceId:null,unlock:'Available from the beginning.'},
-    captain:{name:"Captain's Table",source:'default',sourceId:null,unlock:'Available from the beginning.'},
-    spectral:{name:'Spectral Table',source:'default',sourceId:null,unlock:'Available from the beginning.'},
-    privates:{name:"Captain Blackball's Privates",source:'campaign',sourceId:'pirate_blackball',unlock:'Defeat Captain Blackball to unlock.'}
+    classic:{name:'Classic Tavern',description:'The house table. Familiar green cloth and timber.',previewClass:'table-mini-classic',source:'default',sourceId:null,unlock:'Available from the beginning.',unlockRule:{type:'default'}},
+    captain:{name:"Captain's Table",description:'Polished timber, brass warmth and richer cloth.',previewClass:'table-mini-captain',source:'default',sourceId:null,unlock:'Available from the beginning.',unlockRule:{type:'default'}},
+    spectral:{name:'Spectral Table',description:'Cold glow, spectral mist and ghostly trim.',previewClass:'table-mini-spectral',source:'default',sourceId:null,unlock:'Available from the beginning.',unlockRule:{type:'default'}},
+    privates:{name:"Captain Blackball's Privates",description:'Black cloth, glistening gold-painted timber and a suspiciously level surface at sea.',previewClass:'table-mini-privates',source:'campaign',sourceId:'pirate_blackball',unlock:'Defeat Captain Blackball to unlock.',unlockRule:{type:'defeat_pirate',pirate:'blackball'}},
+    strangevoice:{name:'Strangevoice Island Table',description:'Worn island timber with muted olive-brown cloth.',previewClass:'table-mini-strangevoice',source:'campaign',sourceId:'chapter_2',unlock:'Begin your first Chapter 2 match to unlock.',unlockRule:{type:'explicit_cosmetic',cosmetic:'tables:strangevoice'}},
+    wiggles:{name:"Mr Wiggles' Table",description:'Very pale pastel-pink cloth, worn violet timber and brass details.',previewClass:'table-mini-wiggles',source:'campaign',sourceId:'chapter_2',unlock:'Challenge Mr Wiggles to unlock.',unlockRule:{type:'explicit_cosmetic',cosmetic:'tables:wiggles'}}
   },
   cues:{
-    classic:{name:'Tavern Cue',source:'default',sourceId:null,unlock:'Available from the beginning.'},
-    dave:{name:"Deckhand Dave's Cue",source:'campaign',sourceId:'pirate_dave',unlock:'Defeat Deckhand Dave to unlock.'},
-    simon:{name:"Sweaty Simon's Cue",source:'campaign',sourceId:'pirate_simon',unlock:'Defeat Sweaty Simon to unlock.'},
-    holly:{name:"Holly's Cue",source:'campaign',sourceId:'pirate_holly',unlock:'Defeat Holly to unlock.'},
-    mick:{name:"First Mate Mick's Cue",source:'campaign',sourceId:'pirate_mick',unlock:'Defeat First Mate Mick to unlock.'},
-    blackball:{name:"Captain Blackball's Cue",source:'campaign',sourceId:'pirate_blackball',unlock:'Defeat Captain Blackball to unlock.'},
-    vaper:{name:"Darth Vaper's Cue",source:'campaign',sourceId:'pirate_vaper',unlock:'Defeat Darth Vaper to unlock.'},
-    supporter_test:{name:"Supporter's Test Cue",source:'supporter',sourceId:'supporter_founder_test',unlock:'Supporter entitlement required. (Development test cosmetic.)'}
+    classic:{name:'Tavern Cue',description:'Standard house timber. Available to everyone.',previewClass:'cue-preview-classic',source:'default',sourceId:null,unlock:'Available from the beginning.',unlockRule:{type:'default'}},
+    dave:{name:"Deckhand Dave's Cue",description:'Darker stained tavern timber.',previewClass:'cue-preview-dave',owner:'Deckhand Dave',source:'campaign',sourceId:'pirate_dave',unlock:'Defeat Deckhand Dave to unlock.',unlockRule:{type:'defeat_pirate',pirate:'dave'}},
+    simon:{name:"Sweaty Simon's Cue",description:'House timber with blue stripes.',previewClass:'cue-preview-simon',owner:'Sweaty Simon',source:'campaign',sourceId:'pirate_simon',unlock:'Defeat Sweaty Simon to unlock.',unlockRule:{type:'defeat_pirate',pirate:'simon'}},
+    holly:{name:"Holly's Cue",description:'Dark purple with green dreamcatcher-like markings.',previewClass:'cue-preview-holly',owner:'Holly',source:'campaign',sourceId:'pirate_holly',unlock:'Defeat Holly to unlock.',unlockRule:{type:'defeat_pirate',pirate:'holly'}},
+    mick:{name:"First Mate Mick's Cue",description:'Navy with gold rings.',previewClass:'cue-preview-mick',owner:'First Mate Mick',source:'campaign',sourceId:'pirate_mick',unlock:'Defeat First Mate Mick to unlock.',unlockRule:{type:'defeat_pirate',pirate:'mick'}},
+    blackball:{name:"Captain Blackball's Cue",description:'Polished black and appropriately ominous.',previewClass:'cue-preview-blackball',owner:'Captain Blackball',source:'campaign',sourceId:'pirate_blackball',unlock:'Defeat Captain Blackball to unlock.',unlockRule:{type:'defeat_pirate',pirate:'blackball'}},
+    vaper:{name:"Darth Vaper's Cue",description:'A suspiciously hot stick of light.',previewClass:'cue-preview-vaper',owner:'Darth Vaper',source:'campaign',sourceId:'pirate_vaper',unlock:'Defeat Darth Vaper to unlock.',unlockRule:{type:'defeat_pirate',pirate:'vaper'}},
+    sandy:{name:"Sandy Mandy's Cue",description:'A playful toy pinwheel-inspired island cue.',previewClass:'cue-preview-sandy',owner:'Sandy Mandy',source:'campaign',sourceId:'chapter_2',unlock:'Defeat Sandy Mandy to unlock.',unlockRule:{type:'defeat_pirate',pirate:'sandy'}},
+    shelle:{name:"Shelle's Cue",description:'A smooth pearly-white island cue.',previewClass:'cue-preview-shelle',owner:'Shelle',source:'campaign',sourceId:'chapter_2',unlock:'Defeat Shelle to unlock.',unlockRule:{type:'defeat_pirate',pirate:'shelle'}},
+    graham:{name:"Graham's Cue",description:'Deliberately, scientifically boring grey.',previewClass:'cue-preview-graham',owner:'Graham',source:'campaign',sourceId:'chapter_2',unlock:'Defeat Graham to unlock.',unlockRule:{type:'defeat_pirate',pirate:'graham'}},
+    papa_surf:{name:"Papa Surf's Cue",description:'A bright blue beachcomber cue.',previewClass:'cue-preview-papa',owner:'Papa Surf',source:'campaign',sourceId:'chapter_2',unlock:'Defeat Papa Surf to unlock.',unlockRule:{type:'defeat_pirate',pirate:'papa_surf'}},
+    wiggles:{name:"Mr Wiggles' Cue",description:'A mostly pastel-pink wiggly cue with a straight gameplay axis.',previewClass:'cue-preview-wiggles',owner:'Mr Wiggles',source:'campaign',sourceId:'chapter_2',unlock:'Defeat Mr Wiggles to unlock.',unlockRule:{type:'defeat_pirate',pirate:'chapter2_boss'}},
+    supporter_test:{name:"Supporter's Test Cue",description:'Entitlement test only — no payment system and not final paid content.',previewClass:'cue-preview-supporter',source:'supporter',sourceId:'supporter_founder_test',unlock:'Supporter entitlement required. (Development test cosmetic.)',unlockRule:{type:'entitlement',entitlement:'supporter_founder_test'},devOnly:true}
   }
 };
 const COSMETIC_SOURCE_LABELS={default:'DEFAULT',campaign:'CAMPAIGN',achievement:'ACHIEVEMENT',supporter:'SUPPORTER',special:'SPECIAL'};
 function cosmeticKey(type,id){return `${type}:${id}`;}
-function cosmeticIsUnlocked(type,id){const def=COSMETICS[type]?.[id];if(!def)return false;if(def.source==='supporter')return hasEntitlement(def.sourceId);if(type==='tables'){if(id!=='privates')return true;return !!career.piratesDefeated['5'];}if(type==='cues')return cueUnlocked(id);return false;}
+function pirateDefeated(id,c=career){const pirate=pirateById(id);return !!(pirate&&c.piratesDefeated?.[pirateCareerKey(pirate)]);}
+function unlockRuleMet(rule,c=career){
+  if(!rule||rule.type==='default')return true;
+  if(rule.type==='defeat_pirate')return pirateDefeated(rule.pirate,c);
+  if(rule.type==='complete_chapter')return !!c.chapters?.[rule.chapter]?.completed;
+  if(rule.type==='achievement')return !!c.earnedAchievements?.includes(rule.achievement);
+  if(rule.type==='entitlement')return hasEntitlement(rule.entitlement);
+  if(rule.type==='explicit_cosmetic')return !!c.unlockedCosmetics?.includes(rule.cosmetic);
+  return false;
+}
+function cosmeticIsUnlocked(type,id){const def=COSMETICS[type]?.[id];return !!(def&&unlockRuleMet(def.unlockRule));}
 function unlockedCosmeticKeys(){const out=[];for(const [type,items] of Object.entries(COSMETICS))for(const id of Object.keys(items))if(cosmeticIsUnlocked(type,id))out.push(cosmeticKey(type,id));return out;}
 function initialiseCosmeticSeenState(){if(career.cosmeticSeenInitialized)return;career.seenCosmetics=[...new Set([...(career.seenCosmetics||[]),...unlockedCosmeticKeys()])];career.cosmeticSeenInitialized=true;career.schema=CAREER_SCHEMA;try{localStorage.setItem(CAREER_KEY,JSON.stringify(career));}catch(e){}}
 function markVisibleCosmeticsSeen(panelKey){const type=panelKey==='tables'?'tables':'cues',seen=new Set(career.seenCosmetics||[]);let changed=false;document.querySelectorAll(`[data-cosmetic-panel="${panelKey}"] [data-theme], [data-cosmetic-panel="${panelKey}"] [data-cue]`).forEach(el=>{const id=el.dataset.theme||el.dataset.cue;if(id&&cosmeticIsUnlocked(type,id)){const key=cosmeticKey(type,id);if(!seen.has(key)){seen.add(key);changed=true;}}});if(changed){career.seenCosmetics=[...seen];try{localStorage.setItem(CAREER_KEY,JSON.stringify(career));}catch(e){}}}
@@ -134,12 +200,17 @@ function migrateHistoricalAchievements(){const earned=new Set(career.earnedAchie
 migrateHistoricalAchievements();
 initialiseCosmeticSeenState();
 let pendingPirateReward=null;
-function pirateRewardInfo(level){
-  const trophy=achievementById(PIRATE_TROPHY_IDS[level]);
-  return {level,pirate:PIRATES[level]?.name||'Pirate',trophy:trophy?.name||'',cue:PIRATE_CUE_NAMES[level]||'',next:level<5?PIRATES[level+1]?.name||'':null,table:level===5?"Captain Blackball's Privates":null,campaign:level===5};
+function pirateRewardInfo(levelOrPirate){
+  const pirate=typeof levelOrPirate==='object'?levelOrPirate:pirateByLegacyLevel(levelOrPirate);
+  if(!pirate)return null;
+  const trophy=achievementById(pirate.achievementId);
+  const rewards=Array.isArray(pirate.rewards)?pirate.rewards:[];
+  const cueReward=rewards.find(r=>r.type==='cue'),tableReward=rewards.find(r=>r.type==='table');
+  const main=chapterPirates(pirate.chapter,'main'),index=main.findIndex(p=>p.id===pirate.id),next=pirate.campaignRole==='main'?main[index+1]?.name||null:null;
+  return {level:pirate.legacyLevel,pirate:pirate.name,trophy:trophy?.name||'',cue:cueReward?COSMETICS.cues?.[cueReward.id]?.name||'':null,table:tableReward?COSMETICS.tables?.[tableReward.id]?.name||'':null,next,campaign:isChapterBoss(pirate),chapter:pirate.chapter};
 }
 function rewardSummaryHTML(info){if(!info)return '';const rows=[];if(info.trophy)rows.push(`<div><span aria-hidden="true">🏆</span><p><small>TROPHY UNLOCKED</small><b>${info.trophy}</b></p></div>`);if(info.cue)rows.push(`<div><span aria-hidden="true">🎱</span><p><small>COSMETIC UNLOCKED</small><b>${info.cue}</b></p></div>`);if(info.table)rows.push(`<div><span aria-hidden="true">✨</span><p><small>TABLE UNLOCKED</small><b>${info.table}</b></p></div>`);if(info.next)rows.push(`<div><span aria-hidden="true">🔓</span><p><small>NEW OPPONENT</small><b>${info.next}</b></p></div>`);if(info.campaign)rows.push(`<div><span aria-hidden="true">🏴‍☠️</span><p><small>CAMPAIGN MILESTONE</small><b>Definitive Pool Shark of Captain Blackball's Domain</b></p></div>`);return `<h3>PIRATE DEFEATED — ${info.pirate}</h3>${rows.join('')}`;}
-function cueUnlocked(cueId){const def=COSMETICS.cues?.[cueId];if(def?.source==='supporter')return hasEntitlement(def.sourceId);if(cueId==='classic')return true;const level=Object.entries(PIRATE_CUE_REWARDS).find(([,id])=>id===cueId)?.[0];return !!(level&&career.piratesDefeated[String(level)]);}
+function cueUnlocked(cueId){return cosmeticIsUnlocked('cues',cueId);}
 function validateEquippedCue(){if(!cueUnlocked(equippedCue)){equippedCue='classic';try{localStorage.setItem('seamenCue',equippedCue)}catch(e){}}}
 let trophyKnownUnlocked=new Set(career.earnedAchievements||[]),trophyToastQueue=[],trophyToastBusy=false;
 function trophyUnlockSet(c=career){return new Set(c.earnedAchievements||[]);}
@@ -157,26 +228,46 @@ function noteCareerObjectPots(player,pots){if(!frameStatsEligible)return;const n
 function noteCareerLegalPots(player,count){if(!frameStatsEligible||!careerPlayerEligible(player)||count<=0)return;career.legalBallsPotted+=count;const streak=(potStreakPlayer===player?potStreakCount:0);career.bestPotStreak=Math.max(career.bestPotStreak,streak);saveCareer();}
 function noteCareerFoul(player){if(frameStatsEligible&&careerPlayerEligible(player)){frameFouls[player]=(frameFouls[player]||0)+1;career.foulsCommitted++;saveCareer();}}
 function noteOneVisitClearance(player){if(!frameStatsEligible||!careerPlayerEligible(player)||pendingOneVisitClearance)return;pendingOneVisitClearance=true;career.oneVisitClearances++;saveCareer();}
-function recordCareerFrame(winner){if(!frameStatsEligible||frameRecorded)return;const trophiesBefore=new Set(career.earnedAchievements||[]),now=new Date().toISOString();frameRecorded=true;career.framesPlayed++;if(winner===1){career.framesWon++;if(!career.history.firstWin)career.history.firstWin=now;if(!devForcedWin&&state?.groups?.[2]&&remaining(state.groups[2])===7)career.sevenBallWins++;if(!devForcedWin&&pendingBlackOnBlackWin)career.blackOnBlackWins++;if(!devForcedWin&&(frameFouls[1]||0)===0)career.foulFreeWins++;if(gameMode==='pirate'&&currentPirateLevel>=1&&currentPirateLevel<=5){const key=String(currentPirateLevel),wasDefeated=!!career.piratesDefeated[key];career.piratesDefeated[key]=true;if(!wasDefeated&&!career.history.firstPirateDefeated)career.history.firstPirateDefeated={level:currentPirateLevel,at:now};if(currentPirateLevel===5&&!career.history.chapterOneCompleted)career.history.chapterOneCompleted=now;}}else career.framesLost++;if(gameMode==='pirate'&&currentPirateLevel>=1&&currentPirateLevel<=5){const key=String(currentPirateLevel),rec=career.pirateRecords[key]||{wins:0,losses:0};if(winner===1)rec.wins++;else rec.losses++;career.pirateRecords[key]=rec;}saveCareer(trophiesBefore);}
+function recordCareerFrame(winner){if(!frameStatsEligible||frameRecorded)return;const trophiesBefore=new Set(career.earnedAchievements||[]),now=new Date().toISOString(),pirate=gameMode==='pirate'?activePirate():null;frameRecorded=true;career.framesPlayed++;if(winner===1){career.framesWon++;if(!career.history.firstWin)career.history.firstWin=now;if(!devForcedWin&&state?.groups?.[2]&&remaining(state.groups[2])===7)career.sevenBallWins++;if(!devForcedWin&&pendingBlackOnBlackWin)career.blackOnBlackWins++;if(!devForcedWin&&(frameFouls[1]||0)===0)career.foulFreeWins++;if(pirate){const key=pirateCareerKey(pirate),wasDefeated=!!career.piratesDefeated[key];career.piratesDefeated[key]=true;if(!wasDefeated&&!career.history.firstPirateDefeated&&pirate.legacyLevel!=null)career.history.firstPirateDefeated={level:pirate.legacyLevel,at:now};if(isChapterBoss(pirate)){completeChapter(pirate.chapter);if(pirate.chapter==='chapter_1'&&!career.history.chapterOneCompleted)career.history.chapterOneCompleted=now;}}}else career.framesLost++;if(pirate){const key=pirateCareerKey(pirate),rec=career.pirateRecords[key]||{wins:0,losses:0};if(winner===1)rec.wins++;else rec.losses++;career.pirateRecords[key]=rec;}saveCareer(trophiesBefore);}
 function renderCareer(){
  const grid=document.getElementById('careerStatsGrid');if(grid){const pct=career.framesPlayed?Math.round(career.framesWon/career.framesPlayed*100):0,potsPer100=career.shotsTaken?Math.round(career.legalBallsPotted/career.shotsTaken*100):0,foulsPerFrame=career.framesPlayed?(career.foulsCommitted/career.framesPlayed).toFixed(2):'0.00';const sections=[['CAREER RECORD',[['Frames played',career.framesPlayed],['Wins',career.framesWon],['Losses',career.framesLost],['Win rate',pct+'%']]],['POTTING AND PERFORMANCE',[['Shots taken',career.shotsTaken],['Legal balls potted',career.legalBallsPotted],['Pots per 100 shots',potsPer100],['Best pot streak',career.bestPotStreak],['One-visit clearances',career.oneVisitClearances]]],['DISCIPLINE',[['Fouls committed',career.foulsCommitted],['Fouls per frame',foulsPerFrame],['Foul-free wins',career.foulFreeWins]]],['SPECIAL VICTORIES',[['7-ball wins',career.sevenBallWins],['Black-on-black wins',career.blackOnBlackWins]]]];grid.innerHTML=sections.map(([title,items])=>`<section class="career-stat-section"><h3>${title}</h3><div class="career-stat-section-grid">${items.map(([label,value])=>`<div class="career-stat"><b>${value}</b><small>${label}</small></div>`).join('')}</div></section>`).join('');}
- const pp=document.getElementById('pirateProgress');if(pp)pp.innerHTML=PIRATES.slice(1,6).map((pir,i)=>{const level=i+1,done=!!career.piratesDefeated[String(level)],reward=PIRATE_CUE_NAMES[level],next=level<5?PIRATES[level+1].name:null,rec=career.pirateRecords[String(level)]||{wins:0,losses:0};return `<div class="pirate-progress-item ${done?'defeated':''}"><b>${pir.name}</b><small>${done?'DEFEATED ✓':'Not defeated'}</small><strong class="pirate-record">W ${rec.wins||0} / L ${rec.losses||0}</strong><span>Reward: ${reward}${level===5?` + Captain Blackball's Privates`:''}</span>${next?`<span>Next opponent: ${next}</span>`:`<span>Main campaign finale</span>`}</div>`}).join('');
+ const pp=document.getElementById('pirateProgress');if(pp){const mainPirates=chapterPirates('chapter_1','main');pp.innerHTML=mainPirates.map((pir,i)=>{const done=pirateDefeated(pir.id),rewardNames=(pir.rewards||[]).map(r=>COSMETICS[r.type==='table'?'tables':`${r.type}s`]?.[r.id]?.name).filter(Boolean),next=mainPirates[i+1]?.name||null,rec=career.pirateRecords[pirateCareerKey(pir)]||{wins:0,losses:0};return `<div class="pirate-progress-item ${done?'defeated':''}"><b>${pir.name}</b><small>${done?'DEFEATED ✓':'Not defeated'}</small><strong class="pirate-record">W ${rec.wins||0} / L ${rec.losses||0}</strong><span>Reward: ${rewardNames.join(' + ')||'None'}</span>${next?`<span>Next opponent: ${next}</span>`:`<span>Main campaign finale</span>`}</div>`}).join('');}
  const history=document.getElementById('careerHistory');if(history){const fmt=v=>{if(!v)return '—';try{return new Intl.DateTimeFormat(undefined,{year:'numeric',month:'short',day:'numeric'}).format(new Date(v));}catch(e){return '—';}},fp=career.history?.firstPirateDefeated,firstPirate=fp&&PIRATES[fp.level]?`${PIRATES[fp.level].name} • ${fmt(fp.at)}`:'—';history.innerHTML=`<h3>PLAYER HISTORY</h3><div class="career-history-grid"><div><small>Career started</small><b>${fmt(career.history?.careerStarted)}</b></div><div><small>First frame won</small><b>${fmt(career.history?.firstWin)}</b></div><div><small>First pirate defeated</small><b>${firstPirate}</b></div><div><small>Chapter I completed</small><b>${fmt(career.history?.chapterOneCompleted)}</b></div></div>`;}
- const completion=document.getElementById('campaignCompletion');if(completion){const conquered=!!career.piratesDefeated['5'];completion.hidden=!conquered;if(conquered)completion.innerHTML=`<div class="campaign-completion-crown" aria-hidden="true">🏆</div><div><small>MAIN PIRATE CAMPAIGN COMPLETE</small><h3>DEFINITIVE POOL SHARK OF CAPTAIN BLACKBALL'S DOMAIN</h3><p>Defeated Captain Blackball aboard his ship and conquered Pirates o' the Tavern.</p><div class="uncharted-waters-tease"><b>Uncharted Waters</b><span>Strange challengers are rumoured beyond the known seas...</span></div></div>`;}
+ const completion=document.getElementById('campaignCompletion');if(completion){const conquered=!!career.chapters?.chapter_1?.completed;completion.hidden=!conquered;if(conquered)completion.innerHTML=`<div class="campaign-completion-crown" aria-hidden="true">🏆</div><div><small>MAIN PIRATE CAMPAIGN COMPLETE</small><h3>DEFINITIVE POOL SHARK OF CAPTAIN BLACKBALL'S DOMAIN</h3><p>Defeated Captain Blackball aboard his ship and conquered Pirates o' the Tavern.</p><div class="uncharted-waters-tease"><b>Uncharted Waters</b><span>Strange challengers are rumoured beyond the known seas...</span></div></div>`;}
  const tg=document.getElementById('trophyGrid');if(tg){const earned=new Set(career.earnedAchievements||[]);tg.innerHTML=Object.keys(ACHIEVEMENT_CATEGORIES).map(category=>{const items=ACHIEVEMENTS.filter(a=>a.category===category).map(a=>{const won=earned.has(a.id);return `<div class="trophy-item ${won?'unlocked':''}" data-trophy="${a.id}"><span class="trophy-tier tier-${a.tier.toLowerCase().replace(/\s+/g,'-')}">${a.tier}</span><b>${a.name}</b><small>${a.desc}</small><em>${won?'UNLOCKED ✓':'LOCKED'}</em></div>`}).join('');return `<section class="achievement-category" data-achievement-category="${category}"><h3>${ACHIEVEMENT_CATEGORIES[category]}</h3><div class="achievement-category-grid">${items}</div></section>`}).join('');}
  const dev=document.getElementById('devProgressStats');if(dev)dev.textContent=`Schema: ${career.schema}\nFrames: ${career.framesPlayed} | W ${career.framesWon} | L ${career.framesLost}\nShots: ${career.shotsTaken} | Legal pots: ${career.legalBallsPotted} | Fouls: ${career.foulsCommitted}\nBest pot streak: ${career.bestPotStreak} | 7-ball wins: ${career.sevenBallWins} | Black-on-black wins: ${career.blackOnBlackWins}\nFoul-free wins: ${career.foulFreeWins} | One-visit clearances: ${career.oneVisitClearances}\nAchievements earned: ${(career.earnedAchievements||[]).length}/${ACHIEVEMENTS.length}\nPirate records: ${JSON.stringify(career.pirateRecords||{})}\nCredits read: ${career.creditsRead} | Legacy lifetime premium: ${career.lifetimePremium}\nSupporter test entitlement: ${hasEntitlement('supporter_founder_test')?'YES':'NO'}\nBlackball intro: ${career.blackballIntroSeen} | ending: ${career.blackballEndingSeen}\nPirates defeated: ${Object.keys(career.piratesDefeated).filter(k=>career.piratesDefeated[k]).join(', ')||'none'}`;
 }
-function pirateIsOpen(level){const isDev=level>=6;return isDev?devPiratesUnlocked:level<=getUnlockedPirateLevel();}
+function pirateIsOpen(pirateOrId){
+  const p=typeof pirateOrId==='object'?pirateOrId:(typeof pirateOrId==='string'?pirateById(pirateOrId):pirateByLegacyLevel(pirateOrId));
+  if(!p)return false;
+  if(!chapterIsUnlocked(p.chapter))return false;
+  if(p.unlockRule)return unlockRuleMet(p.unlockRule);
+  if(p.campaignRole==='bonus'){if(chapterById(p.chapter)?.testOnly)return true;return chapterBonusAvailable(p.chapter)||devPiratesUnlocked;}
+  if(p.chapter==='chapter_1'&&p.legacyLevel!=null)return p.legacyLevel<=getUnlockedPirateLevel();
+  return true;
+}
 const DAVE_FIRST_SELECTION_KEY='seamenDaveFirstSelectionSeen';
 const FIRST_RUN_PATH_KEY='seamenFirstRunPathComplete';
 function daveFirstSelectionSeen(){try{return localStorage.getItem(DAVE_FIRST_SELECTION_KEY)==='1'}catch(e){return false}}
 function firstRunPathComplete(){try{return localStorage.getItem(FIRST_RUN_PATH_KEY)==='1'}catch(e){return false}}
 function firstRunGuideActive(){return !firstRunPathComplete()&&!daveFirstSelectionSeen()&&career.framesPlayed===0&&!career.piratesDefeated?.['1'];}
 function completeFirstRunPath(){try{localStorage.setItem(FIRST_RUN_PATH_KEY,'1');localStorage.setItem(DAVE_FIRST_SELECTION_KEY,'1')}catch(e){}refreshFirstRunGuidance();}
-function refreshFirstRunGuidance(){const active=firstRunGuideActive();document.getElementById('titlePlay')?.classList.toggle('first-run-attention',active&&!document.getElementById('titleScreen')?.hidden);document.getElementById('pirateMode')?.classList.toggle('first-run-attention',active&&!document.getElementById('modeMenu')?.hidden);document.querySelector('.pirate-choice[data-level="1"]')?.classList.toggle('first-pirate-attention',active&&!document.getElementById('piratePlaceholder')?.hidden&&document.getElementById('pirateProfileModal')?.hidden);document.getElementById('challengePirate')?.classList.toggle('first-run-attention',active&&!document.getElementById('pirateProfileModal')?.hidden&&profiledPirateLevel===1);document.getElementById('startPirateMatch')?.classList.toggle('first-run-attention',active&&!document.getElementById('pirateIntroModal')?.hidden&&pendingPirateStart?.level===1);}
+function refreshFirstRunGuidance(){const active=firstRunGuideActive();document.getElementById('titlePlay')?.classList.toggle('first-run-attention',active&&!document.getElementById('titleScreen')?.hidden);document.getElementById('pirateMode')?.classList.toggle('first-run-attention',active&&!document.getElementById('modeMenu')?.hidden);document.querySelector('.pirate-choice[data-pirate-id="dave"]')?.classList.toggle('first-pirate-attention',active&&!document.getElementById('piratePlaceholder')?.hidden&&document.getElementById('pirateProfileModal')?.hidden);document.getElementById('challengePirate')?.classList.toggle('first-run-attention',active&&!document.getElementById('pirateProfileModal')?.hidden&&profiledPirateId==='dave');document.getElementById('startPirateMatch')?.classList.toggle('first-run-attention',active&&!document.getElementById('pirateIntroModal')?.hidden&&pendingPirateStart?.pirateId==='dave');}
 function shouldHighlightDave(){return firstRunGuideActive();}
-function renderPirateRoster(){const list=document.getElementById('pirateList');if(!list)return;const roster=IS_DEVELOPMENT_BUILD?PIRATES.slice(1):PIRATES.slice(1,6);list.innerHTML=roster.map((p,i)=>{const level=i+1,nick=p.nickname?` <em>${p.nickname}</em>`:'';return `<button class="pirate-choice" data-level="${level}" type="button"><b>${p.name}${nick}</b><small></small></button>`}).join('');refreshPirateButtons();}
-function refreshPirateButtons(){document.querySelectorAll('.pirate-choice[data-level]').forEach(btn=>{const level=Number(btn.dataset.level),p=PIRATES[level],open=pirateIsOpen(level),isDev=level>=6;btn.disabled=false;btn.classList.toggle('unlocked',open);btn.classList.toggle('locked',!open);btn.classList.toggle('first-pirate-attention',level===1&&open&&shouldHighlightDave());btn.setAttribute('aria-disabled',String(!open));const small=btn.querySelector('small');if(small)small.textContent=isDev?`${p.role} • ${open?'Available':'Locked 🔒'}`:`Difficulty ${level} • ${open?p.role:'Locked 🔒'}`;});}
+function renderPirateRoster(){
+  const list=document.getElementById('pirateList');if(!list)return;
+  const chapters=Object.values(CHAPTERS).filter(ch=>!ch.hidden&&(ch.id==='chapter_2'||chapterIsUnlocked(ch.id)));
+  list.innerHTML=chapters.map(ch=>{
+    const main=chapterPirates(ch.id,'main').filter(p=>!p.devOnly),bonus=(IS_DEVELOPMENT_BUILD||ch.testOnly)?chapterPirates(ch.id,'bonus').filter(p=>!p.devOnly):[];
+    const roster=[...main,...bonus];
+    const chState=chapterState(ch.id),chapterOpen=chapterIsUnlocked(ch.id),status=ch.postRelease?'COMING SOON':!chapterOpen?'LOCKED':chState.completed?'COMPLETE ✓':'AVAILABLE';const heading=`<div class="pirate-chapter-heading"><b>CHAPTER ${ch.number} • ${status}</b><small>${ch.name}${ch.testOnly?' • TEMPORARY ARCHITECTURE PROOF':''}</small></div>`;
+    if(ch.id==='chapter_3')return heading+`<button class="pirate-choice locked" id="beginChapter3" type="button" disabled aria-disabled="true"><b>Begin Chapter 3 🔒</b><small>Armed with new knowledge, a further voyage towards a mysterious clue awaits...</small></button>`;
+    if(!roster.length)return'';
+    if(ch.id==='chapter_2'&&!chState.introSeen)return heading+`<button class="pirate-choice ${chapterOpen?'unlocked':'locked'}" id="beginChapter2" type="button" ${chapterOpen?'':'disabled aria-disabled="true"'}><b>Begin Chapter 2: Uncharted Waters</b><small>${chapterOpen?'The voyage continues...':'Defeat Captain Blackball to unlock 🔒'}</small></button>`;
+    return heading+roster.map(p=>{const nick=p.nickname?` <em>${p.nickname}</em>`:'';return `<button class="pirate-choice" data-pirate-id="${p.id}" type="button"><b>${p.name}${nick}</b><small></small></button>`}).join('');
+  }).join('');refreshPirateButtons();
+}
+function refreshPirateButtons(){document.querySelectorAll('.pirate-choice[data-pirate-id]').forEach(btn=>{const p=pirateById(btn.dataset.pirateId),open=pirateIsOpen(p),special=p?.campaignRole==='bonus';btn.disabled=false;btn.classList.toggle('unlocked',open);btn.classList.toggle('locked',!open);btn.classList.toggle('first-pirate-attention',p?.id==='dave'&&open&&shouldHighlightDave());btn.setAttribute('aria-disabled',String(!open));const small=btn.querySelector('small');if(small)small.textContent=p?.testOnly?`${p.role} • ${open?'Catalogue loaded':'Locked 🔒'}`:special?`${p.role} • ${open?'Available':'Locked 🔒'}`:`Difficulty ${p?.difficulty??'—'} • ${open?p.role:'Locked 🔒'}`;});const begin=document.getElementById('beginChapter2');if(begin){const open=chapterIsUnlocked('chapter_2')&&!chapterState('chapter_2').introSeen;begin.disabled=!open;begin.classList.toggle('unlocked',open);begin.classList.toggle('locked',!open);begin.setAttribute('aria-disabled',String(!open));const small=begin.querySelector('small');if(small)small.textContent=open?'The voyage continues...':'Defeat Captain Blackball to unlock 🔒';}}
 const shootBtn=document.getElementById('shoot'),confirmCue=document.getElementById('confirmCue'),cuePlacementControls=document.getElementById('cuePlacementControls'),tableWrap=document.querySelector('.table-wrap'),powerEl=document.getElementById('power'),powerText=document.getElementById('powerText'),angleEl=document.getElementById('angle'),angleText=document.getElementById('angleText'),msg=document.getElementById('message'),turnEl=document.getElementById('turn');
 const phaseEl=document.getElementById('phase'),lastShotEl=document.getElementById('lastShot'),choice=document.getElementById('choice'),choiceText=document.getElementById('choiceText'),choiceA=document.getElementById('choiceA'),choiceB=document.getElementById('choiceB'),turnOverlay=document.getElementById('turnOverlay'),breakHelp=document.getElementById('breakHelp'),breakRules=document.getElementById('breakRules'),closeBreakRules=document.getElementById('closeBreakRules'),winModal=document.getElementById('winModal'),winTitle=document.getElementById('winTitle'),winText=document.getElementById('winText'),playAgain=document.getElementById('playAgain'),returnMenu=document.getElementById('returnMenu');
 // V0.14.2: result/log overlays live at document root so the split-pane scroll layer cannot trap them beneath the frozen header/table.
@@ -200,11 +291,11 @@ let dialogueLastShot=-99,dialogueReachedBlack={1:false,2:false};
 const dialogueChance={1:.55,2:.48,3:.42,4:.46,5:.30,6:.22,7:.28};
 function hidePirateDialogue(){if(pirateDialogue)pirateDialogue.hidden=true;}
 function showPirateDialogue(category,{major=false}={}){
-  if(gameMode!=='pirate'||!currentPirateLevel||!window.SeamenDialogue)return false;
+  if(gameMode!=='pirate'||!currentPirateLevel||!window.SeamenDialogue||activePirate()?.legacyLevel==null)return false;
   if(!major&&shotNumber-dialogueLastShot<2)return false;
   if(!major&&Math.random()>(dialogueChance[currentPirateLevel]??.35))return false;
   const line=window.SeamenDialogue.getLine(currentPirateLevel,category);if(!line)return false;
-  const p=PIRATES[currentPirateLevel];pirateDialoguePortrait.src=p.image;pirateDialogueName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;pirateDialogueText.textContent=line;pirateDialogue.classList.toggle('dialogue-major',major);pirateDialogue.classList.remove('dialogue-speaking');pirateDialogue.hidden=false;void pirateDialogue.offsetWidth;if(!document.body.classList.contains('reduced-character-portrait-motion'))pirateDialogue.classList.add('dialogue-speaking');dialogueLastShot=shotNumber;
+  const p=activePirate();pirateDialoguePortrait.src=p.image;pirateDialogueName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;pirateDialogueText.textContent=line;pirateDialogue.classList.toggle('dialogue-major',major);pirateDialogue.classList.remove('dialogue-speaking');pirateDialogue.hidden=false;void pirateDialogue.offsetWidth;if(!document.body.classList.contains('reduced-character-portrait-motion'))pirateDialogue.classList.add('dialogue-speaking');dialogueLastShot=shotNumber;
   return true;
 }
 function contextualDialogue(completed){
@@ -424,7 +515,7 @@ function step(dt){const maxSpeed=Math.max(...balls.filter(b=>!b.potted).map(b=>M
 function allStopped(){return balls.every(b=>b.potted||Math.hypot(b.vx,b.vy)<.01)}
 function respotBlack(){const b=balls.find(x=>x.type==='black');if(!b||!b.potted)return;b.potted=false;b.potFadeStarted=null;b.vx=b.vy=0;const spotX=L+PLAY_W*.25,spotY=H/2;for(let dir of [-1,1])for(let dist=0;dist<PLAY_W*.6;dist+=ballR*2.05){const x=spotX+dir*dist,y=spotY;if(x>L+ballR&&x<R-ballR&&balls.filter(o=>o!==b&&!o.potted).every(o=>Math.hypot(o.x-x,o.y-y)>=ballR*2.01)){b.x=x;b.y=y;return;}}}
 function restoreCue(mode){const c=cue();c.potted=false;c.potFadeStarted=null;c.vx=c.vy=0;placementMode=mode;let x=mode==='baulk'?L+PLAY_W*.8:L+PLAY_W*.72,y=H/2;for(let tries=0;tries<40&&!validCuePosition(x,y);tries++)y=T+ballR+((tries+1)*(PLAY_H-2*ballR)/41);c.x=x;c.y=y;}
-function finishFrame(winner,text,resultText='Frame complete'){const firstPirateDefeat=gameMode==='pirate'&&winner===1&&currentPirateLevel>=1&&currentPirateLevel<=5&&!career.piratesDefeated[String(currentPirateLevel)];recordCareerFrame(winner);pendingPirateReward=firstPirateDefeat?pirateRewardInfo(currentPirateLevel):null;state.frameOver=true;state.winner=winner;moving=false;shootBtn.disabled=true;placementMode='none';let finalText=text;if(gameMode==='pirate'&&winner===1&&currentPirateLevel<5){const before=getUnlockedPirateLevel(),next=currentPirateLevel+1;if(next>before){setUnlockedPirateLevel(next);refreshPirateButtons();finalText+=` ${PIRATES[next].name} (Difficulty ${next}) unlocked!`;}}msg.textContent=finalText;lastShotEl.textContent=resultText;updateHUD();if(fiveFrameTestActive)pendingFiveFrameCelebration={winner,text:finalText};else showWinCelebration(winner,finalText);}
+function finishFrame(winner,text,resultText='Frame complete'){const currentPirate=activePirate(),firstPirateDefeat=gameMode==='pirate'&&winner===1&&isMainCampaignPirate(currentPirate)&&!career.piratesDefeated[pirateCareerKey(currentPirate)];recordCareerFrame(winner);if(firstPirateDefeat&&currentPirate?.id==='papa_surf')pendingChapter2BossReveal=true;pendingPirateReward=firstPirateDefeat&&currentPirate.legacyLevel!=null?pirateRewardInfo(currentPirateLevel):null;state.frameOver=true;state.winner=winner;moving=false;shootBtn.disabled=true;placementMode='none';let finalText=text;if(gameMode==='pirate'&&winner===1&&isMainCampaignPirate(currentPirate)&&!isChapterBoss(currentPirate)){const chapter=chapterById(currentPirate.chapter),main=chapterPirates(currentPirate.chapter,'main'),index=main.findIndex(p=>p.id===currentPirate.id),nextPirate=main[index+1];if(currentPirate.chapter==='chapter_1'&&nextPirate?.legacyLevel){const before=getUnlockedPirateLevel();if(nextPirate.legacyLevel>before)setUnlockedPirateLevel(nextPirate.legacyLevel);}refreshPirateButtons();if(nextPirate&&pirateIsOpen(nextPirate))finalText+=` ${nextPirate.name} (Difficulty ${nextPirate.difficulty}) unlocked!`;}msg.textContent=finalText;lastShotEl.textContent=resultText;updateHUD();if(fiveFrameTestActive)pendingFiveFrameCelebration={winner,text:finalText};else showWinCelebration(winner,finalText);}
 function standardFoul(reason,ballInHand='anywhere'){noteCareerFoul(state.player);if(shot&&shot.pots.length)soundFoulPot();else resetPotStreak();const incoming=opponent(state.player);state.player=incoming;state.breakShot=false;if(cue().potted)restoreCue(ballInHand==='baulk'?'baulk':'anywhere');else placementMode='anywhere';msg.textContent=`FOUL — ${reason}. ${pname(incoming)}: cue ball in hand ${ballInHand==='baulk'?'in baulk':'anywhere'}.`;lastShotEl.textContent=`FOUL: ${reason} • Opponent gets cue ball in hand ${ballInHand==='baulk'?'in baulk':'anywhere'}.`;if(tutorialActive&&incoming===1)setTimeout(()=>showTutorialStep('ballinhand','Cue ball in hand',"After a foul you have what's called 'cue ball in hand' and can place it anywhere on the table, shooting forwards or backwards. In this game, tap or drag the white anywhere it fits without touching another ball, then confirm its position before aiming your next shot.",'.cue-placement-controls'),120);}
 function showBreakChoice(){pendingChoice='break';choice.hidden=false;const chooser=opponent(state.breaker);choiceText.textContent=`Illegal break — 3 points are required. ${pname(chooser)} chooses who takes the re-rack break.`;choiceA.textContent='I will break';choiceB.textContent='Opponent breaks';shootBtn.disabled=true;choiceA.onclick=()=>resolveBreakChoice(chooser);choiceB.onclick=()=>resolveBreakChoice(state.breaker);if(aiPlayer===chooser||gameMode==='aivai'){choice.hidden=true;msg.textContent=`Illegal break — ${pname(chooser)} is choosing who breaks the re-rack…`;clearTimeout(aiTimer);aiTimer=setTimeout(()=>resolveBreakChoice(chooser),1100);}}
 function resolveBreakChoice(breaker){pendingChoice=null;choice.hidden=true;newFrame(breaker);msg.textContent=`Re-rack — ${pname(breaker)} to break.`;}
@@ -453,10 +544,13 @@ function tableThemePalette(){
   if(theme==='captain')return{rail:'#4a2916',cloth:'#18583f',edge:'#c99a4c',ambience:'rgba(238,177,86,.045)'};
   if(theme==='spectral')return{rail:'#263b3e',cloth:'#285f59',edge:'#8ed4c4',ambience:'rgba(124,235,217,.07)'};
   if(theme==='privates')return{rail:'#8b6928',cloth:'#202020',edge:'#e0b858',ambience:'rgba(205,205,205,.025)'};
+  if(theme==='strangevoice')return{rail:'#59452f',cloth:'#6d5d46',edge:'#7b6749',ambience:'rgba(75,58,38,.035)'};
+  if(theme==='wiggles')return{rail:'#73517f',cloth:'#dfbad0',edge:'#b99555',ambience:'rgba(255,220,240,.045)'};
   return{rail:'#56371f',cloth:'#2a7b57',edge:'#163f30',ambience:null};
 }
 function drawTableAtmosphere(now,pal){
   const theme=activeTableTheme();
+  if(theme==='wiggles'){ctx.save();ctx.strokeStyle='rgba(205,170,95,.38)';ctx.lineWidth=3;ctx.strokeRect(7,7,W-14,H-14);ctx.fillStyle='rgba(80,45,88,.10)';for(let i=0;i<10;i++){const x=(i*137)%W,y=(i*83)%H;ctx.fillRect(x,y,28+(i%3)*14,2);}ctx.restore();}
   if(theme==='captain'){
     // Rich varnished timber. Highlights breathe slowly rather than travelling around the table.
     const gloss=ctx.createLinearGradient(0,0,W,H);gloss.addColorStop(0,'rgba(255,221,151,.23)');gloss.addColorStop(.20,'rgba(255,255,255,.035)');gloss.addColorStop(.55,'rgba(85,34,10,.17)');gloss.addColorStop(1,'rgba(255,190,93,.15)');
@@ -473,6 +567,17 @@ function drawTableAtmosphere(now,pal){
     }
     ctx.restore();
     const pulse=.24+.10*Math.sin(now/1350);ctx.save();ctx.strokeStyle=`rgba(177,255,240,${pulse})`;ctx.lineWidth=4;ctx.shadowColor='rgba(112,255,230,.42)';ctx.shadowBlur=15+4*Math.sin(now/1700);ctx.strokeRect(L-7,T-7,R-L+14,B-T+14);ctx.restore();
+  }else if(theme==='strangevoice'){
+    // Strangevoice Island house table: worn timber and muted olive-brown cloth.
+    // Cosmetic wear stays beneath balls/guides and does not alter table geometry or physics.
+    ctx.save();
+    const wood=ctx.createLinearGradient(0,0,W,H);wood.addColorStop(0,'rgba(198,157,103,.10)');wood.addColorStop(.34,'rgba(56,37,22,.13)');wood.addColorStop(.7,'rgba(173,130,82,.07)');wood.addColorStop(1,'rgba(38,28,20,.14)');
+    ctx.fillStyle=wood;ctx.fillRect(0,0,W,T);ctx.fillRect(0,B,W,H-B);ctx.fillRect(0,T,L,B-T);ctx.fillRect(R,T,W-R,B-T);
+    ctx.beginPath();ctx.rect(L,T,R-L,B-T);ctx.clip();
+    ctx.strokeStyle='rgba(48,38,27,.075)';ctx.lineWidth=3;
+    const marks=[[.13,.22,.28,.18],[.61,.31,.18,.24],[.26,.73,.22,.68],[.73,.62,.86,.58],[.43,.47,.51,.43]];
+    for(const [x1,y1,x2,y2] of marks){ctx.beginPath();ctx.moveTo(L+(R-L)*x1,T+(B-T)*y1);ctx.lineTo(L+(R-L)*x2,T+(B-T)*y2);ctx.stroke();}
+    ctx.restore();
   }else if(theme==='privates'){
     // Blackball's absurdly level shipboard table: restrained gold glint, candles and thin grey mist.
     const sweep=(now/28)%(W+500)-250,gold=ctx.createLinearGradient(sweep,0,sweep+230,0);gold.addColorStop(0,'rgba(255,220,126,0)');gold.addColorStop(.5,'rgba(255,231,157,.18)');gold.addColorStop(1,'rgba(255,220,126,0)');ctx.fillStyle=gold;ctx.fillRect(0,0,W,T);ctx.fillRect(0,B,W,H-B);
@@ -575,6 +680,13 @@ function drawLegalPotSparkles(now=performance.now()){
   }
 }
 function cueStyleForShooter(player=state?.player){
+  // Chapter 2 opponents have their own real cue identities even when their AI
+  // strength is borrowed from a legacy difficulty profile.
+  if(gameMode==='pirate'&&player===aiPlayer){
+    const pirate=activePirate();
+    if(['sandy','shelle','graham','papa_surf'].includes(pirate?.id))return pirate.id;
+    if(pirate?.id==='chapter2_boss')return 'wiggles';
+  }
   let level=null;
   if(gameMode==='pirate'&&player===aiPlayer)level=currentPirateLevel;
   else if(gameMode==='aivai')level=aiVsAiLevels[player];
@@ -587,12 +699,29 @@ function cueStyleForShooter(player=state?.player){
   if(player===1&&gameMode!=='aivai')return cueUnlocked(equippedCue)?equippedCue:'classic';
   return 'classic';
 }
-function strokeCueLine(x1,y1,x2,y2,style){
-  ctx.lineCap='round';
+function strokeCueLine(x1,y1,x2,y2,style,g=ctx){
+  g.lineCap='round';
   if(style==='vaper'){
-    ctx.shadowColor='#ff2020';ctx.shadowBlur=24;ctx.strokeStyle='rgba(255,38,38,.35)';ctx.lineWidth=18;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
-    ctx.shadowBlur=14;ctx.strokeStyle='#ff2a2a';ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
-    ctx.shadowBlur=7;ctx.strokeStyle='#fff1e8';ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();return;
+    // H2d: keep Vaper unmistakably a lightsaber. The glowing blade occupies the
+    // forward 75%; the tail 25% is a thicker black hilt with two silver bands.
+    const hx=x1+(x2-x1)*.75,hy=y1+(y2-y1)*.75;
+    g.shadowColor='#ff1818';g.shadowBlur=38;g.strokeStyle='rgba(255,30,30,.42)';g.lineWidth=24;g.beginPath();g.moveTo(x1,y1);g.lineTo(hx,hy);g.stroke();
+    g.shadowColor='#ff1010';g.shadowBlur=25;g.strokeStyle='#ff2424';g.lineWidth=12;g.beginPath();g.moveTo(x1,y1);g.lineTo(hx,hy);g.stroke();
+    g.shadowColor='#fff';g.shadowBlur=12;g.strokeStyle='#fff7f2';g.lineWidth=4;g.beginPath();g.moveTo(x1,y1);g.lineTo(hx,hy);g.stroke();
+    g.shadowColor='rgba(0,0,0,.8)';g.shadowBlur=7;g.strokeStyle='#090a0c';g.lineWidth=20;g.beginPath();g.moveTo(hx,hy);g.lineTo(x2,y2);g.stroke();
+    const dx=x2-x1,dy=y2-y1;
+    for(const t of [.79,.94]){const cx=x1+dx*t,cy=y1+dy*t;const half=.017;g.shadowBlur=0;g.strokeStyle='#d8dde2';g.lineWidth=22;g.beginPath();g.moveTo(cx-dx*half,cy-dy*half);g.lineTo(cx+dx*half,cy+dy*half);g.stroke();g.strokeStyle='#777f88';g.lineWidth=3;g.stroke();}
+    return;
+  }
+  if(style==='wiggles'){
+    // H3: visual-only wiggly shaft. Gameplay/aiming remains on the straight cue axis.
+    const dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy)||1,ux=dx/len,uy=dy/len,nx=-uy,ny=ux;
+    const conventional=.20,splitX=x1+dx*conventional,splitY=y1+dy*conventional;
+    g.shadowColor='rgba(255,182,224,.30)';g.shadowBlur=6;g.strokeStyle='#f3a9d3';g.lineWidth=13;g.beginPath();g.moveTo(x1,y1);g.lineTo(splitX,splitY);g.stroke();
+    g.shadowColor='rgba(255,182,224,.42)';g.shadowBlur=9;g.strokeStyle='#f3a9d3';g.lineWidth=13;g.beginPath();g.moveTo(splitX,splitY);
+    const waves=5,amp=8;
+    for(let i=1;i<=32;i++){const t=conventional+(1-conventional)*(i/32),bx=x1+dx*t,by=y1+dy*t,off=Math.sin((t-conventional)/(1-conventional)*Math.PI*2*waves)*amp;g.lineTo(bx+nx*off,by+ny*off);}
+    g.stroke();g.shadowBlur=0;g.strokeStyle='#fff0f8';g.lineWidth=3;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1+dx*.047,y1+dy*.047);g.stroke();return;
   }
   let stops;
   if(style==='blackball')stops=[['0','#d8d2c7'],['.08','#2d2d30'],['.58','#111216'],['1','#030405']];
@@ -600,30 +729,56 @@ function strokeCueLine(x1,y1,x2,y2,style){
   else if(style==='dave')stops=[['0','#ead9b5'],['.10','#9a693d'],['.55','#60391f'],['1','#342014']];
   else if(style==='simon')stops=[['0','#efe0bc'],['.12','#cba56a'],['.38','#805126'],['.42','#3d78c5'],['.47','#805126'],['.72','#3d78c5'],['.77','#6b3f20'],['1','#3d2515']];
   else if(style==='holly')stops=[['0','#eadfc5'],['.10','#6b397c'],['.36','#351b48'],['.42','#73a84c'],['.47','#351b48'],['.68','#73a84c'],['.73','#351b48'],['1','#1f102b']];
+  else if(style==='sandy')stops=[['0','#f4e8c7'],['.12','#e8c65a'],['.24','#d95757'],['.36','#65a8d8'],['.48','#79b85a'],['.60','#e8c65a'],['.72','#d95757'],['.84','#65a8d8'],['1','#7a5534']];
+  else if(style==='shelle')stops=[['0','#fffdf4'],['.18','#eee9e0'],['.45','#fff'],['.70','#ddd8d2'],['1','#faf8f0']];
+  else if(style==='graham')stops=[['0','#ddd'],['.14','#aaa'],['.62','#777'],['1','#555']];
+  else if(style==='papa_surf')stops=[['0','#e9f7ff'],['.12','#42a9ef'],['.62','#0876c9'],['1','#034d8d']];
   else stops=[['0','#efe0bc'],['.12','#cba56a'],['.7','#805126'],['1','#3d2515']];
-  const grad=ctx.createLinearGradient(x1,y1,x2,y2);for(const [at,c] of stops)grad.addColorStop(Number(at),c);
-  ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=5;ctx.strokeStyle=grad;ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
-  ctx.shadowBlur=0;ctx.strokeStyle=style==='blackball'?'#bdb8ad':'#f4ead0';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x1+(x2-x1)*.047, y1+(y2-y1)*.047);ctx.stroke();
+  if(style==='papa_surf'){
+    // H2e: retain the now-visible ocean-blue aura at roughly half H2d intensity.
+    g.shadowColor='rgba(50,170,255,.48)';g.shadowBlur=13;g.strokeStyle='rgba(45,170,255,.26)';g.lineWidth=20;g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();
+    g.shadowColor='rgba(110,215,255,.46)';g.shadowBlur=8;g.strokeStyle='rgba(75,190,255,.31)';g.lineWidth=14;g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();
+  }
+  const grad=g.createLinearGradient(x1,y1,x2,y2);for(const [at,c] of stops)grad.addColorStop(Number(at),c);
+  g.shadowColor=style==='papa_surf'?'rgba(70,185,255,.85)':'rgba(0,0,0,.45)';g.shadowBlur=style==='papa_surf'?12:5;g.shadowBlur=5;g.strokeStyle=grad;g.lineWidth=12;g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();
+  g.shadowBlur=0;g.strokeStyle=style==='blackball'?'#bdb8ad':'#f4ead0';g.lineWidth=3;g.beginPath();g.moveTo(x1,y1);g.lineTo(x1+(x2-x1)*.047, y1+(y2-y1)*.047);g.stroke();
+}
+function drawCueCosmeticDetails(g,style,buttX,buttY,now=performance.now()){
+  if(style==='sandy'){
+    // H2c: larger toy pinwheel, shared by gameplay and Cosmetics preview.
+    const r=22,rot=now/520;g.save();g.translate(buttX,buttY);g.rotate(rot);g.shadowColor='rgba(0,0,0,.45)';g.shadowBlur=4;
+    const pinCols=['#e8c65a','#d95757','#65a8d8','#79b85a'];
+    for(let i=0;i<4;i++){g.rotate(Math.PI/2);g.fillStyle=pinCols[i];g.beginPath();g.moveTo(0,0);g.quadraticCurveTo(r*.35,-r*.9,r,0);g.quadraticCurveTo(r*.42,r*.18,0,0);g.fill();}
+    g.shadowBlur=0;g.fillStyle='#f4e8c7';g.beginPath();g.arc(0,0,4,0,Math.PI*2);g.fill();g.restore();
+  }else if(style==='shelle'){
+    // H2c: slightly larger luminous pearl.
+    const r=11;g.save();g.shadowColor='rgba(255,250,225,.98)';g.shadowBlur=20;g.fillStyle='#fffdf1';g.beginPath();g.arc(buttX,buttY,r+1,0,Math.PI*2);g.fill();
+    g.shadowBlur=0;const pg=g.createRadialGradient(buttX-3.5,buttY-3.5,1,buttX,buttY,r);pg.addColorStop(0,'#ffffff');pg.addColorStop(.45,'#fff9df');pg.addColorStop(1,'#d8d3c8');g.fillStyle=pg;g.beginPath();g.arc(buttX,buttY,r,0,Math.PI*2);g.fill();g.restore();
+  }
 }
 function drawCueStick(now=performance.now()){
   if(!state||state.frameOver||cue().potted||placementMode!=='none'||pendingChoice)return;
   let a=angle,visible=!moving,cueStyle=cueStyleForShooter(),travel=0,anchorX=cue().x,anchorY=cue().y,alpha=1;
   if(cueStrikeVisual){
     const age=now-cueStrikeVisual.started;
-    if(age<420){
-      visible=true;a=cueStrikeVisual.angle;cueStyle=cueStrikeVisual.style||'classic';anchorX=cueStrikeVisual.x;anchorY=cueStrikeVisual.y;
-      // The cue is anchored to the strike point. It lunges into the white, then retreats/fades while the white travels independently.
-      if(age<95)travel=38*(age/95);else{const q=(age-95)/325;travel=38-150*q;alpha=1-Math.max(0,(q-.42)/.58)*.88;}
-    }else cueStrikeVisual=null;
+    if(age<420){visible=true;a=cueStrikeVisual.angle;cueStyle=cueStrikeVisual.style||'classic';anchorX=cueStrikeVisual.x;anchorY=cueStrikeVisual.y;if(age<95)travel=38*(age/95);else{const q=(age-95)/325;travel=38-150*q;alpha=1-Math.max(0,(q-.42)/.58)*.88;}}
+    else cueStrikeVisual=null;
   }
   if(!visible)return;
-  const dx=Math.cos(a),dy=Math.sin(a),backX=-dx,backY=-dy;
-  const tipGap=ballR+10-travel,tipX=anchorX+backX*tipGap,tipY=anchorY+backY*tipGap;
-  const length=360,buttX=tipX+backX*length,buttY=tipY+backY*length;
+  const dx=Math.cos(a),dy=Math.sin(a),backX=-dx,backY=-dy,tipGap=ballR+10-travel,tipX=anchorX+backX*tipGap,tipY=anchorY+backY*tipGap,length=360,buttX=tipX+backX*length,buttY=tipY+backY*length;
   ctx.save();ctx.globalAlpha=alpha;ctx.lineCap='round';
-  strokeCueLine(tipX,tipY,buttX,buttY,cueStyle);
-  ctx.restore();
+  strokeCueLine(tipX,tipY,buttX,buttY,cueStyle,ctx);drawCueCosmeticDetails(ctx,cueStyle,buttX,buttY,now);ctx.restore();
 }
+function renderCueCosmeticPreview(canvasEl,style,now=performance.now()){
+  const g=canvasEl.getContext('2d'),w=420,h=74;canvasEl.width=w;canvasEl.height=h;g.clearRect(0,0,w,h);g.save();
+  // Same renderer, dimensions and cosmetic details as the in-game cue; only placement is catalogue-specific.
+  const tipX=28,tipY=h/2,buttX=388,buttY=h/2;
+  strokeCueLine(tipX,tipY,buttX,buttY,style,g);drawCueCosmeticDetails(g,style,buttX,buttY,now);g.restore();
+}
+function refreshCueCosmeticPreviews(now=performance.now()){
+  document.querySelectorAll('canvas[data-cue-render]').forEach(c=>renderCueCosmeticPreview(c,c.dataset.cueRender||'classic',now));
+}
+
 function drawBallPolish(b){
   const r=ballR,shine=ctx.createRadialGradient(b.x-r*.38,b.y-r*.42,r*.05,b.x,b.y,r*1.05);
   shine.addColorStop(0,'rgba(255,255,255,.72)');shine.addColorStop(.16,'rgba(255,255,255,.22)');shine.addColorStop(.48,'rgba(255,255,255,0)');shine.addColorStop(1,'rgba(0,0,0,.20)');
@@ -663,6 +818,12 @@ document.addEventListener('visibilitychange',()=>{
 // V0.14.6: the former New Frame control now opens the in-match Game menu.
 document.getElementById('rack').onclick=()=>restartCurrentGame(state?.breaker||1);document.getElementById('clear').onclick=()=>{balls.slice(1).forEach(b=>{if(b.type!=='black')b.potted=true});updateHUD();};document.getElementById('soft').onclick=()=>{powerEl.value=25;powerText.textContent='25%'};document.getElementById('hard').onclick=()=>{powerEl.value=100;powerText.textContent='100%'};
 document.getElementById('toggleAngleGuide').onclick=e=>{devAngleGuide=!devAngleGuide;saveAimGuidePreference();syncAimGuideSwitch();e.currentTarget.textContent=`Toggle guide Ian angle: ${devAngleGuide?'ON':'OFF'}`;};
+// Candidate C hidden QA shortcuts: six rapid presses within ~2 seconds.
+const hiddenQaSequences={t:{count:0,last:0},y:{count:0,last:0},u:{count:0,last:0}};
+function hiddenQaTypingTarget(target){const el=target instanceof Element?target:null;return !!el&&(el.matches('input,textarea,[contenteditable]')||!!el.closest('input,textarea,[contenteditable]'));}
+function hiddenQaHit(key){const now=performance.now(),seq=hiddenQaSequences[key];if(now-seq.last>2000)seq.count=0;seq.last=now;seq.count++;if(seq.count<6)return false;seq.count=0;return true;}
+document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.repeat||hiddenQaTypingTarget(e.target))return;const k=e.key.toLowerCase();if(k==='t'&&hiddenQaHit('t')){if(gameMode!=='pirate'||!gameApp||gameApp.hidden||!state||state.frameOver)return;e.preventDefault();devForcedWin=true;try{finishFrame(1,`QA: ${pname(1)} awarded the frame. ${pname(1)} beat off ${pname(2)}!`,`QA WIN — ${pname(1)} wins`);}finally{devForcedWin=false;}return;}if(k==='y'&&hiddenQaHit('y')){const rosterVisible=playersModal&&!playersModal.hidden&&piratePlaceholder&&!piratePlaceholder.hidden;if(!rosterVisible)return;e.preventDefault();setUnlockedPirateLevel(5);refreshPirateButtons();msg.textContent='QA: Captain Blackball unlocked for roster testing.';return;}if(k==='u'&&hiddenQaHit('u')){e.preventDefault();audioReady();pendingPirateStart={level:7,pirateId:'chapter2_boss',playerName:piratePlayerName?.value.trim()||'Player 1'};if(pirateIntroModal)pirateIntroModal.hidden=true;if(pirateProfileModal)pirateProfileModal.hidden=true;if(playersModal)playersModal.hidden=true;if(titleScreen)titleScreen.hidden=true;showScene('chapter_2_boss_reveal',()=>{applyChapter2BossIdentity(true);renderPirateRoster();beginPendingPirateMatch(true);});}});
+
 document.addEventListener('keydown',e=>{if(!IS_DEVELOPMENT_BUILD)return;if(e.ctrlKey||e.metaKey||e.altKey)return;const tag=(e.target?.tagName||'').toLowerCase();if(tag==='input'||tag==='textarea'||tag==='select'||tag==='button')return;const k=e.key.toLowerCase();if(k==='a'){e.preventDefault();nudgeAngle(-.1);}else if(k==='d'){e.preventDefault();nudgeAngle(.1);}else if(k==='w'){e.preventDefault();nudgePower(5);}else if(k==='s'){e.preventDefault();nudgePower(-5);}else if(k==='g'){e.preventDefault();devAngleGuide=!devAngleGuide;saveAimGuidePreference();syncAimGuideSwitch();const btn=document.getElementById('toggleAngleGuide');if(btn)btn.textContent=`Toggle guide Ian angle: ${devAngleGuide?'ON':'OFF'}`;}else if(k==='e'){e.preventDefault();if(!shootBtn.disabled&&!moving&&!state.frameOver&&!pendingChoice&&placementMode==='none')beginShot();}else if(k==='h'){e.preventDefault();devScenariosUnlocked=true;nightmareScenario.disabled=false;cannonScenario.disabled=false;if(fiveFrameScenario)fiveFrameScenario.disabled=false;nightmareScenario.querySelector('small').textContent='Captain Blackball • 3 reds vs 6-yellow blockade';cannonScenario.querySelector('small').textContent='Captain Blackball • oversized 28-ball rack';if(fiveFrameScenario)fiveFrameScenario.querySelector('small').textContent='Captain Blackball vs Darth Vaper • 5 automatic frames';msg.textContent='DEV: Test scenarios unlocked for this session.';}else if(k==='j'){e.preventDefault();setUnlockedPirateLevel(5);devPiratesUnlocked=true;refreshPirateButtons();msg.textContent="DEV: all five standard pirates plus Ol' Cyclops and Darth Vaper unlocked for testing.";}else if(k==='r'&&state?.frameOver&&!winModal.hidden){e.preventDefault();playAgain.click();}});
 document.getElementById('pickupCue').onclick=()=>{if(moving||state.frameOver||pendingChoice)return;restoreCue('anywhere');msg.textContent=`DEV: ${pname(state.player)} may tap or drag anywhere on the table to reposition the cue ball, then confirm.`;updateHUD();};
 document.getElementById('unlockPirates').onclick=()=>{setUnlockedPirateLevel(5);devPiratesUnlocked=true;refreshPirateButtons();msg.textContent="DEV: all five standard pirates plus Ol' Cyclops and Darth Vaper unlocked for testing.";};
@@ -799,6 +960,9 @@ function aiVaperDirectConfidence(candidate){
 }
 
 function aiValidateFinalPlan(plan){
+  // H3b: Wiggles' finesse is judged at his real worm-strength ceiling, not at a stronger planned shot.
+  // This keeps cushion forecasts honest while preserving the absolute 30% cap (including breaks).
+  if(gameMode==='pirate'&&currentPirateId==='chapter2_boss'&&plan)plan.power=Math.min(30,plan.power);
   if(state.breakShot)return plan;
   // V0.7.4: high-level AI must notice a foreseeable early-black loss before committing.
   // This is not clairvoyance: it uses the same silent physics forecast already used for QA.
@@ -1249,7 +1413,7 @@ function aiFindVaperPerfectEscape(){
 function aiEmergencyFallback(reason='normal planner exhausted'){
   // V0.7.6: Vaper gets one final physics-validated escape search before the deliberately
   // foul-tolerant generic deadlock guard is allowed to fire.
-  if(currentPirateLevel===7&&!state.breakShot){const perfect=aiFindVaperPerfectEscape();if(perfect){perfect.emergencyReason=reason;return perfect;}}
+  if(currentPirateLevel===7&&currentPirateId!=='chapter2_boss'&&!state.breakShot){const perfect=aiFindVaperPerfectEscape();if(perfect){perfect.emergencyReason=reason;return perfect;}}
   // V0.7.1 deadlock guard: an AI turn must always resolve to a physical shot.
   // First look cheaply for ANY straight legal first contact. If none exists after the normal
   // safety/cushion solvers have already failed, play a least-bad contact attempt rather than
@@ -1444,7 +1608,7 @@ function aiChooseBasicShot(){
   if(threeEscape){const checked=aiValidateFinalPlan(threeEscape);if(checked)return checked;}
   // V0.7.6: if Vaper's geometric solvers all fail, search the actual physics engine for any
   // survivable legal contact (including routes that naturally bank/carom) before emergency play.
-  const perfectEscape=aiFindVaperPerfectEscape();
+  const perfectEscape=currentPirateId==='chapter2_boss'?null:aiFindVaperPerfectEscape();
   if(perfectEscape)return perfectEscape;
   // Otherwise prefer a target with a clearer cue-ball route instead of blindly taking nearest.
   const ranked=targets.map(target=>{const d=Math.hypot(target.x-c.x,target.y-c.y);const clearance=currentPirateLevel>=4?ballR*2.18:ballR*2.03;const clear=aiSegmentClear(c.x,c.y,target.x,target.y,c,target,clearance);return{target,d,clear,score:d+(clear?0:900)}}).sort((a,b)=>a.score-b.score);
@@ -1494,7 +1658,7 @@ function maybeScheduleAI(){
       // than leave the UI frozen; normal rules/frame state will take over on the next update.
       state.player=opponent(state.player);updateHUD();setTimeout(maybeScheduleAI,250);return;
     }
-    setAngleDeg(pick.deg);powerEl.value=pick.power;powerText.textContent=pick.power+'%';
+    if(gameMode==='pirate'&&currentPirateId==='chapter2_boss')pick.power=Math.min(30,pick.power);setAngleDeg(pick.deg);powerEl.value=pick.power;powerText.textContent=pick.power+'%';
     pendingAIPlan={kind:pick.kind,targetId:pick.target?.id??null,targetType:pick.target?.type??null,intendedDeg:pick.intendedDeg??pick.deg,playedDeg:pick.deg,power:pick.power};
     playHistory.push(`AI WATCHDOG | ${pname(scheduledPlayer)} | normal turn did not launch a shot in time\nAI FALLBACK: FORCED PHYSICAL SHOT • target ${pick.target.type.toUpperCase()} #${pick.target.id} • reason: ${pick.emergencyReason||'watchdog timeout'}\nCalculated aim: ${normaliseDeg(pick.deg).toFixed(1)}° | Power: ${pick.power}%`);renderPlayLog();
     msg.textContent=`${pname(scheduledPlayer)} takes an emergency shot…`;aiThinking=false;beginShot();
@@ -1520,7 +1684,7 @@ function maybeScheduleAI(){
       msg.textContent=`${pname(aiPlayer)} is forcing an emergency route…`;return;
     }
     clearTimeout(aiWatchdogTimer);aiWatchdogTimer=null;
-    setAngleDeg(pick.deg);powerEl.value=pick.power;powerText.textContent=pick.power+'%';
+    if(gameMode==='pirate'&&currentPirateId==='chapter2_boss')pick.power=Math.min(30,pick.power);setAngleDeg(pick.deg);powerEl.value=pick.power;powerText.textContent=pick.power+'%';
     const pocketNames=['top-left','top-centre','top-right','bottom-left','bottom-centre','bottom-right'];
     const planDetail=pick.kind==='DIRECT POT'?`Direct pot found: ${pick.target.type.toUpperCase()} #${pick.target.id} → ${pocketNames[pick.pocket]} pocket`:pick.kind==='COMBINATION POT'?`AI TACTIC: COMBINATION POT • ${pick.target.type.toUpperCase()} #${pick.target.id} → ${pick.secondary.type.toUpperCase()} #${pick.secondary.id} → ${pocketNames[pick.pocket]} pocket`:pick.kind==='SAFETY'?`AI TACTIC: SAFETY • target ${pick.target.type.toUpperCase()} #${pick.target.id} • no worthwhile direct pot selected`:pick.kind==='CUSHION ESCAPE'?`AI TACTIC: CUSHION ESCAPE • ${pick.rail.toUpperCase()} cushion → ${pick.target.type.toUpperCase()} #${pick.target.id}`:pick.kind==='TWO CUSHION ESCAPE'?`AI TACTIC: TWO-CUSHION ESCAPE • ${pick.rails[0].toUpperCase()} → ${pick.rails[1].toUpperCase()} cushions → ${pick.target.type.toUpperCase()} #${pick.target.id}`:pick.kind==='THREE CUSHION ESCAPE'?`AI TACTIC: THREE-CUSHION ESCAPE • ${pick.rails[0].toUpperCase()} → ${pick.rails[1].toUpperCase()} → ${pick.rails[2].toUpperCase()} cushions → ${pick.target.type.toUpperCase()} #${pick.target.id}`:pick.kind==='PERFECT ESCAPE'?`AI TACTIC: PERFECT ESCAPE SEARCH • ${pick.target.type.toUpperCase()} #${pick.target.id} • ${pick.perfectEscapeMode} • physics-validated legal first contact`:pick.kind==='EMERGENCY FALLBACK'?`AI FALLBACK: EMERGENCY SHOT • target ${pick.target.type.toUpperCase()} #${pick.target.id} • ${pick.legalityValidated?'legal straight first contact found':'no legal route found; least-bad contact attempt'} • reason: ${pick.emergencyReason}`:`No clear direct pot found • legal target: ${pick.target.type.toUpperCase()} #${pick.target.id}${pick.clearRoute===false?' • route obstructed/awkward':''}${pick.legalityValidated===false?` • LEGALITY WARNING: predicted first contact ${String(pick.predictedFirstType||'none').toUpperCase()}${pick.predictedFirstId!=null?' #'+pick.predictedFirstId:''}`:' • LEGALITY CHECK: intended ball first'}`;
     const positionDetail=pick.positionScore!=null?` • next-ball position ${pick.positionScore.toFixed(0)}${pick.estimatedCue?` • estimated white (${Math.round(pick.estimatedCue.x)}, ${Math.round(pick.estimatedCue.y)})`:''}${pick.endgameLabel?`\nENDGAME PLAN: ${pick.endgameLabel}${pick.blackRoutes!=null?` • black routes ${pick.blackRoutes}`:''}`:''}${pick.finalColourOverride?'\nENDGAME OVERRIDE: FINAL COLOUR • direct pot protected from safety veto':''}`:'';
@@ -1533,7 +1697,7 @@ function maybeScheduleAI(){
   },1250);
 }
 const resultPirateIdentity=document.getElementById('resultPirateIdentity'),resultPiratePortrait=document.getElementById('resultPiratePortrait'),resultPirateRole=document.getElementById('resultPirateRole'),resultPirateName=document.getElementById('resultPirateName');
-function refreshResultPirateIdentity(){if(!resultPirateIdentity)return;if(gameMode!=='pirate'||!currentPirateLevel){resultPirateIdentity.hidden=true;return;}const p=PIRATES[currentPirateLevel];resultPiratePortrait.src=p.image;resultPirateName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;resultPirateRole.textContent=currentPirateLevel>=6?'SPECIAL OPPONENT':`DIFFICULTY ${currentPirateLevel} • ${p.role.toUpperCase()}`;resultPirateIdentity.hidden=false;}
+function refreshResultPirateIdentity(){if(!resultPirateIdentity)return;if(gameMode!=='pirate'||!currentPirateLevel){resultPirateIdentity.hidden=true;return;}const p=activePirate();resultPiratePortrait.src=p.image;resultPirateName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;resultPirateRole.textContent=p.campaignRole==='bonus'?'SPECIAL OPPONENT':`DIFFICULTY ${p.difficulty} • ${p.role.toUpperCase()}`;resultPirateIdentity.hidden=false;}
 function showWinCelebration(winner,text){
   clearTimeout(turnOverlayTimer);turnOverlay.classList.remove('show');
   if(fiveFrameTestActive){
@@ -1554,9 +1718,11 @@ function showWinCelebration(winner,text){
     winModal.hidden=false;return;
   }
   if(gameMode==='pirate'&&currentPirateLevel===5&&winner===1&&!career.blackballEndingSeen){showBlackballFirstVictory();return;}
+  if(winner===1&&pendingChapter2BossReveal&&!chapterState('chapter_2').bossIntroSeen){pendingChapter2BossReveal=false;soundVictory();runChapterScene('chapter_2','bossIntro',()=>{applyChapter2BossIdentity();renderPirateRoster();startMenuMusic();showTitleScreen();});return;}
+  if(winner===1&&gameMode==='pirate'&&currentPirateId==='chapter2_boss'&&!chapterState('chapter_2').endingSeen){const ch2=chapterState('chapter_2');ch2.endingPending=true;saveCareer();soundVictory();startOutroMusic();runChapterScene('chapter_2','ending',()=>{ch2.endingPending=false;completeChapter('chapter_2');forcedTableTheme=null;refreshPirateButtons();refreshCosmeticsUI?.();startMenuMusic();showTitleScreen();});return;}
   soundVictory();refreshResultPirateIdentity();winTitle.textContent=`${pname(winner)} wins!`;winText.textContent=text;const winRewards=document.getElementById('winRewards');if(winRewards){const showReward=winner===1&&gameMode==='pirate'&&currentPirateLevel<5&&pendingPirateReward;winRewards.hidden=!showReward;winRewards.innerHTML=showReward?rewardSummaryHTML(pendingPirateReward):'';}winModal.hidden=false;
 }
-playAgain.onclick=()=>{winModal.hidden=true;pendingPirateReward=null;forcedTableTheme=null;restartCurrentGame(1);};
+playAgain.onclick=()=>{winModal.hidden=true;pendingPirateReward=null;forcedTableTheme=gameMode==='pirate'?campaignMatchTableTheme(activePirate()):null;restartCurrentGame(1);};
 returnMenu.onclick=()=>{winModal.hidden=true;pendingPirateReward=null;forcedTableTheme=null;startMenuMusic();showTitleScreen();};
 
 showGameLog.onclick=()=>{gameLogModalText.textContent=playHistory.length?playHistory.join('\n\n'):'No shots recorded yet.';if(copyGameLogStatus)copyGameLogStatus.textContent='';if(copyGameLog){copyGameLog.textContent='Select all and copy';copyGameLog.classList.remove('copied');}winModal.hidden=true;gameLogModal.hidden=false;};
@@ -1568,7 +1734,7 @@ aiVsAiMode.onclick=()=>{audioReady();currentScenario=null;populateAiVsAi();modeM
 aiVsAiBack.onclick=()=>showModeMenu();
 startAiVsAi.onclick=()=>{startMatchMusic();if(gameApp)gameApp.hidden=false;const l1=Number(aiVsAiP1.value),l2=Number(aiVsAiP2.value);aiVsAiLevels={1:l1,2:l2};gameMode='aivai';aiPlayer=1;currentScenario=null;playerNames={1:PIRATES[l1].name,2:PIRATES[l2].name};playersModal.hidden=true;aiVsAiMenu.hidden=true;audioReady();newFrame(1);};
 localMode.onclick=()=>{audioReady();currentScenario=null;gameMode='local';aiPlayer=null;modeMenu.hidden=true;playersForm.hidden=false;piratePlaceholder.hidden=true;player1Name.focus();};
-pirateMode.onclick=()=>{audioReady();currentScenario=null;refreshPirateButtons();modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=false;if(testScenarioMenu)testScenarioMenu.hidden=true;piratePlayerName?.focus();refreshFirstRunGuidance();};
+pirateMode.onclick=()=>{audioReady();currentScenario=null;refreshPirateButtons();modeMenu.hidden=true;playersForm.hidden=true;if(testScenarioMenu)testScenarioMenu.hidden=true;const chapterOne=chapterState('chapter_1');if(!chapterOne.introSeen){piratePlaceholder.hidden=true;playersModal.hidden=true;runChapterScene('chapter_1','intro',()=>{playersModal.hidden=false;modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=false;refreshPirateButtons();piratePlayerName?.focus();refreshFirstRunGuidance();});return;}const chapterTwo=chapterState('chapter_2');if(chapterTwo.endingPending&&!chapterTwo.endingSeen){piratePlaceholder.hidden=true;playersModal.hidden=true;runChapterScene('chapter_2','ending',()=>{chapterTwo.endingPending=false;completeChapter('chapter_2');startMenuMusic();showTitleScreen();});return;}if(chapterTwo.introSeen&&pirateDefeated('papa_surf')&&!chapterTwo.bossIntroSeen){piratePlaceholder.hidden=true;playersModal.hidden=true;runChapterScene('chapter_2','bossIntro',()=>{applyChapter2BossIdentity();playersModal.hidden=false;modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=false;renderPirateRoster();piratePlayerName?.focus();});return;}piratePlaceholder.hidden=false;piratePlayerName?.focus();refreshFirstRunGuidance();};
 testMode.onclick=()=>{audioReady();modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=true;testScenarioMenu.hidden=false;nightmareScenario.disabled=!devScenariosUnlocked;cannonScenario.disabled=!devScenariosUnlocked;if(fiveFrameScenario)fiveFrameScenario.disabled=!devScenariosUnlocked;testPlayerName?.focus();};
 testBack.onclick=showModeMenu;nightmareScenario.onclick=()=>{if(devScenariosUnlocked){startMatchMusic();startScenario('nightmare');}};cannonScenario.onclick=()=>{if(devScenariosUnlocked){startMatchMusic();startScenario('cannon');}};if(fiveFrameScenario)fiveFrameScenario.onclick=()=>{if(devScenariosUnlocked){startMatchMusic();startFiveFrameTest();}};
 backToMode.onclick=showModeMenu;pirateBack.onclick=showModeMenu;
@@ -1578,10 +1744,213 @@ const pirateIntroModal=document.getElementById('pirateIntroModal'),matchIntroPor
 // V0.8.7: keep the pre-match introduction outside the hidden gameplay tree.
 // This lets Challenge show the intro while the table remains completely hidden until Rack 'em up! is pressed.
 if(pirateIntroModal && pirateIntroModal.parentElement!==document.body) document.body.appendChild(pirateIntroModal);
-let pendingPirateStart=null;
-let profiledPirateLevel=1;
-function showPirateProfile(level){const p=PIRATES[level];if(!p)return;profiledPirateLevel=level;const open=pirateIsOpen(level);pirateProfileFullName.textContent=p.fullName;pirateProfileName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;pirateProfileDifficulty.textContent=`${level>=6?'SPECIAL':'DIFFICULTY '+level} • ${p.role}`;pirateProfileStyle.textContent=p.style;pirateProfileBio.textContent=p.bio;pirateProfileReputation.textContent=p.reputation;piratePortrait.innerHTML=`<img src="${p.image}" alt="" draggable="false"><span class="portrait-fallback">${p.portrait}</span>`;challengePirate.disabled=!open;challengePirate.textContent=open?'Challenge':'Locked 🔒';pirateProfileModal.hidden=false;refreshFirstRunGuidance();}
+let pendingPirateStart=null,pendingChapter2BossReveal=false;
+let profiledPirateId='dave';
+function showPirateProfile(pirateId){const p=pirateById(pirateId);if(!p)return;profiledPirateId=p.id;const open=pirateIsOpen(p);pirateProfileFullName.textContent=p.fullName;pirateProfileName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;pirateProfileDifficulty.textContent=`${p.campaignRole==='bonus'?'SPECIAL':'DIFFICULTY '+p.difficulty} • ${p.role}`;pirateProfileStyle.textContent=p.style;pirateProfileBio.textContent=p.bio;const rewardNames=(p.rewards||[]).map(r=>COSMETICS[r.type==='table'?'tables':`${r.type}s`]?.[r.id]?.name).filter(Boolean);pirateProfileReputation.textContent=`${p.reputation}${rewardNames.length?` Reward: ${rewardNames.join(' + ')}.`:''}`;piratePortrait.innerHTML=`${p.image?`<img src="${p.image}" alt="" draggable="false">`:''}<span class="portrait-fallback">${p.portrait}</span>`;const sceneId=p.scene||chapterById(p.chapter)?.scenes?.intro;challengePirate.disabled=!open||(p.playable===false&&!sceneId);challengePirate.textContent=!open?'Locked 🔒':(p.playable===false&&sceneId?'View scene':(p.playable===false?'Coming soon':'Challenge'));pirateProfileModal.hidden=false;refreshFirstRunGuidance();}
 const blackballStory=document.getElementById('blackballStory'),blackballStoryTitle=document.getElementById('blackballStoryTitle'),blackballStoryText=document.getElementById('blackballStoryText'),blackballStoryNext=document.getElementById('blackballStoryNext');
+/* V0.17.0 Phase 5B: layered catalogue-driven story scenes.
+   Each scene owns a small asset library (backgrounds / characters / props). Dialogue beats choose
+   which assets are visible and may request deliberately simple South-Park-style motion. */
+const SCENES={
+  chapter_1_intro:{
+    id:'chapter_1_intro',chapter:'chapter_1',kicker:'CHAPTER 1',title:'Chapter 1: Liver Island tavern',finishLabel:'Enter the tavern',typewriterMs:28,finishFadeMs:4000,
+    assets:{backgrounds:{black:{kind:'gradient',value:'linear-gradient(#000,#000)'},tavern:{src:'assets/scenes/liver-island-tavern.png'}},characters:{},props:{}},
+    lines:[
+      {text:"Hey, you're finally awake.",stage:{background:'black'}},
+      {text:"You've woken up on a remote island's beach. Must be a long way from England. The weather is nicer, for a start.",stage:{background:'black'}},
+      {text:"A faint smell of ale is in the distance, and an overwhelming sense that for some reason, there are pool players here, and not much else.",stage:{background:'black'}},
+      {text:"That's handy - back home, you used to be king of the tables.",stage:{background:'black'}},
+      {text:"The tavern seems like an obvious place to meet the locals and see what all of this is about.",stage:{background:'black'}},
+      {text:'Your adventure...',transitionMs:4000,stage:{background:'tavern'}},
+      {text:'Your pool adventure...',stage:{background:'tavern'}},
+      {text:'Begins here.',stage:{background:'tavern'}}
+    ]
+  },
+  chapter_2_intro:{
+    id:'chapter_2_intro',chapter:'chapter_2',kicker:'CHAPTER 2',title:'Uncharted Waters',finishLabel:'See the island players',typewriterMs:28,finishFadeMs:1625,theatreEffects:true,
+    assets:{backgrounds:{tavern:{src:'assets/scenes/liver-island-tavern.png'},ship:{src:'assets/scenes/open-ocean-ship-deck.png'},beach:{src:'assets/scenes/strangevoice-beach.png'}},characters:{blackball:{src:'assets/scenes/captain-blackball-main.png',alt:'Captain Blackball',x:22,y:88,width:36,anchor:'bottom-center'},sandy:{src:'assets/portraits/sandy-mandy-main.png',alt:'Sandy Mandy',x:74,y:90,width:34,anchor:'bottom-center'},shelle:{src:'assets/portraits/shelle-main.png',alt:'Shelle',x:74,y:90,width:34,anchor:'bottom-center'},graham:{src:'assets/portraits/graham-main.png',alt:'Graham',x:74,y:90,width:34,anchor:'bottom-center'},papa:{src:'assets/portraits/papa-surf-main.png',alt:'Papa Surf',x:74,y:90,width:34,anchor:'bottom-center'}},props:{sandcastle:{src:'assets/scenes/sandy-sandcastle.png',alt:'Sandcastle',x:74,y:86,width:18,anchor:'bottom-center'},shell:{src:'assets/scenes/shelle-pearl-shell.png',alt:'Pearly shell',x:75,y:80,width:13,anchor:'bottom-center'},fossil:{src:'assets/scenes/graham-fossil.png',alt:'Fossil',x:75,y:81,width:14,anchor:'bottom-center'},tongue:{src:'assets/scenes/graham-tongue.png',alt:'Tongue',x:75,y:72,width:10,anchor:'center'},stew:{src:'assets/scenes/papa-surf-stew.png',alt:'Stew',x:74,y:82,width:16,anchor:'bottom-center'}}},
+    lines:[
+      {speaker:'Captain Blackball',text:"Right. I've had time to reflect on recent events.",stage:{background:'tavern',characters:['blackball']}},
+      {speaker:'Captain Blackball',text:"Apparently, losing one's title is considered an opportunity to learn.",stage:{background:'tavern',characters:['blackball']}},
+      {speaker:'Captain Blackball',text:"I dislike the 'learn' part. Nevertheless, there must be players beyond these waters who have something worth stealing—knowledge-wise.",stage:{background:'tavern',characters:['blackball']}},
+      {speaker:'Captain Blackball',text:'We sail for uncharted waters. Pack your cue.',stage:{background:'tavern',characters:['blackball']}},
+      {speaker:'Narrator',text:'For roughly a week, there is water. Then more water. Then, unexpectedly, considerably less water.',transitionMs:1625,stage:{background:'ship',characters:['blackball']}},
+      {speaker:'Captain Blackball',text:'Land.',stage:{background:'ship',characters:['blackball']}},
+      {speaker:'STRANGE VOICE',text:"AH, YOU'RE THAT POOL GUY WHO THINKS HE'S ALL THAT.",stage:{background:'ship'}},
+      {speaker:'STRANGE VOICE',text:"WELL, LET ME TELL YOU, SUNSHINE, YOU'RE NOT.",stage:{background:'ship'}},
+      {speaker:'STRANGE VOICE',text:"COME TO OUR PLACE AND WE'LL SHOW YOU WHAT REAL POOL ACTUALLY LOOKS LIKE.",stage:{background:'ship'}},
+      {speaker:'STRANGE VOICE',text:'AND BRING YOUR STINKY FRIEND.',stage:{background:'ship'}},
+      {speaker:'Captain Blackball',text:'Who said that?',stage:{background:'ship',characters:['blackball']}},
+      {speaker:'STRANGE VOICE',text:'Slurrrrrrp.',stage:{background:'ship'}},
+      {speaker:'Captain Blackball',text:'I am unsure whether we have discovered civilisation or are about to be eaten.',stage:{background:'ship',characters:['blackball']}},
+      {speaker:'Captain Blackball',text:"Alright lads, get your cues out, we're back in business.",stage:{background:'ship',characters:['blackball']}},
+      {speaker:'Captain Blackball',text:'Are you the creature that was shouting at us?',transitionMs:1625,stage:{background:'beach',characters:['blackball','sandy'],props:['sandcastle']}},
+      {speaker:'Sandy Mandy',text:'No. Shouting is for those who have lost their voice, which is why I carry my alarm clock with me.',stage:{background:'beach',characters:['blackball','sandy'],props:['sandcastle']}},
+      {speaker:'Captain Blackball',text:'You disgust me.',stage:{background:'beach',characters:['blackball','sandy'],props:['sandcastle']}},
+      {speaker:'Captain Blackball',text:'You there! Have you been beckoning ships from afar?',stage:{background:'beach',characters:['blackball','shelle'],props:['shell']}},
+      {speaker:'Shelle',text:"Huh? I don't own a ship? You're so silly!?",stage:{background:'beach',characters:['blackball','shelle'],props:['shell']}},
+      {speaker:'Captain Blackball',text:"...Yeah, it definitely wasn't you.",stage:{background:'beach',characters:['blackball','shelle'],props:['shell']}},
+      {speaker:'Graham',text:'Hey guys, can I interest you in learning about this fossil I found? Look at it.',stage:{background:'beach',characters:['blackball','graham'],props:['fossil']}},
+      {speaker:'Captain Blackball',text:"No, shut your face up, you foul mystery creature. I don't want to hear another word from your wretched gob-hole. Especially not one about your ornate pebbles.",stage:{background:'beach',characters:['blackball','graham'],props:['fossil']}},
+      {speaker:'Narrator',text:'Graham slowly licks his lips for no apparent reason.',stage:{background:'beach',characters:['blackball','graham'],props:['tongue']}},
+      {speaker:'Captain Blackball',text:'Keep walking.',stage:{background:'beach',characters:['blackball','graham'],props:['fossil']}},
+      {speaker:'Papa Surf',text:'Greetings, traveller. You look weary. Do you need to fill your belly and sit by the fire, telling tales of your mighty voyages?',stage:{background:'beach',characters:['blackball','papa'],props:['stew']}},
+      {speaker:'Captain Blackball',text:'I wish for no part to play in the repulsive activities of your alien goblin tribe. I merely wish to find the one who dared challenge the finest pool player in the ocean and his stinky friend.',stage:{background:'beach',characters:['blackball','papa'],props:['stew']}},
+      {speaker:'Papa Surf',text:'Oh yes, we have a pool table. How exciting! We must play sometime. Tell me a tale of fair maidens and really big waves lapping all over you.',stage:{background:'beach',characters:['blackball','papa'],props:['stew']}},
+      {speaker:'Captain Blackball',text:'Please spare me from this madness.',stage:{background:'beach',characters:['blackball','papa'],props:['stew']}},
+      {speaker:'Narrator',text:'None of them summoned the ship. There is a brief silence.',stage:{background:'beach',characters:['blackball']}},
+      {speaker:'STRANGE VOICE',text:'Slurrrrrrp.',stage:{background:'beach',characters:['blackball']}},
+      {speaker:'Captain Blackball',text:"...It's still here.",stage:{background:'beach',characters:['blackball']}}
+    ]
+  },
+  chapter_2_boss_reveal:{
+    id:'chapter_2_boss_reveal',chapter:'chapter_2',kicker:'STRANGEVOICE ISLAND — AFTER PAPA SURF',title:'Boss Reveal',finishLabel:'Return to the island roster',typewriterMs:28,finishFadeMs:1625,theatreEffects:true,
+    assets:{backgrounds:{beach:{src:'assets/scenes/strangevoice-beach.png'}},characters:{blackball:{src:'assets/scenes/captain-blackball-main.png',alt:'Captain Blackball',x:26,y:96,width:45,anchor:'bottom-center'},wiggles:{src:'assets/scenes/mr-wiggles-main.png',alt:'Mr Wiggles',x:72,y:96,width:42,anchor:'bottom-center',suppressSpeakerWobble:true},wiggle1:{src:'assets/scenes/mr-wiggles-wiggle-01.png',alt:'Mr Wiggles'},wiggle2:{src:'assets/scenes/mr-wiggles-wiggle-02.png',alt:'Mr Wiggles'},wiggle3:{src:'assets/scenes/mr-wiggles-wiggle-03.png',alt:'Mr Wiggles'},wiggle4:{src:'assets/scenes/mr-wiggles-wiggle-04.png',alt:'Mr Wiggles'},wiggle5:{src:'assets/scenes/mr-wiggles-wiggle-05.png',alt:'Mr Wiggles'},wiggle6:{src:'assets/scenes/mr-wiggles-wiggle-06.png',alt:'Mr Wiggles'},wiggle7:{src:'assets/scenes/mr-wiggles-wiggle-07.png',alt:'Mr Wiggles'},wiggle8:{src:'assets/scenes/mr-wiggles-wiggle-08.png',alt:'Mr Wiggles'}},props:{revealTitle:{text:'MR WIGGLES',className:'scene-reveal-title',x:50,y:50,width:80,anchor:'center'}}},
+    lines:[
+      {speaker:'Captain Blackball',text:"That's four. And still no sign of the loud-mouthed creature that summoned us here.",stage:{background:'beach',characters:['blackball']}},
+      {speaker:'STRANGE VOICE',text:'Slurrrrrrp.',stage:{background:'beach',characters:['blackball']}},
+      {speaker:'Captain Blackball',text:'...There you are.',stage:{background:'beach',characters:['blackball']}},
+      {speaker:'STRANGE VOICE',text:'Ball!',stage:{background:'beach',characters:['blackball']}},
+      {speaker:'Mr Wiggles',text:"I'm a worm! I'm a worm!",stage:{background:'beach',characters:['blackball','wiggles'],props:['revealTitle'],animate:[{target:'prop:revealTitle',effect:'reveal',duration:900,repeat:1},{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:"You're the one who's been shouting at us?",stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:"I'm playing pool!",stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:"You dragged us across the ocean, insulted my ability, insulted my friend, and you're a worm.",stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:'Slurrrrrrp.',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:'I hate this island.',stage:{background:'beach',characters:['blackball','wiggles']}}
+    ]
+  },
+  chapter_2_ending:{
+    id:'chapter_2_ending',chapter:'chapter_2',kicker:'STRANGEVOICE ISLAND — AFTER THE MATCH',title:'Uncharted Waters — Chapter Ending',finishLabel:'Finish Chapter 2',typewriterMs:28,finishFadeMs:1625,theatreEffects:true,
+    assets:{backgrounds:{beach:{src:'assets/scenes/strangevoice-beach.png'},voyage:{src:'assets/scenes/open-ocean-ship-deck.png'}},characters:{blackball:{src:'assets/scenes/captain-blackball-main.png',alt:'Captain Blackball',x:26,y:96,width:45,anchor:'bottom-center'},wiggles:{src:'assets/scenes/mr-wiggles-main.png',alt:'Mr Wiggles',x:72,y:96,width:42,anchor:'bottom-center',suppressSpeakerWobble:true},wiggle1:{src:'assets/scenes/mr-wiggles-wiggle-01.png',alt:'Mr Wiggles'},wiggle2:{src:'assets/scenes/mr-wiggles-wiggle-02.png',alt:'Mr Wiggles'},wiggle3:{src:'assets/scenes/mr-wiggles-wiggle-03.png',alt:'Mr Wiggles'},wiggle4:{src:'assets/scenes/mr-wiggles-wiggle-04.png',alt:'Mr Wiggles'},wiggle5:{src:'assets/scenes/mr-wiggles-wiggle-05.png',alt:'Mr Wiggles'},wiggle6:{src:'assets/scenes/mr-wiggles-wiggle-06.png',alt:'Mr Wiggles'},wiggle7:{src:'assets/scenes/mr-wiggles-wiggle-07.png',alt:'Mr Wiggles'},wiggle8:{src:'assets/scenes/mr-wiggles-wiggle-08.png',alt:'Mr Wiggles'}},props:{}},
+    lines:[
+      {speaker:'Mr Wiggles',text:'Ball!',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:"Yes. You lost at ball. We've established this.",stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:'Good ball!',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:'Thank you.',stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:'Cave!',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:'...Cave?',stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:'Dark cave!',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:"I'm listening.",stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:'Pool people!',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:'There are pool players in this cave?',stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:'Old!',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:'Old pool players.',stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:'OLD!',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:'Ancient pool players?',stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:'SLURRRRRP!',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:'Ancient pool players, hidden away in a dark cave.',stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Captain Blackball',text:'Masters from a time long gone, perhaps? Keepers of techniques forgotten by the modern game?',stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:'Worm!',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:"I'll take that as a yes.",stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:'Boat!',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:'We have a boat.',stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:'Boat... boat... boat...',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:'How far?',stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:'Weeks!',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:'How many weeks?',stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:'Ball!',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:'Useful.',stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Captain Blackball',text:'Still... ancient masters of the game, hidden beyond the known waters. Knowledge untouched for generations.',stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:"I'm a worm!",stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:"Lads, prepare the ship. We're going to find this cave.",stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:'Your turn!',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:"No, we're leaving.",stage:{background:'beach',characters:['blackball','wiggles']}},
+      {speaker:'Mr Wiggles',text:'Slurrrrrrp.',stage:{background:'beach',characters:['blackball','wiggles'],animate:[{target:'character:wiggles',effect:'swap',frames:['wiggle1','wiggle2','wiggle3','wiggle4','wiggle5','wiggle6','wiggle7','wiggle8'],interval:125,repeat:2}]}},
+      {speaker:'Captain Blackball',text:"If that worm has sent us three weeks across the ocean to look at a hole in a rock, I'm going back there and putting him in a plant pot.",transitionMs:1625,stage:{background:'voyage',characters:['blackball']}},
+      {speaker:'Captain Blackball',text:"...Well I'll be damned.",stage:{background:'voyage',characters:['blackball']}},
+      {speaker:'???',text:'The voyage continues...',stage:{background:'voyage',characters:[]}}
+    ]
+  },
+  blackball_intro:{
+    id:'blackball_intro',chapter:'chapter_1',kicker:"CAPTAIN BLACKBALL'S PRIVATE QUARTERS",title:'Captain Blackball',finishLabel:'Begin the ultimate showdown!',typewriterMs:28,finishFadeMs:1625,theatreEffects:true,
+    assets:{backgrounds:{quarters:{src:'assets/scenes/blackball-private-quarters.png',filter:'brightness(0.86)'}},characters:{blackball:{src:'assets/scenes/captain-blackball-main.png',alt:'Captain Blackball',x:50,y:87,width:45,anchor:'bottom-center'}},props:{}},
+    lines:[
+      {speaker:'Captain Blackball',text:"So, welcome to my ship and my private pool room in the Captain's quarters. It's just me and you now, and you only get one chance... unless you lose and try again as if this never happened.",stage:{background:'quarters',characters:['blackball']}},
+      {speaker:'Captain Blackball',text:'Defeat me to become the greatest pool player of all the oceans. But beware, otherworldly beings and mysterious creatures unknown also visit from time to time. Only time will tell.',stage:{background:'quarters',characters:['blackball']}},
+      {speaker:'Captain Blackball',text:"This will not be an easy game. You will need everything you've learned, and I will show you that what you think you know might make you king of the tavern, you need to up your game and think of it more like chess: 3 steps ahead, if you're going to have a chance with me or out in uncharted waters.",stage:{background:'quarters',characters:['blackball']}}
+    ]
+  },
+  blackball_ending:{
+    id:'blackball_ending',chapter:'chapter_1',kicker:"CAPTAIN BLACKBALL'S PRIVATE QUARTERS",title:'Captain Blackball',finishLabel:'Return to the title',typewriterMs:28,finishFadeMs:1625,theatreEffects:true,
+    assets:{backgrounds:{quarters:{src:'assets/scenes/blackball-private-quarters.png',filter:'brightness(0.86)'}},characters:{blackball:{src:'assets/scenes/captain-blackball-main.png',alt:'Captain Blackball',x:50,y:87,width:45,anchor:'bottom-center'}},props:{}},
+    lines:[{speaker:'Captain Blackball',text:'Well done, well done indeed. A jolly fine match. Feel free to come and use my table any time you wish, and my beautiful cue. I must be at sea again in the morning, or the next morning, something like that. Gather all the practice you can muster, and most importantly, enjoy yourself!',stage:{background:'quarters',characters:['blackball']}}]
+  }
+};
+let activeSceneId=null,activeSceneStep=0,activeSceneDone=null,activeSceneTimers=[],activeSceneTyping=false;
+function sceneById(id){return SCENES[id]||null;}
+function clearSceneTimers(){activeSceneTimers.forEach(t=>clearTimeout(t));activeSceneTimers=[];}
+function ensureSceneStage(){
+  let stage=document.getElementById('genericSceneStage');if(stage)return stage;
+  stage=document.createElement('div');stage.id='genericSceneStage';stage.className='generic-scene-stage';stage.setAttribute('aria-hidden','true');
+  stage.innerHTML='<div class="generic-scene-background"></div><div class="generic-scene-characters"></div><div class="generic-scene-props"></div><div class="generic-scene-fx"></div>';
+  blackballStory.querySelector('.blackball-room')?.appendChild(stage);return stage;
+}
+function sceneAsset(scene,type,id){return scene?.assets?.[type]?.[id]||null;}
+function sceneLayerElement(type,id,def){
+  const el=def.src?document.createElement('img'):document.createElement('div');
+  el.className=`scene-layer scene-${type.slice(0,-1)}${def.className?' '+def.className:''}`;el.dataset.sceneAsset=id;
+  if(def.src){el.src=def.src;el.alt=def.alt||'';el.draggable=false;}else if(def.text!=null)el.textContent=def.text;
+  const x=def.x??50,y=def.y??50,w=def.width??35;el.style.left=`${x}%`;el.style.top=`${y}%`;el.style.width=`${w}%`;
+  const anchor=def.anchor||'center';el.dataset.anchor=anchor;return el;
+}
+function sceneSpeakerCharacterId(entry){
+  const speaker=entry?.speaker||'';
+  if(speaker==='Captain Blackball')return 'blackball';
+  const map={'Sandy Mandy':'sandy','Shelle':'shelle','Graham':'graham','Papa Surf':'papa','Mr Wiggles':'wiggles'};
+  return map[speaker]||null;
+}
+function sceneVoiceWaves(stage,slurp=false){
+  const fx=stage.querySelector('.generic-scene-fx');if(!fx)return;
+  const w=document.createElement('div');w.className='scene-voicewaves'+(slurp?' slurp':'');
+  for(let k=0;k<4;k++){const q=document.createElement('div');q.className='scene-wave';w.appendChild(q);}
+  fx.appendChild(w);activeSceneTimers.push(setTimeout(()=>w.remove(),slurp?2200:1600));
+}
+function renderSceneStage(scene,entry){
+  clearSceneTimers();const stage=ensureSceneStage(),state=entry.stage||{};
+  const bg=stage.querySelector('.generic-scene-background'),chars=stage.querySelector('.generic-scene-characters'),props=stage.querySelector('.generic-scene-props'),fx=stage.querySelector('.generic-scene-fx');
+  const bgDef=sceneAsset(scene,'backgrounds',state.background);
+  const previousBackground=stage.dataset.sceneBackground||'';
+  const nextBackground=state.background||'';
+  const backgroundChanged=previousBackground!==nextBackground;
+  stage.dataset.sceneBackground=nextBackground;
+  bg.style.backgroundImage='';bg.style.background='';bg.style.filter='';
+  if(bgDef?.kind==='gradient')bg.style.background=bgDef.value;else if(bgDef?.src)bg.style.backgroundImage=`url("${bgDef.src}")`;
+  if(bgDef?.filter)bg.style.filter=bgDef.filter;
+  /* Candidate E7: stage-presence continuity. Characters persist between dialogue beats.
+     They fade only when genuinely entering/leaving, or when a new background/location begins. */
+  const wantedCharacters=new Set(state.characters||[]);
+  const existingCharacters=[...chars.querySelectorAll('.scene-character')];
+  for(const el of existingCharacters){
+    const id=el.dataset.sceneAsset||'';
+    if(backgroundChanged||!wantedCharacters.has(id)){
+      el.classList.remove('scene-character-talking','scene-character-entering');
+      if(scene.theatreEffects){el.classList.add('scene-character-leaving');el.addEventListener('transitionend',()=>el.remove(),{once:true});}
+      else el.remove();
+    }
+  }
+  for(const id of wantedCharacters){
+    if(!backgroundChanged&&chars.querySelector(`[data-scene-asset="${id}"]:not(.scene-character-leaving)`))continue;
+    const def=sceneAsset(scene,'characters',id);if(!def)continue;
+    const el=sceneLayerElement('characters',id,def);chars.appendChild(el);
+    if(scene.theatreEffects){el.classList.add('scene-character-entering');requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.remove('scene-character-entering')));}
+  }
+  props.replaceChildren();if(fx)fx.replaceChildren();
+  for(const id of state.props||[]){const def=sceneAsset(scene,'props',id);if(def)props.appendChild(sceneLayerElement('props',id,def));}
+  if(scene.theatreEffects){const speakingId=sceneSpeakerCharacterId(entry),speakerEl=speakingId?chars.querySelector(`[data-scene-asset="${speakingId}"]`):null,speakingDef=speakingId?sceneAsset(scene,'characters',speakingId):null;if(speakerEl&&!speakingDef?.suppressSpeakerWobble)speakerEl.classList.add('scene-character-talking');if(entry.speaker==='STRANGE VOICE')sceneVoiceWaves(stage,String(entry.text||'').includes('Slur'));}
+  for(const a of state.animate||[]){
+    const [kind,id]=String(a.target||'').split(':'),root=kind==='prop'?props:chars,el=root.querySelector(`[data-scene-asset="${id}"]`);if(!el)continue;
+    const effect=['shake','bounce','slide','fade','reveal'].includes(a.effect)?a.effect:'bounce',duration=Math.max(120,Number(a.duration)||500),repeat=Math.max(1,Math.min(12,Number(a.repeat)||1));
+    el.style.setProperty('--scene-motion-duration',`${duration}ms`);el.style.setProperty('--scene-motion-count',repeat);el.classList.add(`scene-motion-${effect}`);
+  }
+  /* Optional frame swap: alternates static artwork to create intentionally crude pose animation. */
+  for(const a of state.animate||[]){if(a.effect!=='swap'||!Array.isArray(a.frames)||a.frames.length<2)continue;const [kind,id]=String(a.target||'').split(':'),root=kind==='prop'?props:chars,el=root.querySelector(`[data-scene-asset="${id}"]`);if(!el||el.tagName!=='IMG')continue;const defs=a.frames.map(fid=>sceneAsset(scene,kind==='prop'?'props':'characters',fid)).filter(d=>d?.src);if(defs.length<2)continue;let i=0,left=Math.max(1,Math.min(24,Number(a.repeat)||4))*defs.length,interval=Math.max(80,Number(a.interval)||200);const tick=()=>{if(!activeSceneId||left--<=0)return;i=(i+1)%defs.length;el.src=defs[i].src;activeSceneTimers.push(setTimeout(tick,interval));};activeSceneTimers.push(setTimeout(tick,interval));}
+}
+function showScene(sceneId,onDone){const scene=sceneById(sceneId);if(!scene){if(onDone)onDone();return false;}activeSceneId=sceneId;activeSceneStep=0;activeSceneDone=onDone||null;blackballStory.classList.add('generic-story-mode');blackballStory.classList.remove('fading');if(blackballStory.parentElement!==document.body)document.body.appendChild(blackballStory);blackballStory.hidden=false;ensureSceneStage().dataset.sceneBackground='';renderScene();return true;}
+function renderScene(){const scene=sceneById(activeSceneId);if(!scene)return;const entry=scene.lines[activeSceneStep]||{};const kicker=blackballStory.querySelector('.blackball-story-copy small');if(kicker)kicker.textContent=scene.kicker||'';blackballStoryTitle.textContent=entry.speaker?`${scene.title} — ${entry.speaker}`:scene.title;renderSceneStage(scene,entry);const text=entry.text||'',typingMs=Math.max(0,Number(scene.typewriterMs)||0);blackballStoryText.textContent=typingMs?'':text;activeSceneTyping=!!(typingMs&&text);if(activeSceneTyping){let i=0;const typeNext=()=>{if(!activeSceneId||!activeSceneTyping)return;blackballStoryText.textContent=text.slice(0,++i);if(i>=text.length){activeSceneTyping=false;stopSceneSpeaking();return;}activeSceneTimers.push(setTimeout(typeNext,typingMs));};typeNext();}blackballStoryNext.textContent=activeSceneStep===scene.lines.length-1?(scene.finishLabel||'Continue'):'Next';}
+function stopSceneSpeaking(){ensureSceneStage().querySelectorAll('.scene-character-talking').forEach(el=>el.classList.remove('scene-character-talking'));}
+function completeSceneTyping(){if(!activeSceneTyping)return false;const scene=sceneById(activeSceneId),entry=scene?.lines?.[activeSceneStep]||{};activeSceneTyping=false;clearSceneTimers();stopSceneSpeaking();blackballStoryText.textContent=entry.text||'';return true;}
+function advanceScene(){const scene=sceneById(activeSceneId);if(!scene)return;if(completeSceneTyping())return;if(activeSceneStep>=scene.lines.length-1){closeScene();return;}const next=scene.lines[activeSceneStep+1]||{},transitionMs=Math.max(0,Number(next.transitionMs)||0);if(!transitionMs){activeSceneStep++;renderScene();return;}blackballStoryNext.disabled=true;const half=Math.max(1,Math.round(transitionMs/2));blackballStory.style.transitionDuration=`${half}ms`;blackballStory.classList.add('fading');activeSceneTimers.push(setTimeout(()=>{activeSceneStep++;renderScene();blackballStory.classList.remove('fading');activeSceneTimers.push(setTimeout(()=>{blackballStoryNext.disabled=false;blackballStory.style.transitionDuration='';},half));},half));}
+function closeScene(){clearSceneTimers();activeSceneTyping=false;const scene=sceneById(activeSceneId),fadeMs=Math.max(0,Number(scene?.finishFadeMs)||450);blackballStory.style.transitionDuration=`${fadeMs}ms`;blackballStory.classList.add('fading');setTimeout(()=>{blackballStory.hidden=true;blackballStory.classList.remove('fading','generic-story-mode');blackballStory.style.transitionDuration='';blackballStoryNext.disabled=false;const stage=ensureSceneStage();stage.querySelector('.generic-scene-characters')?.replaceChildren();stage.querySelector('.generic-scene-props')?.replaceChildren();stage.dataset.sceneBackground='';const done=activeSceneDone;activeSceneId=null;activeSceneDone=null;if(done)done();},fadeMs);}
 const BLACKBALL_INTRO_LINES=[
   "So, welcome to my ship and my private pool room in the Captain's quarters. It's just me and you now, and you only get one chance... unless you lose and try again as if this never happened.",
   "Defeat me to become the greatest pool player of all the oceans. But beware, otherworldly beings and mysterious creatures unknown also visit from time to time. Only time will tell.",
@@ -1589,21 +1958,26 @@ const BLACKBALL_INTRO_LINES=[
 ];
 const BLACKBALL_ENDING_LINES=["Well done, well done indeed. A jolly fine match. Feel free to come and use my table any time you wish, and my beautiful cue. I must be at sea again in the morning, or the next morning, something like that. Gather all the practice you can muster, and most importantly, enjoy yourself!"];
 let blackballStoryMode='',blackballStoryStep=0,blackballStoryDone=null;
-function showBlackballStory(mode,onDone){blackballStoryMode=mode;blackballStoryStep=0;blackballStoryDone=onDone||null;blackballStoryTitle.textContent='Captain Blackball';blackballStory.classList.remove('fading');blackballStory.hidden=false;renderBlackballStory();}
+function showBlackballStory(mode,onDone){blackballStoryMode=mode;blackballStoryStep=0;blackballStoryDone=onDone||null;blackballStoryTitle.textContent='Captain Blackball';blackballStory.classList.remove('fading');if(blackballStory.parentElement!==document.body)document.body.appendChild(blackballStory);blackballStory.hidden=false;renderBlackballStory();}
 function renderBlackballStory(){const lines=blackballStoryMode==='ending'?BLACKBALL_ENDING_LINES:BLACKBALL_INTRO_LINES;blackballStoryText.textContent=lines[blackballStoryStep];if(blackballStoryMode==='ending')blackballStoryNext.textContent='Return to the title';else blackballStoryNext.textContent=blackballStoryStep===lines.length-1?'Begin the ultimate showdown!':'Next';}
 function closeBlackballStory(){blackballStory.classList.add('fading');setTimeout(()=>{blackballStory.hidden=true;blackballStory.classList.remove('fading');const done=blackballStoryDone;blackballStoryDone=null;if(done)done();},1050);}
-blackballStoryNext?.addEventListener('click',()=>{const lines=blackballStoryMode==='ending'?BLACKBALL_ENDING_LINES:BLACKBALL_INTRO_LINES;if(blackballStoryStep<lines.length-1){blackballStoryStep++;renderBlackballStory();return;}closeBlackballStory();});
-function beginBlackballFirstShowdown(){career.blackballIntroSeen=true;saveCareer();forcedTableTheme='privates';showBlackballStory('intro',()=>beginPendingPirateMatch(true));}
+blackballStoryNext?.addEventListener('click',()=>{if(activeSceneId){advanceScene();return;}const lines=blackballStoryMode==='ending'?BLACKBALL_ENDING_LINES:BLACKBALL_INTRO_LINES;if(blackballStoryStep<lines.length-1){blackballStoryStep++;renderBlackballStory();return;}closeBlackballStory();});
+function beginBlackballFirstShowdown(){forcedTableTheme='privates';runChapterScene('chapter_1','bossIntro',()=>{career.blackballIntroSeen=true;saveCareer();beginPendingPirateMatch(true);});}
 const progressionRewardModal=document.getElementById('progressionRewardModal'),progressionRewardTitle=document.getElementById('progressionRewardTitle'),progressionRewardBody=document.getElementById('progressionRewardBody'),closeProgressionReward=document.getElementById('closeProgressionReward');
 function showProgressionReward(info){if(!progressionRewardModal||!info)return;progressionRewardTitle.textContent=`${info.pirate} defeated!`;progressionRewardBody.innerHTML=rewardSummaryHTML(info);progressionRewardModal.hidden=false;}
 closeProgressionReward?.addEventListener('click',()=>{progressionRewardModal.hidden=true;pendingPirateReward=null;});
-function showBlackballFirstVictory(){career.blackballEndingSeen=true;saveCareer();forcedTableTheme='privates';startOutroMusic();showBlackballStory('ending',()=>{const reward=pendingPirateReward||pirateRewardInfo(5);forcedTableTheme=null;showTitleScreen();showProgressionReward(reward);});}
-function startProfiledPirate(){const level=profiledPirateLevel;if(!pirateIsOpen(level))return;const p=PIRATES[level];pendingPirateStart={level,playerName:piratePlayerName.value.trim()||'Player 1'};audioReady();pirateProfileModal.hidden=true;playersModal.hidden=true;if(level===5&&!career.blackballIntroSeen){beginBlackballFirstShowdown();return;}matchIntroPortrait.src=p.image;matchIntroName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;matchIntroLine.textContent=(window.SeamenDialogue?.getLine(level,'intro'))||p.bio;matchIntroKicker.textContent=level>=6?'SPECIAL OPPONENT':'YOUR OPPONENT';pirateIntroModal.hidden=false;refreshFirstRunGuidance();}
-function beginPendingPirateMatch(storyApproved=false){if(!pendingPirateStart)return;if(pendingPirateStart.level===1&&firstRunGuideActive())completeFirstRunPath();if(pendingPirateStart.level===5&&!career.blackballIntroSeen&&!storyApproved){pirateIntroModal.hidden=true;beginBlackballFirstShowdown();return;}startMatchMusic();if(gameApp)gameApp.hidden=false;const {level,playerName}=pendingPirateStart,p=PIRATES[level];pendingPirateStart=null;pirateIntroModal.hidden=true;currentScenario=null;currentPirateLevel=level;currentPirateName=p.name;gameMode='pirate';aiPlayer=2;playerNames={1:playerName,2:currentPirateName};newFrame(1);}
+function showBlackballFirstVictory(){forcedTableTheme='privates';startOutroMusic();runChapterScene('chapter_1','ending',()=>{career.blackballEndingSeen=true;saveCareer();const reward=pendingPirateReward||pirateRewardInfo(5);forcedTableTheme=null;showTitleScreen();showProgressionReward(reward);});}
+function startProfiledPirate(){const p=pirateById(profiledPirateId);if(!p||!pirateIsOpen(p))return;if(p.playable===false){const sceneId=p.scene||chapterById(p.chapter)?.scenes?.intro;if(sceneId){pirateProfileModal.hidden=true;playersModal.hidden=true;showScene(sceneId,()=>{playersModal.hidden=false;modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=false;refreshPirateButtons();});}return;}const level=p.legacyLevel??p.aiLevel;pendingPirateStart={level,pirateId:p.id,playerName:piratePlayerName.value.trim()||'Player 1'};audioReady();pirateProfileModal.hidden=true;playersModal.hidden=true;if(level===5&&!career.blackballIntroSeen){beginBlackballFirstShowdown();return;}matchIntroPortrait.src=p.image;matchIntroName.textContent=p.nickname?`${p.name} ${p.nickname}`:p.name;matchIntroLine.textContent=p.legacyLevel==null?(p.challengeQuote||p.bio):((window.SeamenDialogue?.getLine(level,'intro'))||p.bio);matchIntroKicker.textContent=level>=6?'SPECIAL OPPONENT':'YOUR OPPONENT';pirateIntroModal.hidden=false;refreshFirstRunGuidance();}
+function campaignMatchTableTheme(p){
+  if(!p)return null;
+  if(p.id==='blackball')return 'privates';
+    return null;
+}
+function beginPendingPirateMatch(storyApproved=false){if(!pendingPirateStart)return;if(pendingPirateStart.level===1&&firstRunGuideActive())completeFirstRunPath();if(pendingPirateStart.level===5&&!career.blackballIntroSeen&&!storyApproved){pirateIntroModal.hidden=true;beginBlackballFirstShowdown();return;}startMatchMusic();if(titleScreen)titleScreen.hidden=true;if(playersModal)playersModal.hidden=true;if(pirateProfileModal)pirateProfileModal.hidden=true;if(gameApp)gameApp.hidden=false;const {level,pirateId,playerName}=pendingPirateStart,p=pirateById(pirateId)||PIRATES[level];pendingPirateStart=null;pirateIntroModal.hidden=true;currentScenario=null;currentPirateLevel=level;currentPirateId=p.id;currentPirateName=p.name;gameMode='pirate';aiPlayer=2;playerNames={1:playerName,2:currentPirateName};forcedTableTheme=campaignMatchTableTheme(p);if(p.id==='chapter2_boss'){const key='tables:wiggles',fresh=!career.unlockedCosmetics?.includes(key);if(fresh)career.unlockedCosmetics=[...(career.unlockedCosmetics||[]),key];equippedTableTheme='wiggles';try{localStorage.setItem('seamenTableTheme',equippedTableTheme)}catch(e){}if(fresh)saveCareer();refreshCosmeticsUI?.();}if(p.chapter==='chapter_2'&&p.id!=='chapter2_boss'){const key='tables:strangevoice';if(!career.unlockedCosmetics?.includes(key)){career.unlockedCosmetics=[...(career.unlockedCosmetics||[]),key];equippedTableTheme='strangevoice';try{localStorage.setItem('seamenTableTheme',equippedTableTheme)}catch(e){}saveCareer();refreshCosmeticsUI?.();}}newFrame(1);}
 startPirateMatch?.addEventListener('click',()=>beginPendingPirateMatch(false));
 const cancelPirateIntro=document.getElementById('cancelPirateIntro');
 cancelPirateIntro?.addEventListener('click',()=>{pendingPirateStart=null;pirateIntroModal.hidden=true;playersModal.hidden=false;modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=false;if(testScenarioMenu)testScenarioMenu.hidden=true;if(aiVsAiMenu)aiVsAiMenu.hidden=true;refreshPirateButtons();});
-document.getElementById('pirateList')?.addEventListener('click',e=>{const btn=e.target.closest('.pirate-choice[data-level]');if(btn){const level=Number(btn.dataset.level);showPirateProfile(level);}});
+document.getElementById('pirateList')?.addEventListener('click',e=>{const begin=e.target.closest('#beginChapter2');if(begin){if(!chapterIsUnlocked('chapter_2')||chapterState('chapter_2').introSeen)return;playersModal.hidden=true;piratePlaceholder.hidden=true;runChapterScene('chapter_2','intro',()=>{playersModal.hidden=false;modeMenu.hidden=true;playersForm.hidden=true;piratePlaceholder.hidden=false;renderPirateRoster();piratePlayerName?.focus();});return;}const btn=e.target.closest('.pirate-choice[data-pirate-id]');if(btn)showPirateProfile(btn.dataset.pirateId);});
 challengePirate?.addEventListener('click',startProfiledPirate);closePirateProfile?.addEventListener('click',()=>pirateProfileModal.hidden=true);
 renderPirateRoster();
 function detectUnsupportedBrowser(){
@@ -1640,7 +2014,7 @@ if(rulesHelpBack)rulesHelpBack.onclick=()=>{rulesHelpModal.hidden=true;gameMenuM
 if(rulesHelpBreak)rulesHelpBreak.onclick=()=>{rulesHelpModal.hidden=true;breakRules.hidden=false;};
 if(rulesHelpTutorial)rulesHelpTutorial.onclick=()=>{try{localStorage.removeItem(TUTORIAL_KEY)}catch(e){}tutorialActive=true;tutorialSteps.clear();rulesHelpModal.hidden=true;gameMenuModal.hidden=true;gamePaused=false;last=performance.now();showTutorialStep('place','Place the white',"For the opening break, tap or drag the cue ball (white) anywhere inside the baulk area, then confirm its position. The 'baulk area' is anywhere on the table behind the full chalk (baulk) line. There's no D-shape on traditional English pool/billiard tables, though many tend to have both. For these English Pool Association rules, the D is ignored. Baulk and balk are both interchangeable spellings, though 'balk' is typically used in the US/Canada and in the UK (England) and Australia 'baulk' is preferred.",'.cue-placement-controls');};
 if(gameMenuConcede)gameMenuConcede.onclick=()=>{if(!confirm('Concede this frame?\n\nThis will count as a loss and immediately start a new frame.'))return;gameMenuModal.hidden=true;rulesHelpModal.hidden=true;gamePaused=false;const conceder=gameMode==='pirate'?1:state.player,winner=gameMode==='pirate'?2:opponent(state.player);recordCareerFrame(winner);state.frameOver=true;state.winner=winner;moving=false;shot=null;msg.textContent=`${pname(conceder)} conceded the frame. Starting a new one.`;lastShotEl.textContent=`CONCEDED • ${pname(winner)} wins`;updateHUD();setTimeout(()=>restartCurrentGame(1),80);};
-if(gameMenuReturnTitle)gameMenuReturnTitle.onclick=()=>{if(!confirm('Return to title?\n\nThis unfinished frame will not count as a loss.'))return;gameMenuModal.hidden=true;rulesHelpModal.hidden=true;gamePaused=false;clearTimeout(aiTimer);clearTimeout(aiWatchdogTimer);aiTimer=aiWatchdogTimer=null;startMenuMusic();showTitleScreen();};
+if(gameMenuReturnTitle)gameMenuReturnTitle.onclick=()=>{if(!confirm('Return to title?\n\nThis unfinished frame will not count as a loss.'))return;gameMenuModal.hidden=true;rulesHelpModal.hidden=true;gamePaused=false;clearTimeout(aiTimer);clearTimeout(aiWatchdogTimer);aiTimer=aiWatchdogTimer=null;forcedTableTheme=null;startMenuMusic();showTitleScreen();};
 syncAimGuideSwitch();
 
 /* V0.9.0 audio/presentation controls + soundtrack manager. */
@@ -1709,7 +2083,7 @@ function setSaveDataStatus(text,isError=false){if(!saveDataStatus)return;saveDat
 function collectStorage(keys=SAVE_KEYS){const data={};for(const key of keys){const value=localStorage.getItem(key);if(value!==null)data[key]=value;}return data;}
 function collectPortableSave(){return{game:APP_NAME,saveSchema:SAVE_FILE_SCHEMA,gameVersion:APP_VERSION,exportedAt:new Date().toISOString(),data:collectStorage()};}
 function validFlag(v){return v==='0'||v==='1';}
-function validateCareerData(c){if(!c||typeof c!=='object'||Array.isArray(c))throw new Error('Career data is damaged.');if(Number(c.schema||1)>CAREER_SCHEMA)throw new Error('This career save was made by a newer incompatible version.');for(const key of ['framesPlayed','framesWon','framesLost','shotsTaken','legalBallsPotted','foulsCommitted','bestPotStreak','sevenBallWins','blackOnBlackWins','foulFreeWins','oneVisitClearances']){if(c[key]!==undefined&&(!Number.isFinite(Number(c[key]))||Number(c[key])<0))throw new Error('Career data contains an invalid statistic.');}if(c.earnedAchievements!==undefined&&!Array.isArray(c.earnedAchievements))throw new Error('Career achievement data is damaged.');if(c.seenCosmetics!==undefined&&!Array.isArray(c.seenCosmetics))throw new Error('Career cosmetic data is damaged.');if(c.piratesDefeated!==undefined&&(!c.piratesDefeated||typeof c.piratesDefeated!=='object'||Array.isArray(c.piratesDefeated)))throw new Error('Career pirate data is damaged.');if(c.pirateRecords!==undefined&&(!c.pirateRecords||typeof c.pirateRecords!=='object'||Array.isArray(c.pirateRecords)))throw new Error('Career pirate record data is damaged.');}
+function validateCareerData(c){if(!c||typeof c!=='object'||Array.isArray(c))throw new Error('Career data is damaged.');if(Number(c.schema||1)>CAREER_SCHEMA)throw new Error('This career save was made by a newer incompatible version.');for(const key of ['framesPlayed','framesWon','framesLost','shotsTaken','legalBallsPotted','foulsCommitted','bestPotStreak','sevenBallWins','blackOnBlackWins','foulFreeWins','oneVisitClearances']){if(c[key]!==undefined&&(!Number.isFinite(Number(c[key]))||Number(c[key])<0))throw new Error('Career data contains an invalid statistic.');}if(c.earnedAchievements!==undefined&&!Array.isArray(c.earnedAchievements))throw new Error('Career achievement data is damaged.');if(c.seenCosmetics!==undefined&&!Array.isArray(c.seenCosmetics))throw new Error('Career cosmetic data is damaged.');if(c.unlockedCosmetics!==undefined&&!Array.isArray(c.unlockedCosmetics))throw new Error('Career unlocked cosmetic data is damaged.');if(c.piratesDefeated!==undefined&&(!c.piratesDefeated||typeof c.piratesDefeated!=='object'||Array.isArray(c.piratesDefeated)))throw new Error('Career pirate data is damaged.');if(c.chapters!==undefined&&(!c.chapters||typeof c.chapters!=='object'||Array.isArray(c.chapters)))throw new Error('Career chapter data is damaged.');if(c.pirateRecords!==undefined&&(!c.pirateRecords||typeof c.pirateRecords!=='object'||Array.isArray(c.pirateRecords)))throw new Error('Career pirate record data is damaged.');}
 function validatePortableSave(obj){if(!obj||typeof obj!=='object'||Array.isArray(obj))throw new Error('This is not a valid Seamen save file.');if(obj.game!=='Seamen English Rules Pool')throw new Error('This file does not appear to be a Seamen save.');if(!Number.isInteger(obj.saveSchema)||obj.saveSchema<1||obj.saveSchema>SAVE_FILE_SCHEMA)throw new Error('This save uses an unsupported save-file version.');if(!obj.data||typeof obj.data!=='object'||Array.isArray(obj.data))throw new Error('The save file has no valid data section.');for(const key of Object.keys(obj.data)){if(!SAVE_KEYS.includes(key))throw new Error('The save contains an unexpected data field.');if(typeof obj.data[key]!=='string')throw new Error('The save contains malformed data.');}
  if(obj.data.seamenCareer){let c;try{c=JSON.parse(obj.data.seamenCareer)}catch(e){throw new Error('Career data is damaged.');}validateCareerData(c);}
  if(obj.data.seamenPirateUnlocked!==undefined){const n=Number(obj.data.seamenPirateUnlocked);if(!Number.isInteger(n)||n<1||n>5)throw new Error('Pirate progression data is damaged.');}
@@ -1720,7 +2094,7 @@ function validatePortableSave(obj){if(!obj||typeof obj!=='object'||Array.isArray
  return true;}
 function restoreStorageSnapshot(snapshot){for(const key of SAVE_KEYS)localStorage.removeItem(key);for(const [key,value] of Object.entries(snapshot))localStorage.setItem(key,value);}
 function applyPortableSave(obj){validatePortableSave(obj);const before=collectStorage();try{for(const key of SAVE_KEYS)localStorage.removeItem(key);for(const [key,value] of Object.entries(obj.data))localStorage.setItem(key,value);for(const [key,value] of Object.entries(obj.data))if(localStorage.getItem(key)!==value)throw new Error('The browser could not verify the imported save.');}catch(e){try{restoreStorageSnapshot(before);}catch(rollbackError){}throw new Error('Import failed safely. Your previous save has been restored.');}}
-if(exportSaveBtn)exportSaveBtn.onclick=()=>{try{const payload=JSON.stringify(collectPortableSave(),null,2),blob=new Blob([payload],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a'),d=new Date().toISOString().slice(0,10);a.href=url;a.download=`seamen-pool-save-${d}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);setSaveDataStatus('Save exported. Keep the JSON file somewhere safe.');}catch(e){setSaveDataStatus('Could not export the save.',true);}};
+if(exportSaveBtn)exportSaveBtn.onclick=async()=>{try{const payload=JSON.stringify(collectPortableSave(),null,2),d=new Date().toISOString().slice(0,10),filename=`seamen-pool-save-${d}.json`;const nativeContainer=!!(window.SeamenRuntime&&window.SeamenRuntime.isNativeContainer());const filesystem=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Filesystem;if(nativeContainer){if(!filesystem||typeof filesystem.writeFile!=='function')throw new Error('Native save export is not available in this installation.');await filesystem.writeFile({path:filename,data:payload,directory:'DOCUMENTS',encoding:'utf8'});setSaveDataStatus(`Save exported to Documents/${filename}`);return;}const blob=new Blob([payload],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);setSaveDataStatus(`Save exported as ${filename}. Keep the JSON file somewhere safe.`);}catch(e){setSaveDataStatus(e&&e.message?e.message:'Could not export the save.',true);}};
 if(importSaveBtn)importSaveBtn.onclick=()=>{if(importSaveFile){importSaveFile.value='';importSaveFile.click();}};
 if(importSaveFile)importSaveFile.onchange=async()=>{const file=importSaveFile.files&&importSaveFile.files[0];if(!file)return;try{const obj=JSON.parse(await file.text());validatePortableSave(obj);if(!confirm('Import this save? Your current Seamen progress and saved settings will be replaced.')){setSaveDataStatus('Import cancelled.');return;}applyPortableSave(obj);setSaveDataStatus('Save imported successfully. Reloading…');setTimeout(()=>location.reload(),450);}catch(e){setSaveDataStatus(e&&e.message?e.message:'Could not import this save file.',true);}};
 if(resetPlayerDataBtn)resetPlayerDataBtn.onclick=()=>{if(!confirm('Reset ALL Seamen player progress? This removes career statistics, trophies, pirate progress, unlocked/equipped cosmetics and first-run/tutorial progress. Audio and Aim guide preferences are kept. This cannot be undone.'))return;if(!confirm('Final confirmation: permanently reset all player progress on this browser?'))return;for(const key of PLAYER_PROGRESS_KEYS){try{localStorage.removeItem(key)}catch(e){}}setSaveDataStatus('Player progress reset. Reloading…');setTimeout(()=>location.reload(),450);};
@@ -1830,12 +2204,21 @@ if(titlePlay)titlePlay.onclick=()=>{audioReady();showWhoIsPlaying();};
 if(backToTitle)backToTitle.onclick=showTitleScreen;
 if(titleSettings)titleSettings.onclick=()=>{audioReady();refreshAudioSettings();settingsModal.hidden=false;};
 let activeCosmeticFilter='all';
-function cosmeticStateText(type,id,unlocked,equipped){const def=COSMETICS[type]?.[id],key=cosmeticKey(type,id),isNew=unlocked&&!(career.seenCosmetics||[]).includes(key);if(equipped)return 'EQUIPPED';if(isNew)return 'NEW';if(unlocked)return 'OWNED';return `LOCKED • ${def?.unlock||'Requirement not met.'}`;}
+function cosmeticDisplayDef(type,id){const def=COSMETICS[type]?.[id];if(!def)return def;const hiddenWiggles=(id==='wiggles'&&(type==='tables'||type==='cues')&&!chapterState('chapter_2').bossIntroSeen);return hiddenWiggles?{...def,name:'???',description:'The identity of this cosmetic has not yet been revealed.',unlock:'Defeat the island opponents to reveal this cosmetic.'}:def;}
+function cosmeticStateText(type,id,unlocked,equipped){const def=cosmeticDisplayDef(type,id),key=cosmeticKey(type,id),isNew=unlocked&&!(career.seenCosmetics||[]).includes(key);if(equipped)return 'EQUIPPED';if(isNew)return 'NEW';if(unlocked)return 'OWNED';return `LOCKED • ${def?.unlock||'Requirement not met.'}`;}
 function decorateCosmeticCard(card,type,id){const def=COSMETICS[type]?.[id];if(!def)return;let badge=card.querySelector('.cosmetic-source');if(!badge){badge=document.createElement('span');badge.className='cosmetic-source';const copy=card.querySelector('.cosmetic-copy')||card;copy.insertBefore(badge,copy.firstChild);}badge.textContent=COSMETIC_SOURCE_LABELS[def.source]||String(def.source||'').toUpperCase();badge.dataset.source=def.source;card.dataset.source=def.source;card.dataset.sourceId=def.sourceId||'';}
 function cosmeticCardStatus(type,id){const unlocked=cosmeticIsUnlocked(type,id),equipped=unlocked&&((type==='tables'&&id===equippedTableTheme)||(type==='cues'&&id===equippedCue)),key=cosmeticKey(type,id),isNew=unlocked&&!(career.seenCosmetics||[]).includes(key);if(isNew)return 'new';if(equipped)return 'equipped';if(unlocked)return 'owned';return 'others';}
 function applyCosmeticFilter(){const activePanel=document.querySelector('.cosmetic-panel.active');if(!activePanel)return;const type=activePanel.dataset.cosmeticPanel==='tables'?'tables':'cues';let shown=0;activePanel.querySelectorAll('[data-theme], [data-cue], .cue-preview-card.supporter').forEach(card=>{let status='others';const id=card.dataset.theme||card.dataset.cue;if(id)status=cosmeticCardStatus(type,id);const visible=activeCosmeticFilter==='all'||status===activeCosmeticFilter;card.classList.toggle('cosmetic-filter-hidden',!visible);if(visible)shown++;});let empty=activePanel.querySelector('.cosmetic-filter-empty');if(!empty){empty=document.createElement('p');empty.className='cosmetic-filter-empty';const grid=activePanel.querySelector('.cosmetic-showcase,.cue-showcase')||activePanel;grid.appendChild(empty);}const label={all:'cosmetics',new:'new cosmetics',equipped:'equipped cosmetics',owned:'owned cosmetics',others:'other cosmetics'}[activeCosmeticFilter]||'cosmetics';empty.textContent=`No ${label} in this category.`;empty.hidden=shown>0;}
 function refreshCosmeticsUI(){validateEquippedCue();document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>{const id=b.dataset.theme,unlocked=cosmeticIsUnlocked('tables',id),equipped=id===equippedTableTheme&&unlocked,key=cosmeticKey('tables',id),isNew=unlocked&&!(career.seenCosmetics||[]).includes(key);decorateCosmeticCard(b,'tables',id);b.classList.toggle('equipped',equipped);b.classList.toggle('locked',!unlocked);b.classList.toggle('new',isNew);b.disabled=!unlocked;const state=b.querySelector('.cosmetic-state');if(state)state.textContent=cosmeticStateText('tables',id,unlocked,equipped);});document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>{const id=b.dataset.cue,unlocked=cosmeticIsUnlocked('cues',id),equipped=id===equippedCue&&unlocked,key=cosmeticKey('cues',id),isNew=unlocked&&!(career.seenCosmetics||[]).includes(key);decorateCosmeticCard(b,'cues',id);b.classList.toggle('equipped',equipped);b.classList.toggle('locked',!unlocked);b.classList.toggle('new',isNew);b.disabled=!unlocked;const state=b.querySelector('.cosmetic-state');if(state)state.textContent=cosmeticStateText('cues',id,unlocked,equipped);});applyCosmeticFilter();}
 function acknowledgeCosmetic(type,id){const key=cosmeticKey(type,id),seen=new Set(career.seenCosmetics||[]);if(!seen.has(key)){seen.add(key);career.seenCosmetics=[...seen];try{localStorage.setItem(CAREER_KEY,JSON.stringify(career));}catch(e){}}}
+/* V0.17.0 build 1525: cosmetic cards are generated from COSMETICS. Adding a cue/table now requires catalogue metadata + its visual CSS/asset, not hand-written index.html markup. */
+function renderCosmeticCatalogue(){
+ const tableGrid=document.querySelector('[data-cosmetic-panel="tables"] .cosmetic-showcase'),cueGrid=document.querySelector('[data-cosmetic-panel="cues"] .cue-showcase');
+ if(tableGrid){tableGrid.innerHTML='';for(const [id,rawDef] of Object.entries(COSMETICS.tables)){const def=cosmeticDisplayDef('tables',id);if(rawDef.devOnly&&!IS_DEVELOPMENT_BUILD)continue;const b=document.createElement('button');b.className='cosmetic-choice cosmetic-card-choice';b.dataset.theme=id;b.type='button';const preview=document.createElement('span');preview.className=`table-mini ${def.previewClass||''}`.trim();const copy=document.createElement('span');copy.className='cosmetic-copy';const name=document.createElement('b');name.textContent=def.name;const desc=document.createElement('small');desc.textContent=def.description||'';const state=document.createElement('em');state.className='cosmetic-state';copy.append(name,desc,state);b.append(preview,copy);tableGrid.appendChild(b);}}
+ if(cueGrid){cueGrid.innerHTML='';for(const [id,rawDef] of Object.entries(COSMETICS.cues)){const def=cosmeticDisplayDef('cues',id);if(rawDef.devOnly&&!IS_DEVELOPMENT_BUILD)continue;const b=document.createElement('button');b.className=`cue-preview-card cue-choice${def.source==='supporter'?' supporter':''}`;b.dataset.cue=id;if(def.owner)b.dataset.owner=def.owner;b.type='button';const preview=document.createElement('canvas');preview.className='cue-preview cue-preview-live';preview.dataset.cueRender=id;preview.setAttribute('aria-hidden','true');const name=document.createElement('b');name.textContent=def.name;const desc=document.createElement('small');desc.textContent=def.description||'';const state=document.createElement('em');state.className='cosmetic-state';b.append(preview,name,desc,state);cueGrid.appendChild(b);}}
+}
+renderCosmeticCatalogue();
+refreshCueCosmeticPreviews();
 document.querySelectorAll('.cosmetic-choice[data-theme]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.theme;if(!cosmeticIsUnlocked('tables',id))return;acknowledgeCosmetic('tables',id);equippedTableTheme=id;try{localStorage.setItem('seamenTableTheme',equippedTableTheme)}catch(e){}refreshCosmeticsUI();}));
 document.querySelectorAll('.cue-choice[data-cue]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.cue;if(!cosmeticIsUnlocked('cues',id))return;acknowledgeCosmetic('cues',id);equippedCue=id;try{localStorage.setItem('seamenCue',equippedCue)}catch(e){}refreshCosmeticsUI();}));
 const titlePrivacy=document.getElementById('titlePrivacy'),privacyScreen=document.getElementById('privacyScreen'),privacyBack=document.getElementById('privacyBack');
@@ -1866,7 +2249,7 @@ const devTriggerPlayerWin=document.getElementById('devTriggerPlayerWin');if(devT
 const devGrantSupporter=document.getElementById('devGrantSupporter');if(devGrantSupporter)devGrantSupporter.onclick=()=>{setDevEntitlement('supporter_founder_test',true);msg.textContent='DEV: supporter test entitlement granted. Test cosmetic is now available.';};
 const devRevokeSupporter=document.getElementById('devRevokeSupporter');if(devRevokeSupporter)devRevokeSupporter.onclick=()=>{setDevEntitlement('supporter_founder_test',false);msg.textContent='DEV: supporter test entitlement revoked. Any equipped supporter test cue falls back safely.';};
 refreshDevEntitlementUI();
-const devResetProgress=document.getElementById('devResetProgress');if(devResetProgress)devResetProgress.onclick=()=>{if(!confirm('Reset ALL saved progression and lifetime statistics? This cannot be undone.'))return;career=defaultCareer();trophyKnownUnlocked=new Set();try{localStorage.removeItem(CAREER_KEY);localStorage.setItem('seamenPirateUnlocked','1');}catch(e){}devPiratesUnlocked=false;saveCareer();refreshPirateButtons();msg.textContent='DEV: progression and statistics reset.';};
+const devResetProgress=document.getElementById('devResetProgress');if(devResetProgress)devResetProgress.onclick=()=>{if(!confirm('Reset ALL saved progression and lifetime statistics? This cannot be undone.'))return;career=defaultCareer();pendingChapter2BossReveal=false;trophyKnownUnlocked=new Set();try{localStorage.removeItem(CAREER_KEY);localStorage.setItem('seamenPirateUnlocked','1');}catch(e){}devPiratesUnlocked=false;saveCareer();refreshPirateButtons();msg.textContent='DEV: progression and statistics reset.';};
 const devAchievementSelect=document.getElementById('devAchievementSelect');
 if(devAchievementSelect){devAchievementSelect.innerHTML=ACHIEVEMENTS.map(a=>`<option value="${a.id}">${a.tier} — ${a.name}</option>`).join('');}
 const devTestTrophyToast=document.getElementById('devTestTrophyToast');if(devTestTrophyToast)devTestTrophyToast.onclick=()=>{const trophy=achievementById(devAchievementSelect?.value)||ACHIEVEMENTS[0];if(!trophy)return;trophyToastQueue.push({...trophy,id:`dev_preview_${trophy.id}`});runTrophyToastQueue();msg.textContent=`DEV: previewed ${trophy.tier} — ${trophy.name}. Career data unchanged.`;};
@@ -1976,6 +2359,7 @@ newFrame=function(breaker=1){customGameActive=false;customGameCountsStats=false;
 function applyBuildModeSurface(){
   if(IS_DEVELOPMENT_BUILD)return;
   document.querySelector('details')?.remove();
+  document.querySelector('footer')?.remove();
   testMode?.remove();
   aiVsAiMode?.remove();
   document.querySelector('[data-cue="supporter_test"]')?.remove();

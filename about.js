@@ -13,8 +13,16 @@ window.SeamenAbout = {
       { label: 'Amazon Music', url: 'https://music.amazon.co.uk/albums/B0HKYGB9RR?marketplaceId=A1F83G8C2ARO7P&musicTerritory=GB&ref=dm_sh_qTybwo8gAOhYAo1axOrebn09B' },
       { label: 'YouTube Music', url: 'https://music.youtube.com/playlist?list=OLAK5uy_k2yorguHlsoe9HsscBl5RsXHS5Hjez8nY&si=3Qt6a0AyNZ70eM2b' }
     ] },
-    { title: 'Licensing and attribution', body: 'No third-party JavaScript library or framework is bundled in this build. External services and tools named in these credits remain the property of their respective owners. Asset and music provenance is tracked separately for release preparation so store builds can include any attribution or licence information that is actually required.' },
-    { title: 'Testing and QA', body: 'Huge thanks to the usual pair of testees for my seamen games: Chris Moore and Seasick Sam.' },
+ { title: 'Licensing and attribution', body: 'No third-party JavaScript library or framework is bundled in this build. External services and tools named in these credits remain the property of their respective owners. Asset and music provenance is tracked separately for release preparation so store builds can include any attribution or licence information that is actually required.' },
+    { title: 'Privacy and support',
+      body: 'Privacy information and support for Seamen English Rules Pool:',
+      links: [
+        { label: 'Privacy Policy', url: 'https://seamengames.com/privacy/' },
+        { label: 'Support', url: 'https://seamengames.com/support/' }
+      ]
+    },
+	{ title: 'Testing and QA', body: 'Huge thanks to the usual pair of testees for my seamen games: Chris Moore and Seasick Sam.' },
     { title: 'Special thanks', body: 'Also thanks to Ash Grundy for briefly nodding, smiling, and listening when I mentioned what I have been up to.' },
+	
   ]
 };
