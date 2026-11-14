@@ -1,3 +1,7 @@
+K3I.2: The current v0.17.52/build 1582 browser entry is index.html, which boots
+the complete releases/v0.17.52-b1582/ bundle. See README.md and K3I.2-REVIEW.md.
+The v0.17.0 root files/documentation below are retained for legacy-client recovery.
+
 SEAMEN ENGLISH RULES POOL — V0.15.7aa
 ===================================
 
