@@ -1,0 +1,1429 @@
+*{box-sizing:border-box}html,body{margin:0;background:#17120d;color:#f5ead5;font-family:system-ui,-apple-system,Segoe UI,sans-serif}body{min-height:100vh;background:radial-gradient(circle at top,#3b2818,#17120d 55%)}main{width:min(100%,620px);margin:auto;padding:12px 12px 28px}header,.status{display:flex;align-items:center;justify-content:space-between;gap:12px}h1{font-family:Georgia,serif;letter-spacing:.14em;margin:0;color:#e8c477;font-size:28px}header p{margin:0;color:#bda98a;font-size:13px}.status{margin:10px 0;background:#241a12;border:1px solid #59432c;padding:9px 12px;border-radius:10px;font-size:13px}.status span:first-child{font-weight:800;color:#e8c477}.table-wrap{width:100%;display:block;overflow:visible}.table-wrap canvas{display:block;width:100%;height:auto;max-width:100%;aspect-ratio:1780/980;touch-action:none;border-radius:14px;box-shadow:0 12px 35px #0008}
+.controls{margin-top:13px;background:#241a12;border:1px solid #59432c;padding:13px;border-radius:12px}.controls label{display:flex;justify-content:space-between;font-size:13px;font-weight:800;letter-spacing:.05em}.controls input{width:100%;height:44px;accent-color:#c9963c}.controls button,#reset,.dev button{border:0;border-radius:9px;min-height:46px;font-weight:900;cursor:pointer}.controls button{width:100%;background:#c9963c;color:#17120d;font-size:17px;letter-spacing:.06em}.controls button:disabled{opacity:.45}.hint,footer{color:#aa9b87;font-size:12px;text-align:center}.hint{margin:9px 0 0}#reset,.dev button{background:#3a2a1c;color:#f5ead5;border:1px solid #6b5033;padding:0 13px}details{margin-top:12px;color:#bfae95;font-size:13px}.dev{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}footer{margin-top:15px}@media(max-height:700px){.controls{margin-top:8px;padding:9px}.controls input{height:36px}.fine-aim button{min-height:38px}.hint{display:none}}@media(min-width:700px){main{max-width:760px}}
+
+.fine-aim{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:-2px 0 10px}.fine-aim button{min-height:44px;background:#3a2a1c;color:#f5ead5;border:1px solid #6b5033;border-radius:9px;font-weight:800}.controls label:not(:first-child){margin-top:5px}
+
+/* V0.1.8: fixed two-line status HUD to prevent layout jumping */
+.status{align-items:stretch;min-height:58px}
+.status span{display:flex;align-items:center;min-height:38px;line-height:19px}
+.status span:first-child{flex:0 0 34%;min-width:108px}
+.status span:last-child{flex:1 1 66%;min-width:0}
+@media(max-width:420px){.status span:first-child{flex-basis:38%;min-width:112px}}
+.rules-hud{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:6px;margin:0 0 10px;text-align:center}.rules-hud>div{background:#241a12;border:1px solid #59432c;border-radius:9px;padding:7px 4px;min-width:0}.rules-hud b,.rules-hud small{display:block}.rules-hud b{font-size:12px;color:#e8c477}.rules-hud small{font-size:10px;color:#aa9b87;margin-top:2px}.choice{background:#352514;border:1px solid #c9963c;border-radius:10px;padding:10px;margin-bottom:10px;text-align:center}.choice p{margin:0 0 8px;font-size:13px}.choice div{display:grid;grid-template-columns:1fr 1fr;gap:8px}.choice button{min-height:44px;border:0;border-radius:8px;background:#c9963c;color:#17120d;font-weight:900}
+
+
+/* V0.2.4: stable turn announcement overlay */
+.table-wrap{position:relative}
+.turn-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;pointer-events:none;text-align:center;font-family:Georgia,serif;font-weight:900;font-size:clamp(20px,5vw,38px);letter-spacing:.02em;color:#fff;text-shadow:0 2px 8px #000,0 0 18px #000;background:#0000;opacity:0;transform:scale(1);z-index:4}
+.turn-overlay.show{animation:turnAnnouncement 3s ease-out both}
+@keyframes turnAnnouncement{0%{opacity:0;transform:scale(1.16)}12%{opacity:1;transform:scale(1.06)}58%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.72)}}
+@media(prefers-reduced-motion:reduce){.turn-overlay.show{animation:turnAnnouncementReduced 3s linear both}@keyframes turnAnnouncementReduced{0%,70%{opacity:1;transform:none}100%{opacity:0;transform:none}}}
+
+/* V0.2.7: rules summary row is always a stable two-line HUD */
+.rules-hud>div{display:grid;grid-template-rows:16px 14px;align-content:center;min-height:45px}
+.rules-hud b,.rules-hud small{line-height:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* V0.2.8: break scoring explainer */
+.break-help{display:block;margin:-3px auto 10px;border:1px solid #6b5033;background:#2c2016;color:#e8c477;border-radius:8px;min-height:38px;padding:6px 12px;font-weight:800;cursor:pointer}
+.rules-modal[hidden]{display:none}.rules-modal{position:fixed;inset:0;z-index:20;background:#000b;display:flex;align-items:center;justify-content:center;padding:18px}.rules-modal-card{position:relative;width:min(100%,480px);background:#241a12;border:1px solid #c9963c;border-radius:14px;padding:20px;color:#f5ead5;box-shadow:0 16px 45px #000}.rules-modal-card h2{margin:0 34px 10px 0;color:#e8c477;font-family:Georgia,serif;font-size:22px}.rules-modal-card p{font-size:14px;line-height:1.5;margin:9px 0}.modal-close{position:absolute;right:9px;top:7px;width:40px;height:40px;border:0;background:transparent;color:#f5ead5;font-size:28px;cursor:pointer}
+
+/* V0.2.9: restore visibly two-line rules HUD; finger-friendly break help dialog */
+.rules-hud>div{grid-template-rows:minmax(16px,auto) minmax(16px,auto);min-height:54px;padding-top:8px;padding-bottom:8px}
+.rules-hud b,.rules-hud small{min-height:16px;line-height:16px}
+.rules-modal-card h2{margin-right:0}
+.modal-close{display:none}
+.modal-gotit{display:block;width:100%;min-height:52px;margin-top:16px;border:0;border-radius:10px;background:#c9963c;color:#17120d;font-size:17px;font-weight:900;cursor:pointer}
+
+/* V0.3.0: end-of-frame celebration and prototype menu notice */
+.win-card{text-align:center}.win-card h2{font-size:clamp(26px,7vw,38px);margin-bottom:8px}.win-actions{display:grid;gap:10px;margin-top:16px}.win-actions .modal-gotit{margin-top:0}.modal-secondary{display:block;width:100%;min-height:52px;border:1px solid #8a6a45;border-radius:10px;background:#3a2a1c;color:#f5ead5;font-size:16px;font-weight:900;cursor:pointer}
+
+/* V0.3.2 developer QA tools */
+.dev-log-wrap{margin-top:10px;background:#120e0a;border:1px solid #59432c;border-radius:9px;padding:9px}.dev-log-wrap>b{color:#e8c477}.dev-log-wrap pre{margin:7px 0 0;max-height:260px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;color:#d8cbb8;font:11px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace}.dev button{padding:6px 8px}
+
+/* V0.3.4 player names, game log and touch-friendly startup */
+.player-form label{display:block;text-align:left;margin:12px 0;font-weight:800;color:#e8c477}.player-form input{box-sizing:border-box;width:100%;min-height:48px;margin-top:6px;border:1px solid #8a6a45;border-radius:9px;background:#120e0a;color:#f5ead5;padding:10px 12px;font-size:17px}.game-log-card{text-align:left}.game-log-card pre{max-height:52vh;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#120e0a;border:1px solid #59432c;border-radius:9px;padding:10px;color:#d8cbb8;font:11px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace}
+
+
+/* V0.3.5 mobile control and HUD refinements */
+html{scrollbar-width:auto;scrollbar-color:#c9963c #241a12}
+::-webkit-scrollbar{width:18px}
+::-webkit-scrollbar-track{background:#241a12;border-left:1px solid #59432c}
+::-webkit-scrollbar-thumb{background:#c9963c;border:4px solid #241a12;border-radius:12px}
+::-webkit-scrollbar-thumb:hover{background:#e8c477}
+.fine-aim.angle-buttons,.power-buttons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:-2px 0 10px}
+.fine-aim button,.power-buttons button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation;min-width:0;min-height:46px;background:#3a2a1c;color:#f5ead5;border:1px solid #6b5033;border-radius:9px;font-weight:800;font-size:14px;padding:4px}
+.power-buttons{margin-top:-2px}
+.rules-hud{margin-top:10px;align-items:stretch}
+.rules-hud>div{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:78px;padding:8px 5px;text-align:center}
+.rules-hud b{width:100%;min-height:18px;line-height:16px;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
+.rules-hud small{width:100%;min-height:48px;line-height:16px;margin-top:4px;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;display:flex;align-items:flex-start;justify-content:center;text-align:center}
+.rules-hud .centre small{align-items:flex-start}
+@media(max-width:420px){::-webkit-scrollbar{width:16px}.fine-aim button,.power-buttons button{font-size:13px;padding:3px}.rules-hud{grid-template-columns:1fr 1.2fr 1fr}.rules-hud>div{min-height:82px}}
+
+
+/* V0.3.6 mobile QA refinements */
+.break-help[hidden]{display:none!important}
+.rules-hud b{white-space:normal}
+.rules-hud small{white-space:pre-line!important}
+.fine-aim.angle-buttons{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);overflow:visible}
+.fine-aim.angle-buttons button{width:100%;aspect-ratio:1.45/1;min-height:0;padding:4px 2px;white-space:nowrap;font-size:clamp(11px,3.4vw,14px)}
+.browser-warning{margin:7px 0 0;max-width:440px;padding:8px 10px;border:1px solid #c9963c;border-radius:8px;background:#352514;color:#f5ead5;font-size:12px;line-height:1.35}
+.browser-warning[hidden]{display:none!important}
+@media(max-width:420px){.fine-aim.angle-buttons{gap:5px}.fine-aim.angle-buttons button{font-size:12px}}
+
+
+/* V0.4.0: opening game-mode menu; local play preserved, pirate mode scaffolded */
+.mode-menu{text-align:center}.mode-menu h2{margin-bottom:8px}.mode-actions{display:grid;gap:10px;margin-top:16px}.mode-actions .modal-gotit{margin-top:0}.mode-actions button{width:100%;min-height:58px}.mode-actions button small{display:block;margin-top:3px;font-size:12px;font-weight:700;opacity:.8}.player-form[hidden],.mode-menu[hidden]{display:none!important}
+
+
+/* V0.4.1: mobile-friendly cue-ball placement */
+.confirm-cue{display:block;width:100%;min-height:54px;margin:10px 0 0;border:1px solid #e8c477;border-radius:10px;background:#c9963c;color:#17120d;font-size:16px;font-weight:900;letter-spacing:.035em;cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+.confirm-cue[hidden]{display:none!important}
+.table-wrap.placing-cue canvas{outline:3px solid #c9963c;outline-offset:2px}
+
+/* V0.4.1 mobile cue placement refinement */
+.cue-placement-controls{margin-top:10px;padding:10px;border:1px solid #7f6a45;border-radius:12px;background:#211c16;text-align:center}
+.cue-placement-controls[hidden]{display:none!important}
+.cue-placement-controls p{margin:0 0 9px;font-size:13px;line-height:1.35}
+.cue-nudge-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:8px}
+.cue-nudge-grid button{min-width:0;min-height:52px;border-radius:10px;font-size:22px;font-weight:900;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none}
+.table-wrap.placing-cue canvas{touch-action:none;cursor:crosshair}
+
+
+/* V0.4.2: first Pirates o' the Tavern opponent framework */
+.pirate-list{display:grid;gap:8px;margin:14px 0}.pirate-choice{width:100%;min-height:54px;border:1px solid #6b5033;border-radius:10px;background:#2b2118;color:#9d8d78;font-weight:900;padding:8px}.pirate-choice.unlocked{background:#c9963c;color:#17120d;border-color:#e8c477;cursor:pointer}.pirate-choice small{display:block;margin-top:3px;font-size:12px}.pirate-choice:disabled{opacity:.55}.pirate-note{font-size:12px!important;color:#bda98a}.ai-thinking{color:#e8c477;font-weight:800}
+
+/* V0.4.4: sequential pirate difficulty progression */
+.pirate-choice.unlocked{opacity:1}
+.pirate-choice:disabled{cursor:not-allowed}
+
+
+/* V0.7.8 game-log copy helper */
+.game-log-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.game-log-heading h2{margin:0}.copy-game-log{width:auto;min-height:40px;padding:7px 12px;white-space:nowrap}.copy-game-log.copied{border-color:#e8c477;background:#5a4325}.copy-game-log-status{min-height:20px;margin:7px 0 5px;color:#e8c477;font-size:13px;font-weight:800;text-align:right}@media(max-width:560px){.game-log-heading{align-items:stretch;flex-direction:column}.copy-game-log{width:100%}.copy-game-log-status{text-align:left}}
+\n\n/* V0.7.13: iOS/Safari interaction hardening.\n   Game chrome is deliberately non-selectable; form fields and the game-log text remain selectable. */\nbody.game-interaction-hardened main,\nbody.game-interaction-hardened main button,\nbody.game-interaction-hardened main canvas,\nbody.game-interaction-hardened main label,\nbody.game-interaction-hardened main .status,\nbody.game-interaction-hardened main .rules-hud,\nbody.game-interaction-hardened main .hint,\nbody.game-interaction-hardened main summary {\n  -webkit-user-select:none; user-select:none;\n  -webkit-touch-callout:none;\n}\nbody.game-interaction-hardened button,\nbody.game-interaction-hardened canvas {\n  -webkit-user-drag:none;\n}\nbody.game-interaction-hardened button {\n  touch-action:manipulation;\n}\nbody.game-interaction-hardened .fine-aim button,\nbody.game-interaction-hardened .power-buttons button,\nbody.game-interaction-hardened .cue-nudge-grid button,\nbody.game-interaction-hardened #shoot {\n  touch-action:none;\n}\n/* Keep normal page scrolling on non-control UI, and preserve intentional selection/copy areas. */\nbody.game-interaction-hardened input,\nbody.game-interaction-hardened textarea,\nbody.game-interaction-hardened select,\nbody.game-interaction-hardened #gameLogModalText,\nbody.game-interaction-hardened #gameLogModalText * {\n  -webkit-user-select:text; user-select:text;\n  -webkit-touch-callout:default;\n}\n
+
+/* V0.7.14: iOS Safari sustained-press selection fix.
+   Safari can ignore inherited user-select on native buttons while a touch is held,
+   so protect the button itself AND every rendered descendant with !important. */
+body.game-interaction-hardened .fine-aim button,
+body.game-interaction-hardened .fine-aim button *,
+body.game-interaction-hardened .power-buttons button,
+body.game-interaction-hardened .power-buttons button *,
+body.game-interaction-hardened .cue-nudge-grid button,
+body.game-interaction-hardened .cue-nudge-grid button *,
+body.game-interaction-hardened #shoot,
+body.game-interaction-hardened #shoot * {
+  -webkit-user-select:none !important;
+  user-select:none !important;
+  -webkit-touch-callout:none !important;
+  -webkit-user-drag:none !important;
+}
+body.game-interaction-hardened .fine-aim button,
+body.game-interaction-hardened .power-buttons button,
+body.game-interaction-hardened .cue-nudge-grid button,
+body.game-interaction-hardened #shoot {
+  touch-action:none !important;
+  -webkit-tap-highlight-color:transparent;
+}
+
+
+/* V0.7.15: keep iOS controls non-selectable without globally cancelling touch events.
+   manipulation preserves reliable taps in WebKit-based iOS browsers; JS handles press-and-hold. */
+body.game-interaction-hardened .fine-aim button,
+body.game-interaction-hardened .power-buttons button,
+body.game-interaction-hardened .cue-nudge-grid button,
+body.game-interaction-hardened #shoot {
+  touch-action:manipulation !important;
+  -webkit-user-select:none !important; user-select:none !important;
+  -webkit-touch-callout:none !important;
+}
+
+/* V0.8.0: opponent roster + reusable profile presentation framework */
+.pirate-roster-card{width:min(100%,540px)}
+.pirate-roster-intro{color:#d7c8b2}
+.pirate-choice{text-align:left;position:relative;padding:10px 12px}
+.pirate-choice b{display:block;color:inherit;font-family:Georgia,serif;font-size:16px}
+.pirate-choice b em{font-size:13px;font-weight:700;opacity:.8}
+.pirate-choice.locked{cursor:pointer;opacity:.62;background:#211912;color:#b6a58f}
+.pirate-choice.locked:hover,.pirate-choice.locked:focus{opacity:.82}
+.pirate-profile-card{width:min(100%,520px)}
+.pirate-profile-top{display:grid;grid-template-columns:112px 1fr;gap:16px;align-items:center}
+.pirate-portrait{aspect-ratio:1;border:1px solid #8a6a45;border-radius:14px;background:radial-gradient(circle at 50% 35%,#4a3929,#120e0a 72%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#e8c477;text-align:center;overflow:hidden}
+.pirate-portrait span{font:900 31px/1 Georgia,serif;letter-spacing:.04em}.pirate-portrait small{margin-top:8px;padding:0 8px;color:#aa9b87;font-size:9px;line-height:1.15}
+.pirate-profile-title small{display:block;color:#bda98a;font-size:11px;text-transform:uppercase;letter-spacing:.08em}.pirate-profile-title h2{margin:3px 0 8px;font-size:clamp(21px,6vw,30px)}
+.pirate-difficulty{display:inline-block;border:1px solid #8a6a45;border-radius:999px;padding:5px 9px;color:#e8c477;background:#17120d;font-size:11px;font-weight:900;letter-spacing:.04em}
+.pirate-profile-body{margin-top:16px;padding:12px 14px;border:1px solid #59432c;border-radius:11px;background:#1a130e}.pirate-profile-body p{margin:7px 0}.pirate-profile-flavour{color:#d8cbb8}
+#challengePirate:disabled{opacity:.48;cursor:not-allowed}
+@media(max-width:430px){.pirate-profile-top{grid-template-columns:88px 1fr;gap:12px}.pirate-profile-card{padding:16px}.pirate-portrait span{font-size:25px}}
+
+
+/* V0.8.2: Pirates & Presentation — tavern visual identity pass.
+   Presentation only: no rules, physics or AI behaviour changes. */
+:root{--ink:#120d09;--wood:#2a1a10;--wood2:#3b2515;--brass:#c9963c;--brass-hi:#f0cf82;--parch:#ead8b4;--iron:#63594d;--blood:#6f2119}
+html,body{background:#100c09}
+body{background:
+ radial-gradient(ellipse at 50% -15%,#5a3519 0,#2a190f 29%,transparent 58%),
+ repeating-linear-gradient(90deg,#17100b 0,#17100b 46px,#130d09 47px,#130d09 92px);}
+main{position:relative;padding-top:16px}
+main:before{content:"";display:block;height:5px;margin:0 2px 11px;border-radius:99px;background:linear-gradient(90deg,transparent,#8d642d 15%,#e5bf6a 50%,#8d642d 85%,transparent);opacity:.72}
+header{padding:10px 12px;background:linear-gradient(180deg,#2e1e13,#21150e);border:1px solid #654729;border-radius:12px;box-shadow:inset 0 1px #9a6c3555,0 8px 22px #0007}
+h1{text-shadow:0 2px #000,0 0 14px #c9963c33}
+header p b{color:#e8c477}
+#reset{box-shadow:inset 0 1px #ffffff12}
+.status,.controls,.rules-hud>div,details{box-shadow:inset 0 1px #ffffff08,0 6px 18px #0003}
+.controls{background:linear-gradient(180deg,#2a1d13,#21160f)}
+#shoot{background:linear-gradient(180deg,#e2b95f,#b87d2c);border:1px solid #f0cf82!important;box-shadow:inset 0 1px #fff7,0 3px 0 #71491b,0 7px 14px #0005;text-shadow:0 1px #f5d999}
+#shoot:active{transform:translateY(2px);box-shadow:inset 0 1px #fff5,0 1px 0 #71491b}
+
+/* Modal cards now read as carved tavern boards with brass edging. */
+.rules-modal{backdrop-filter:blur(2px);background:radial-gradient(circle at 50% 30%,#27190ecc,#050403f2 72%)}
+.rules-modal-card{background:
+ linear-gradient(#ffffff05,#00000018),
+ repeating-linear-gradient(0deg,#2c1c12 0,#2c1c12 34px,#29190f 35px,#29190f 70px);
+ border:2px solid #8c632f;outline:1px solid #24150b;border-radius:10px;
+ box-shadow:inset 0 0 0 3px #120c08aa,inset 0 1px #e5bf6a55,0 18px 55px #000d}
+.rules-modal-card:before,.rules-modal-card:after{content:"◆";position:absolute;top:8px;color:#9b7139;font-size:10px;text-shadow:0 1px #000}
+.rules-modal-card:before{left:10px}.rules-modal-card:after{right:10px}
+.rules-modal-card h2{color:var(--brass-hi);text-shadow:0 2px #000;letter-spacing:.025em}
+.modal-gotit{background:linear-gradient(180deg,#dfb65d,#b67b2c);border:1px solid #f0cf82;color:#160f09;box-shadow:inset 0 1px #fff6,0 3px 0 #704719}
+.modal-secondary{background:linear-gradient(180deg,#46301f,#302014);border-color:#76532f;box-shadow:inset 0 1px #ffffff10}
+.modal-secondary:hover,.modal-secondary:focus{border-color:#c9963c;background:linear-gradient(180deg,#543923,#382416)}
+
+/* Main mode menu: small masthead treatment, no image assets required. */
+.mode-menu h2:before{content:"☠  ";font-size:.85em}.mode-menu h2:after{content:"  ☠";font-size:.85em}
+.mode-menu>p{color:#c8b79d}
+.mode-actions button{position:relative;overflow:hidden}
+.mode-actions button:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 20%,#fff1 48%,transparent 70%);transform:translateX(-120%);transition:transform .35s ease}
+.mode-actions button:hover:after,.mode-actions button:focus:after{transform:translateX(120%)}
+
+/* Roster cards: distinct plaques with a compact level marker. */
+.pirate-roster-card{max-height:min(92vh,780px);overflow:auto}
+.pirate-list{gap:9px}
+.pirate-choice{min-height:62px;padding:10px 52px 10px 14px;border-width:1px;background:linear-gradient(180deg,#382518,#281a11);box-shadow:inset 0 1px #ffffff0c,0 3px 8px #0004;transition:transform .12s ease,border-color .12s ease,filter .12s ease}
+.pirate-choice:after{content:"⚓";position:absolute;right:15px;top:50%;transform:translateY(-50%);font-size:20px;opacity:.36}
+.pirate-choice.unlocked{background:linear-gradient(180deg,#c99a46,#9e6b2d);border-color:#efcc7c;color:#17100a;box-shadow:inset 0 1px #fff8,0 3px 9px #0005}
+.pirate-choice.unlocked:after{opacity:.72}
+.pirate-choice:hover,.pirate-choice:focus{transform:translateY(-1px);filter:brightness(1.08)}
+.pirate-choice b{font-size:17px;letter-spacing:.015em}.pirate-choice small{opacity:.86}
+.pirate-note{padding:9px 10px;border-left:3px solid #76532f;background:#140e0a88;border-radius:4px}
+
+/* Profile: brass-framed portrait aperture and parchment-like information panel. */
+.pirate-profile-card{overflow:hidden}
+.pirate-profile-top{padding:6px 4px 14px;border-bottom:1px solid #6d4c2b}
+.pirate-portrait{position:relative;border:2px solid #b8873e;outline:3px solid #17100b;background:radial-gradient(circle at 50% 30%,#5b432d,#24170f 57%,#0d0907 100%);box-shadow:inset 0 0 24px #000b,0 4px 14px #0008}
+.pirate-portrait:after{content:"";position:absolute;inset:5px;border:1px solid #e6c37344;border-radius:9px;pointer-events:none}
+.pirate-portrait span{color:#f0cf82;text-shadow:0 2px #000,0 0 14px #e0b85b44}
+.pirate-profile-title small{color:#c5ae87}.pirate-profile-title h2{color:#f0cf82}
+.pirate-difficulty{border-color:#b8863e;background:#120d09;box-shadow:inset 0 0 10px #000;color:#eac878}
+.pirate-profile-body{position:relative;background:linear-gradient(180deg,#e7d4ad,#cdb78d);border:1px solid #9b7746;color:#261a10;box-shadow:inset 0 0 18px #76552b33}
+.pirate-profile-body b{color:#5a351b}.pirate-profile-flavour{color:#3c2a1b!important}
+.pirate-profile-body:after{content:"";position:absolute;inset:4px;border:1px solid #6f512322;pointer-events:none}
+
+/* Tiny ornamental dividers around HUD without increasing asset weight. */
+.rules-hud>div{background:linear-gradient(180deg,#2a1d13,#21160f);border-color:#64472b}
+.rules-hud .centre{border-color:#8d642f}
+footer:before{content:"⚓  "}footer:after{content:"  ⚓"}
+
+@media(max-width:430px){
+ header{padding:8px 9px}h1{font-size:24px}.pirate-choice{min-height:58px;padding-right:44px}.pirate-choice:after{right:12px;font-size:17px}
+ .rules-modal{padding:10px}.pirate-roster-card{max-height:95vh}.pirate-profile-top{grid-template-columns:84px 1fr}
+}
+@media(prefers-reduced-motion:reduce){.mode-actions button:after,.pirate-choice{transition:none}}
+
+
+/* V0.8.2: approved cinematic character portrait integration. */
+.pirate-portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
+.pirate-portrait .portrait-fallback{display:none}
+.pirate-portrait:has(img){background:#0d0907}
+.pirate-profile-top{align-items:stretch}
+@media(max-width:430px){.pirate-portrait img{object-position:center top}}
+
+/* V0.8.3: match personality — lightweight opponent introduction presentation. */
+.match-intro-card{width:min(92vw,520px);text-align:center;overflow:hidden;position:relative}
+.match-intro-portrait{width:min(72vw,330px);aspect-ratio:1;margin:0 auto 14px;border:3px solid #b88837;border-radius:16px;overflow:hidden;box-shadow:0 12px 30px #0009,inset 0 0 0 2px #e3bd6a55;background:#17100b}
+.match-intro-portrait img{width:100%;height:100%;object-fit:cover;display:block;-webkit-user-drag:none}
+#matchIntroKicker{display:block;color:#cda34f;font-weight:900;letter-spacing:.16em;margin-bottom:5px}
+#matchIntroName{margin:0 0 10px;font-family:Georgia,serif;color:#f0d59a;text-shadow:0 2px 3px #000}
+#matchIntroLine{margin:0 auto 18px;max-width:420px;font-family:Georgia,serif;font-size:17px;line-height:1.45;color:#eadfc9;font-style:italic}
+
+/* V0.8.5 contextual pirate dialogue */
+.pirate-dialogue{display:grid;grid-template-columns:54px 1fr;gap:10px;align-items:center;min-height:58px;box-sizing:border-box;margin:10px 0;padding:8px 10px;background:linear-gradient(180deg,#2b1d12,#1c130d);border:1px solid #8d642f;border-radius:10px;box-shadow:inset 0 1px #ffffff0a,0 6px 18px #0004}
+.pirate-dialogue[hidden]{display:none}
+.pirate-dialogue img{width:54px;height:54px;object-fit:cover;border-radius:8px;border:1px solid #a87837}
+.pirate-dialogue b{font-family:Georgia,serif;color:#e8c477;font-size:13px}
+.pirate-dialogue p{margin:2px 0 0;color:#f5ead5;font-size:13px;line-height:1.3}
+
+.header-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-left:auto}
+.header-icon-btn{width:38px;min-width:38px;height:38px;padding:0;display:grid;place-items:center;font-size:19px;line-height:1;border-radius:9px}
+.settings-card{max-width:430px}
+.audio-setting{margin:14px 0;padding:12px;border:1px solid #654729;border-radius:10px;background:#1d150f}
+.audio-setting-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.audio-setting input[type=range]{width:calc(100% - 58px);vertical-align:middle}
+.audio-setting>span{display:inline-block;width:52px;text-align:right;font-weight:800;color:#e8c477}
+.audio-mute{padding:7px 11px;min-width:76px}
+.settings-note{display:block;color:#bda98a;margin-top:8px;line-height:1.35}
+@media(max-width:460px){.header-actions{gap:4px}.header-icon-btn{width:34px;min-width:34px;height:34px;font-size:17px}#reset{padding-left:9px;padding-right:9px}header{gap:7px}}
+\n\n/* V0.8.5 title screen and editable About/Credits presentation. */\n.title-screen{z-index:80}\n.title-menu-card{width:min(92vw,560px);text-align:center;position:relative;padding-top:24px}\n.title-logo-placeholder{width:118px;aspect-ratio:1;margin:0 auto 10px;border:2px solid #b8873e;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,#543a24,#17100b 68%);box-shadow:inset 0 0 24px #000b,0 8px 24px #0008}\n.title-logo-placeholder span{font-size:58px;color:#e8c477;text-shadow:0 3px #000}\n.title-menu-card h1{margin:2px 0 0;font-family:Georgia,serif;font-size:42px;color:#f0cf82;letter-spacing:.08em;text-shadow:0 3px #000}\n.title-subtitle{margin:2px 0 18px;color:#cdbb9f}\n.title-menu-actions{display:grid;gap:9px}\n.title-menu-actions button,.title-menu-actions .button-link{width:100%;box-sizing:border-box;min-height:48px}\n.title-menu-actions button small{display:block;margin-top:2px;opacity:.68}\n.title-menu-actions button:disabled{opacity:.46;cursor:not-allowed;filter:saturate(.45)}\n.button-link{display:flex;align-items:center;justify-content:center;text-decoration:none;font:inherit;padding:10px 12px;border-radius:8px}\n.title-sound-btn{position:absolute;right:13px;top:13px;width:38px;height:38px;padding:0;display:grid;place-items:center;font-size:19px;border-radius:9px}\n.about-card{width:min(92vw,650px);max-height:88vh;overflow:auto}\n.about-content{display:grid;gap:10px;margin:12px 0 18px;text-align:left}\n.about-content section{padding:11px 13px;border:1px solid #654729;border-radius:9px;background:#1d150f}\n.about-content h3{margin:0 0 5px;color:#e8c477;font-family:Georgia,serif}\n.about-content p{margin:0;color:#dfd1b9;line-height:1.45}\n@media(max-width:460px){.title-menu-card h1{font-size:34px}.title-logo-placeholder{width:94px}.title-logo-placeholder span{font-size:46px}.title-menu-actions button,.title-menu-actions .button-link{min-height:45px;font-size:13px}}\n
+
+/* V0.8.5 standalone title screen revision.
+   This is a true outer application screen, not a modal over the pool UI. */
+.title-screen{
+  position:fixed;
+  inset:0;
+  z-index:80;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:auto;
+  padding:24px 14px;
+  background:
+    radial-gradient(circle at 50% 12%,#4b301b 0,#24170f 28%,#100c09 66%,#080604 100%);
+}
+.title-screen[hidden]{display:none!important}
+.title-screen .title-menu-card{
+  width:min(92vw,560px);
+  text-align:center;
+  position:relative;
+  padding:26px 22px 22px;
+  border:1px solid #8b632f;
+  border-radius:18px;
+  background:linear-gradient(180deg,#2d1e13,#17100b 74%);
+  box-shadow:0 24px 70px #000b,inset 0 0 36px #0005;
+}
+#gameApp[hidden]{display:none!important}
+
+/* V0.8.5 title layout refinement: centre the menu as a true title composition,
+   while keeping the global sound control independent in the top-right corner. */
+.title-screen{
+  box-sizing:border-box;
+  min-height:100dvh;
+  align-items:center;
+  justify-content:center;
+}
+.title-screen .title-menu-card{
+  margin:auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  /* Keep the first item reachable when a short screen makes this card scroll. */
+  justify-content:flex-start;
+}
+.title-screen .title-menu-actions{
+  width:100%;
+  margin-left:auto;
+  margin-right:auto;
+}
+.story-progress-summary{
+  margin:0;
+  padding:8px 10px;
+  min-width:0;
+  border:1px solid #654729;
+  border-radius:8px;
+  background:#1d150f;
+  color:#dfd1b9;
+  font-size:14px;
+  line-height:1.4;
+  text-align:left;
+  overflow-wrap:break-word;
+}
+.story-progress-summary>strong{display:block;margin-bottom:4px;font-weight:600}
+.story-progress-reminder{margin:0;font-weight:400}
+@media(max-width:460px){.story-progress-summary{font-size:13px}}
+.title-sound-btn{
+  position:fixed;
+  top:max(14px, env(safe-area-inset-top));
+  right:max(14px, env(safe-area-inset-right));
+  z-index:82;
+  width:42px;
+  min-width:42px;
+  height:42px;
+  padding:0;
+  display:grid;
+  place-items:center;
+  font-size:19px;
+  line-height:1;
+  border-radius:50%;
+}
+@media(max-width:460px){
+  .title-screen{padding:64px 12px 24px}
+  .title-sound-btn{width:38px;min-width:38px;height:38px;font-size:17px}
+}
+
+/* V0.8.5 title true-centre correction.
+   Anchor the menu composition to the viewport midpoint itself, rather than
+   allowing scrolling/padding to influence the flex centring calculation. */
+.title-screen{
+  overflow:auto;
+  padding:0;
+}
+.title-screen .title-menu-card{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  margin:0;
+  box-sizing:border-box;
+  max-height:calc(100dvh - 32px);
+  overflow:auto;
+}
+@media(max-width:460px){
+  .title-screen{padding:0}
+  .title-screen .title-menu-card{
+    width:min(92vw,560px);
+    max-height:calc(100dvh - 28px);
+  }
+}
+\n\n/* V0.8.5 title-menu tidy-up: centred link content and compact red availability notes. */
+.title-menu-actions .button-link{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  line-height:1.2;
+}
+.title-menu-actions button:disabled{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:2px;
+}
+.title-menu-actions button:disabled .not-available{
+  display:block;
+  margin:0;
+  color:#ff5b5b;
+  font-size:11px;
+  line-height:1.05;
+  font-weight:800;
+  opacity:1;
+}
+@media(max-width:460px){
+  .title-menu-actions button:disabled .not-available{font-size:10px}
+}
+
+
+/* V0.8.5 EPA rules button: force true optical/box centring independent of anchor line box. */
+.title-menu-actions .rules-link-button{
+  position:relative;
+  display:block;
+  min-height:52px;
+  padding:0;
+  overflow:hidden;
+}
+.title-menu-actions .rules-link-button>span{
+  position:absolute;
+  left:12px;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  display:block;
+  margin:0;
+  text-align:center;
+  line-height:1.2;
+}
+@media(max-width:460px){
+  .title-menu-actions .rules-link-button{min-height:45px}
+}
+
+/* V0.8.7 — character and presentation polish */
+.motion-setting{margin:14px 0;padding:12px;border:1px solid #654729;border-radius:10px;background:#1d150f}
+.motion-setting-head{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+.motion-setting b{display:block;color:#f5ead5;min-width:0}
+.motion-setting small{display:block;width:100%;color:#bda98a;font-size:11px;line-height:1.35;margin-top:7px}
+.motion-setting .motion-toggle{flex:0 0 auto;min-width:42px;width:42px;max-width:42px;padding:6px 4px;line-height:1.1}
+
+/* Short, intentional screen/modal entrances. Layout dimensions never animate. */
+@keyframes seamenFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes seamenCardIn{from{opacity:0;transform:translateY(7px) scale(.992)}to{opacity:1;transform:none}}
+@keyframes seamenPortraitSpeak{0%{transform:scale(.94);filter:brightness(.86);box-shadow:0 0 0 1px #a87837,0 0 0 rgba(255,210,105,0)}35%{transform:scale(1.10);filter:brightness(1.28) saturate(1.15);box-shadow:0 0 0 3px #ffd36b,0 0 18px 7px rgba(255,193,70,.82)}72%{transform:scale(1.045);filter:brightness(1.16) saturate(1.08);box-shadow:0 0 0 2px #f1b84e,0 0 13px 5px rgba(255,177,44,.62)}100%{transform:scale(1);filter:brightness(1.05);box-shadow:0 0 0 2px #dca74a,0 0 8px 2px rgba(255,177,44,.35)}}
+.rules-modal:not([hidden]){animation:seamenFadeIn .40s ease-out both}
+.rules-modal:not([hidden])>.rules-modal-card{animation:seamenCardIn .40s ease-out both}
+.title-screen:not([hidden]),main#gameApp:not([hidden]){animation:seamenFadeIn .40s ease-out both}
+
+/* Speaking portrait: emphasis only; its box remains fixed so the table cannot jump. */
+.pirate-dialogue{transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}
+.pirate-dialogue.dialogue-major{border-color:#d2a14d;box-shadow:inset 0 1px #ffffff12,0 0 0 1px #d2a14d33,0 7px 20px #0006;background:linear-gradient(180deg,#352316,#1d140d)}
+.pirate-dialogue.dialogue-major b{color:#ffd987}
+.pirate-dialogue.dialogue-speaking img{position:relative;z-index:1;animation:seamenPortraitSpeak .85s ease-out both;transform-origin:center}
+
+/* Keep opponent identity consistent through the result screen. */
+.result-pirate-identity{display:flex;align-items:center;gap:10px;margin:0 0 13px;padding:8px 10px;border:1px solid #72512e;border-radius:10px;background:#1b130d;text-align:left}
+.result-pirate-identity[hidden]{display:none}.result-pirate-identity img{width:54px;height:54px;object-fit:cover;border-radius:9px;border:1px solid #b3833c;box-shadow:0 3px 10px #0007}.result-pirate-identity small,.result-pirate-identity b{display:block}.result-pirate-identity small{font-size:9px;letter-spacing:.12em;color:#a99473}.result-pirate-identity b{font-family:Georgia,serif;color:#e8c477;margin-top:2px}
+
+body.reduced-character-portrait-motion .pirate-dialogue.dialogue-speaking img{animation:none!important;transform:none!important;filter:none!important}
+body.reduced-character-portrait-motion .match-intro-portrait img,
+body.reduced-character-portrait-motion .pirate-portrait img,
+body.reduced-character-portrait-motion .result-pirate-identity img{animation:none!important;transform:none!important;filter:none!important}
+@media(prefers-reduced-motion:reduce){.rules-modal:not([hidden]),.rules-modal:not([hidden])>.rules-modal-card,.title-screen:not([hidden]),main#gameApp:not([hidden]),.pirate-dialogue.dialogue-speaking img{animation:none!important}}
+
+/* V0.8.7 menu-layer isolation fix: the pool table remains completely hidden
+   until an actual frame starts. Outer menus transition over an opaque backdrop. */
+#playersModal.rules-modal,
+#pirateProfileModal.rules-modal,
+#pirateIntroModal.rules-modal,
+#aboutScreen.rules-modal{
+  background:radial-gradient(circle at 50% 30%,#27190e 0,#100b08 58%,#050403 100%);
+}
+\n\n/* V0.8.7 menu consistency + clearer portrait-motion choice.\n   All non-match application screens share the title backdrop so cross-fades never expose a different background. */\nhtml,body{background:#080604}\n.title-screen,\n.rules-modal,\n#playersModal.rules-modal,\n#pirateProfileModal.rules-modal,\n#pirateIntroModal.rules-modal,\n#aboutScreen.rules-modal,\n#trophiesScreen.rules-modal,\n#settingsModal.rules-modal{\n  background:radial-gradient(circle at 50% 12%,#4b301b 0,#24170f 28%,#100c09 66%,#080604 100%);\n}\n.motion-setting>b{display:block;margin-bottom:9px}\n.motion-choice{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:132px;margin:0 0 7px}\n.motion-choice .motion-option{min-width:0;width:100%;padding:6px 8px;opacity:.58;border-color:#5b4228}\n.motion-choice .motion-option.is-active{opacity:1;color:#17100b;background:linear-gradient(#f0cf82,#b8873e);border-color:#f0cf82;box-shadow:0 0 0 1px #f0cf8244,0 0 10px #dca74a44;font-weight:900}\n.motion-choice .motion-option:not(.is-active){color:#c9b99e;background:#241a12}\n@media(max-width:460px){.motion-choice{width:118px}}\n
+
+/* V0.8.7 single sliding switch for reduced portrait motion */
+.motion-switch{display:flex;align-items:center;gap:8px;width:max-content;max-width:100%;padding:4px 6px;border:1px solid #654729;border-radius:999px;background:#17110c;color:#b9aa91;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.motion-switch-label{font-size:10px;font-weight:900;letter-spacing:.06em;transition:color .22s ease,text-shadow .22s ease}
+.motion-switch-track{position:relative;display:block;width:48px;height:25px;flex:0 0 48px;border-radius:999px;background:#51483d;border:1px solid #756956;box-shadow:inset 0 2px 4px #0008;transition:background .25s ease,border-color .25s ease,box-shadow .25s ease}
+.motion-switch-knob{position:absolute;left:3px;top:3px;width:17px;height:17px;border-radius:50%;background:linear-gradient(#eee0bd,#bca575);box-shadow:0 1px 3px #000b;transition:transform .25s ease,background .25s ease,box-shadow .25s ease}
+.motion-switch-off{color:#f0d99d;text-shadow:0 0 7px #d4a84d66}
+.motion-switch.is-on .motion-switch-track{background:#775d2c;border-color:#d7ae58;box-shadow:inset 0 2px 4px #0007,0 0 8px #d7ae5844}
+.motion-switch.is-on .motion-switch-knob{transform:translateX(23px);background:linear-gradient(#ffe8a3,#d5a541);box-shadow:0 1px 3px #000b,0 0 8px #e4b64c99}
+.motion-switch.is-on .motion-switch-off{color:#7f7566;text-shadow:none}
+.motion-switch.is-on .motion-switch-on{color:#ffe19a;text-shadow:0 0 7px #d4a84d88}
+.motion-switch:not(.is-on) .motion-switch-on{color:#7f7566;text-shadow:none}
+.motion-switch:focus-visible{outline:2px solid #f0cf82;outline-offset:3px}
+
+/* V0.8.7: align portrait-motion switch with setting label; no light/white button chrome. */
+.motion-setting{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:14px;row-gap:7px}
+.motion-setting>b{grid-column:1;grid-row:1;margin:0;align-self:center}
+.motion-setting>.motion-switch{grid-column:2;grid-row:1;align-self:center;justify-self:end;margin:0;appearance:none;-webkit-appearance:none;background:transparent!important;border:0!important;box-shadow:none!important;outline-offset:3px;padding:0;border-radius:999px;color:#b9aa91}
+.motion-setting>small{grid-column:1 / -1;grid-row:2;margin-top:0}
+.motion-switch:hover,.motion-switch:active{background:transparent!important;border:0!important;box-shadow:none!important}
+@media(max-width:460px){.motion-setting{column-gap:9px}.motion-switch{gap:5px}.motion-switch-track{width:44px;flex-basis:44px}.motion-switch.is-on .motion-switch-knob{transform:translateX(19px)}}
+
+/* V0.8.7 — one permanent application backdrop.
+   The backdrop belongs to the document, never to an individual screen, so
+   foreground cross-fades cannot flash between different background paints. */
+html{
+  min-height:100%;
+  background:#080604;
+}
+body{
+  min-height:100vh;
+  background:#080604 !important;
+  position:relative;
+  isolation:isolate;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:radial-gradient(circle at 50% 12%,#4b301b 0,#24170f 28%,#100c09 66%,#080604 100%);
+}
+/* Full-screen navigation surfaces are foreground only. The permanent body
+   backdrop remains untouched while these screens fade in/out. */
+.title-screen,
+#playersModal.rules-modal,
+#pirateProfileModal.rules-modal,
+#pirateIntroModal.rules-modal,
+#aboutScreen.rules-modal,
+#trophiesScreen.rules-modal{
+  background:transparent !important;
+}
+/* The game itself also sits on the same permanent backdrop. */
+main#gameApp{
+  background:transparent !important;
+}
+
+/* V0.9.0 unified Settings switches */
+.audio-setting-head .audio-switch{appearance:none;-webkit-appearance:none;background:transparent!important;border:0!important;box-shadow:none!important;padding:0;margin:0;flex:0 0 auto;}
+.audio-setting-head .audio-switch:hover,.audio-setting-head .audio-switch:active{background:transparent!important;border:0!important;box-shadow:none!important;}
+.audio-setting-head{min-height:30px;}
+@media(max-width:460px){.audio-setting-head{gap:8px}.audio-setting-head .audio-switch{transform:scale(.94);transform-origin:right center;}}
+
+/* V0.9.0 boot gate: one intentional user gesture unlocks soundtrack playback.
+   Startup now uses a slow, simple fade with no wave/wash animation. */
+.boot-splash{
+  position:fixed;inset:0;z-index:2000;display:grid;place-items:center;
+  overflow:hidden;background:radial-gradient(circle at 50% 12%,#4b301b 0,#24170f 28%,#100c09 66%,#080604 100%);text-align:center;padding:24px;
+}
+.boot-splash[hidden]{display:none!important}
+.boot-splash-inner{position:relative;z-index:2;width:min(88vw,520px)}
+.boot-emblem{width:112px;aspect-ratio:1;margin:0 auto 14px;display:grid;place-items:center;
+  border:2px solid #b8873e;border-radius:50%;font-size:52px;color:#e8c477;
+  background:radial-gradient(circle at 50% 35%,#543a24,#17100b 68%);
+  box-shadow:inset 0 0 24px #000b,0 8px 24px #0008;text-shadow:0 3px #000}
+.boot-splash h1{margin:0;font-family:Georgia,serif;font-size:48px;letter-spacing:.08em;color:#f0cf82;text-shadow:0 3px #000}
+.boot-splash p{margin:4px 0 22px;color:#cdbb9f}
+.boot-enter{display:block;width:min(100%,360px);min-height:52px;margin:0 auto;font-weight:900;letter-spacing:.03em}
+.boot-splash.is-entering{animation:bootSplashAway 2.5s ease-in-out both}
+@keyframes bootSplashAway{0%{opacity:1}100%{opacity:0}}
+@media(max-width:460px){.boot-emblem{width:92px;font-size:43px}.boot-splash h1{font-size:38px}.boot-enter{min-height:50px}}
+@media(prefers-reduced-motion:reduce){.boot-splash.is-entering{animation:bootSplashAway 2.5s linear both}}
+
+/* V0.9.1 soundtrack credit links */
+.about-links{margin-top:.45rem;line-height:1.8}
+.about-links a{font-weight:800;color:#f0c36a;text-underline-offset:3px}
+.about-links a:hover,.about-links a:focus-visible{color:#ffe3a3}
+
+/* V0.9.1 audio balance/settings refinement */
+.audio-setting-head .mute-control-label{
+  margin-left:auto;
+  margin-right:.4rem;
+  font-size:.88rem;
+  font-weight:700;
+  opacity:.9;
+  white-space:nowrap;
+}
+.audio-setting-head .mute-control-label + .audio-switch{margin-left:0;}
+
+
+/* V0.10.0 cosmetics framework */
+.cosmetics-menu-button{position:relative;overflow:hidden;border-color:#cda85a!important;box-shadow:0 0 10px rgba(218,183,103,.16)}
+.cosmetics-menu-button::after{content:"";position:absolute;inset:-35% auto -35% -35%;width:18%;transform:skewX(-18deg);background:linear-gradient(90deg,transparent,rgba(255,242,190,.42),transparent);animation:cosmeticsGlisten 5.5s ease-in-out infinite;pointer-events:none}
+@keyframes cosmeticsGlisten{0%,70%{left:-35%;opacity:0}74%{opacity:.8}88%{left:125%;opacity:.55}92%,100%{left:125%;opacity:0}}
+.cosmetics-card{max-width:680px}.cosmetics-intro,.cosmetics-note{opacity:.82}.cosmetic-section{text-align:left;margin:18px 0}.cosmetic-section h3{text-align:center}.cosmetic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.cosmetic-choice{min-height:76px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;text-align:center}.cosmetic-choice small{font-size:.78em;opacity:.75}.cosmetic-choice.equipped{border-color:#e3c26e;box-shadow:0 0 0 1px #e3c26e inset,0 0 14px rgba(227,194,110,.2)}.cosmetic-choice.equipped::before{content:'EQUIPPED';font-size:.62em;letter-spacing:.12em;color:#f0d98d}.cosmetic-choice.locked{opacity:.55}
+/* V0.10.1 cosmetics catalogue foundation */
+.cosmetics-card{max-width:780px;width:min(92vw,780px)}
+.cosmetics-heading{text-align:center}.cosmetics-heading>small{letter-spacing:.18em;color:#d9bd72;font-size:.68rem}.cosmetics-heading h2{margin:.2rem 0}.cosmetics-heading p{opacity:.78;margin:.3rem auto 1rem}
+.cosmetic-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 16px}.cosmetic-tab{min-height:44px;border:1px solid #76633e;background:#171713;color:#cfc7b4;font-weight:800;letter-spacing:.12em}.cosmetic-tab.active{border-color:#e1bd62;color:#fff0b6;box-shadow:inset 0 -3px #d6ad4e,0 0 14px rgba(221,183,89,.12)}
+.cosmetic-panel{margin:0 0 16px}.cosmetic-showcase,.cue-showcase{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.cosmetic-card-choice,.cue-preview-card{position:relative;min-height:150px;border:1px solid #5e5138;border-radius:10px;background:linear-gradient(180deg,#211f19,#141410);padding:12px;overflow:hidden}.cosmetic-card-choice{display:block;text-align:left;color:inherit}.cosmetic-card-choice:hover{border-color:#a78b4e}.cosmetic-card-choice.equipped{border-color:#e3c26e;box-shadow:0 0 0 1px #e3c26e inset,0 0 18px rgba(227,194,110,.18)}.cosmetic-card-choice.equipped::before{content:none}.cosmetic-copy{display:flex;flex-direction:column;gap:4px}.cosmetic-copy b,.cue-preview-card>b{font-size:1rem}.cosmetic-copy small,.cue-preview-card small{opacity:.72;line-height:1.3}.cosmetic-state{display:inline-block;width:max-content;margin-top:6px;padding:3px 7px;border:1px solid #75633d;border-radius:999px;color:#d9c27f;font-size:.58rem;font-style:normal;font-weight:900;letter-spacing:.1em}.cosmetic-card-choice.equipped .cosmetic-state{font-size:0}.cosmetic-card-choice.equipped .cosmetic-state::after{content:'EQUIPPED';font-size:.58rem}.table-mini{display:block;height:68px;margin-bottom:10px;border:9px solid #69401f;border-radius:8px;box-shadow:inset 0 7px 12px rgba(0,0,0,.25),0 3px 8px #0008;background:#246746}.table-mini-captain{border-color:#4a2916;background:#18583f;box-shadow:inset 0 7px 12px rgba(0,0,0,.28),inset 0 0 0 2px #c99a4c,0 3px 8px #0008}.table-mini-spectral{border-color:#263b3e;background:radial-gradient(circle at 35% 30%,#3d8177,#285f59 58%,#204a47);box-shadow:inset 0 0 0 2px #8ed4c4,0 0 12px rgba(142,212,196,.2)}
+.cue-preview-card{display:flex;flex-direction:column;justify-content:flex-end;gap:4px;min-height:135px}.cue-preview{height:18px;margin:18px 5px 25px;border-radius:999px;transform:rotate(-4deg);box-shadow:0 4px 7px #0009;background:linear-gradient(90deg,#efe0bc 0 4%,#cba56a 12%,#805126 70%,#3d2515)}.cue-preview-mick{background:linear-gradient(90deg,#efe0bc 0 4%,#c9a34c 4% 8%,#12274c 8% 48%,#c9a34c 48% 51%,#071a38 51% 78%,#c9a34c 78% 81%,#07152e 81%)}.cue-preview-blackball{background:linear-gradient(90deg,#d8d2c7 0 4%,#2d2d30 5%,#111216 58%,#030405)}.cue-preview-vaper{height:10px;background:#fff1e8;box-shadow:0 0 6px #fff,0 0 12px #ff3030,0 0 22px #ff2020}.cue-preview-locked{filter:grayscale(1);opacity:.35}.cue-preview-supporter{background:linear-gradient(90deg,#f6e5bd,#c9a34c 15%,#60491e 50%,#d8b65b 80%,#4b3514)}.cue-preview-card.locked{opacity:.62}.cue-preview-card.supporter{border-style:dashed}.equipped-static{border-color:#b89c55;color:#f0d98d}
+@media(max-width:560px){.cosmetics-card{width:94vw}.cosmetic-showcase,.cue-showcase{grid-template-columns:1fr}.cosmetic-card-choice,.cue-preview-card{min-height:126px}.table-mini{height:58px}}
+
+
+/* V0.11.0 persistent career statistics and trophy framework */
+.career-card{width:min(94vw,760px)}.career-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.career-tab{min-height:42px}.career-tab.active{border-color:#e8c477;box-shadow:inset 0 0 0 1px #e8c477;color:#f3d990}.career-panel h3{margin:16px 0 8px;color:#e8c477;font-family:Georgia,serif}.career-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.career-stat{padding:10px 8px;border:1px solid #5e452d;border-radius:9px;background:#17100c;text-align:center}.career-stat b{display:block;font-size:1.45rem;color:#f0cf82}.career-stat small{display:block;margin-top:3px;color:#cdbb9f}.pirate-progress{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:7px}.pirate-progress-item{padding:8px;border:1px solid #57422e;border-radius:8px;background:#17100c}.pirate-progress-item.defeated{border-color:#8b743e;color:#f0cf82}.trophy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px}.trophy-item{padding:11px;border:1px solid #4d3b2b;border-radius:9px;background:#17100c;opacity:.48}.trophy-item.unlocked{opacity:1;border-color:#a27d3d;box-shadow:inset 0 0 16px rgba(232,196,119,.06)}.trophy-item b{display:block;color:#e8c477}.trophy-item small{display:block;margin-top:4px;color:#cdbb9f}.trophy-item em{display:block;margin-top:7px;font-size:.7rem;letter-spacing:.08em;font-style:normal}.trophy-item.unlocked em{color:#9fda9b}.trophy-item:not(.unlocked) em{color:#9b8d7d}@media(max-width:560px){.career-stats-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* V0.11.0 DEV custom-game generator */
+.custom-game-counts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}.custom-game-counts label{display:grid;gap:7px;font-weight:800}.custom-game-counts select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#111;color:#fff;font:inherit}.custom-stats-setting{margin:14px 0 18px}.custom-game-card .mode-actions{margin-top:14px}@media(max-width:520px){.custom-game-counts{grid-template-columns:1fr}}
+\n/* V0.11.0 trophy presentation polish */\n.career-tab{border:1px solid #76633e!important;background:#171713!important;color:#cfc7b4!important;font-weight:800;letter-spacing:.12em}\n.career-tab.active{border-color:#e1bd62!important;color:#fff0b6!important;box-shadow:inset 0 -3px #d6ad4e,0 0 14px rgba(221,183,89,.12)!important}\n.career-tab:hover,.career-tab:focus-visible{border-color:#b99145!important;color:#f0d68f!important}\n.trophy-toast{position:fixed;z-index:10000;left:50%;top:18px;transform:translate(-50%,-18px) scale(.96);width:min(92vw,430px);display:flex;align-items:center;gap:13px;padding:12px 16px;border:1px solid #e1bd62;border-radius:13px;background:linear-gradient(135deg,rgba(30,19,11,.98),rgba(74,46,19,.98));box-shadow:0 8px 30px #000a,0 0 24px rgba(225,189,98,.28),inset 0 0 18px rgba(255,220,130,.07);opacity:0;pointer-events:none;overflow:hidden;transition:opacity .24s ease,transform .24s ease}\n.trophy-toast::after{content:'';position:absolute;inset:-60% -30%;background:linear-gradient(105deg,transparent 43%,rgba(255,238,174,.36) 49%,rgba(255,255,255,.62) 50%,rgba(255,238,174,.28) 52%,transparent 58%);transform:translateX(-65%);animation:trophyGlint .85s ease-out forwards}\n.trophy-toast.show{opacity:1;transform:translate(-50%,0) scale(1)}\n.trophy-toast-icon{font-size:2rem;filter:drop-shadow(0 0 8px rgba(255,207,91,.55));animation:trophyPop .48s ease-out}\n.trophy-toast div:last-child{display:grid;gap:1px;position:relative;z-index:1}.trophy-toast small{font-size:.68rem;letter-spacing:.14em;color:#e9c66f;font-weight:900}.trophy-toast b{font-family:Georgia,serif;color:#fff0b6;font-size:1.08rem}.trophy-toast span{font-size:.78rem;color:#d8c7aa}\n@keyframes trophyGlint{to{transform:translateX(65%)}}@keyframes trophyPop{0%{transform:scale(.55) rotate(-12deg)}60%{transform:scale(1.18) rotate(5deg)}100%{transform:scale(1) rotate(0)}}\n@media(max-width:520px){.trophy-toast{top:10px;width:min(94vw,390px);padding:10px 12px}.trophy-toast-icon{font-size:1.7rem}}\n
+/* V0.11.0 trophy tabs: deliberately share the Cosmetics tab presentation. */
+.career-tabs .career-tab{
+  appearance:none;-webkit-appearance:none;
+  min-height:44px;
+  border:1px solid #76633e!important;
+  background:#171713!important;
+  color:#cfc7b4!important;
+  font-weight:800;
+  letter-spacing:.12em;
+  border-radius:0;
+  box-shadow:none!important;
+}
+.career-tabs .career-tab.active{
+  border-color:#e1bd62!important;
+  color:#fff0b6!important;
+  box-shadow:inset 0 -3px #d6ad4e,0 0 14px rgba(221,183,89,.12)!important;
+}
+.career-tabs .career-tab:hover,.career-tabs .career-tab:focus-visible{
+  border-color:#b99145!important;color:#f0d68f!important;
+}
+
+/* v0.11.0 pirate progress layout: status always below pirate name */
+.pirate-progress-item b,.pirate-progress-item small{display:block;}
+.pirate-progress-item small{margin-top:4px;}
+
+/* Trophy toast must obey hidden until explicitly shown. */
+.trophy-toast[hidden]{display:none!important}
+
+/* V0.11.0 global trophy toast: always above every modal/result layer */
+#trophyToast.trophy-toast{position:fixed!important;left:50%!important;top:8vh!important;right:auto!important;bottom:auto!important;z-index:2147483647!important;transform:translate(-50%,-18px) scale(.96)!important;width:min(92vw,460px)!important;isolation:isolate!important;pointer-events:none!important;}
+#trophyToast.trophy-toast.show{transform:translate(-50%,0) scale(1)!important;opacity:1!important;visibility:visible!important;}
+#trophyToast.trophy-toast[hidden]{display:none!important;}
+
+/* V0.11.0 trophy toast card refinement */
+#trophyToast.trophy-toast{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  align-items:center;
+  column-gap:13px;
+  padding:14px 18px 15px;
+  border:1px solid rgba(225,189,98,.88);
+  border-radius:12px;
+  background:linear-gradient(135deg,rgba(24,15,9,.90),rgba(67,40,17,.86));
+  box-shadow:0 10px 34px rgba(0,0,0,.62),0 0 22px rgba(225,189,98,.22),inset 0 1px rgba(255,235,177,.10);
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+}
+#trophyToast .trophy-toast-icon{grid-row:1 / span 3;align-self:center}
+#trophyToast>div:last-child{display:flex!important;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
+#trophyToast small,#trophyToast b,#trophyToast span{display:block;width:100%}
+#trophyToast #trophyToastDesc{margin-top:2px;line-height:1.3;color:#ddcfb7;font-size:.8rem;font-style:italic}
+/* V0.11 cue reward catalogue */
+.cue-preview-card.cue-choice{color:inherit;text-align:left;cursor:pointer}
+.cue-preview-card.cue-choice:not(:disabled):hover{border-color:#a78b4e}
+.cue-preview-card.cue-choice.equipped{border-color:#e3c26e;box-shadow:0 0 0 1px #e3c26e inset,0 0 18px rgba(227,194,110,.18)}
+.cue-preview-card.cue-choice:disabled{cursor:not-allowed;opacity:.58}
+.cue-preview-dave{background:linear-gradient(90deg,#ead9b5 0 5%,#9a693d 12%,#60391f 62%,#342014)}
+.cue-preview-simon{background:linear-gradient(90deg,#efe0bc 0 5%,#cba56a 12%,#805126 38%,#3d78c5 40% 45%,#805126 47% 69%,#3d78c5 71% 76%,#6b3f20 78%,#3d2515)}
+.cue-preview-holly{background:linear-gradient(90deg,#eadfc5 0 5%,#6b397c 11%,#351b48 34%,#73a84c 38% 43%,#351b48 47% 65%,#73a84c 68% 73%,#351b48 77%,#1f102b)}
+
+
+/* V0.12.0 First Voyage contextual tutorial */
+.tutorial-modal{z-index:12000}.tutorial-card{width:min(92vw,520px);border-color:#b99145;box-shadow:0 16px 48px #000b,0 0 24px rgba(218,183,103,.16)}
+.tutorial-kicker{display:block;color:#d9bd72;letter-spacing:.18em;font-weight:900;margin-bottom:4px}.tutorial-card h2{margin:.2rem 0 .65rem}.tutorial-card p{line-height:1.5;color:#e1d6c2}
+.tutorial-focus{position:relative!important;z-index:11950!important;filter:drop-shadow(0 0 8px rgba(255,215,110,.9));outline:2px solid rgba(232,196,119,.8)!important;outline-offset:4px;border-radius:8px;animation:tutorialPulse 1.4s ease-in-out infinite}
+@keyframes tutorialPulse{0%,100%{filter:drop-shadow(0 0 5px rgba(255,215,110,.5))}50%{filter:drop-shadow(0 0 14px rgba(255,215,110,1))}}
+#replayTutorial{width:100%;margin:8px 0 10px}
+
+/* V0.12.1 save-data controls */
+.save-data-settings{margin-top:14px;padding-top:12px;border-top:1px solid rgba(194,151,75,.42)}
+.save-data-settings h3{margin:0 0 5px;color:#e2bd72;font-size:1rem;letter-spacing:.04em;text-transform:uppercase}
+.save-data-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.save-data-actions .danger-button{grid-column:1/-1;border-color:#9b5548;background:linear-gradient(#59352d,#3a231e);color:#f0d8cf}
+.save-data-status{min-height:1.2em;margin-top:8px;font-size:.84rem;color:#d9bd82}
+@media(max-width:520px){.save-data-actions{grid-template-columns:1fr}.save-data-actions .danger-button{grid-column:auto}}
+
+/* V0.12.2 global responsive modal scrolling pass */
+html,body{max-width:100%;overflow-x:hidden}
+.rules-modal{
+  box-sizing:border-box;
+  overflow:hidden;
+  overscroll-behavior:contain;
+  padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));
+}
+.rules-modal>.rules-modal-card{
+  box-sizing:border-box;
+  max-width:100%;
+  max-height:calc(100vh - 20px);
+  max-height:calc(100dvh - 20px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:auto;
+  scrollbar-color:#b88a45 rgba(18,12,8,.72);
+  scrollbar-gutter:stable;
+}
+.rules-modal>.rules-modal-card::-webkit-scrollbar{width:10px}
+.rules-modal>.rules-modal-card::-webkit-scrollbar-track{background:rgba(18,12,8,.72);border-radius:999px}
+.rules-modal>.rules-modal-card::-webkit-scrollbar-thumb{background:linear-gradient(#d1a65c,#7f5729);border:2px solid rgba(18,12,8,.72);border-radius:999px}
+.rules-modal>.rules-modal-card::-webkit-scrollbar-thumb:hover{background:linear-gradient(#e0bb72,#966735)}
+
+/* Nested modal cards use the same viewport-safe scrolling behaviour. */
+#pirateProfileModal>.rules-modal-card,
+#breakRules>.rules-modal-card,
+#pirateIntroModal>.rules-modal-card{
+  max-height:calc(100vh - 20px);
+  max-height:calc(100dvh - 20px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-color:#b88a45 rgba(18,12,8,.72);
+}
+
+/* Do not allow large catalogue/grid children to force horizontal overflow. */
+.rules-modal-card>*{min-width:0}
+.cosmetic-showcase,.cue-showcase,.career-stats-grid,.pirate-progress,.trophy-grid,.save-data-actions,.mode-actions{min-width:0}
+.cosmetic-card-choice,.cue-preview-card,.career-stat,.pirate-progress-item,.trophy-item{min-width:0;max-width:100%;box-sizing:border-box}
+
+@media(max-width:560px){
+  .rules-modal{align-items:center;justify-content:center;padding:8px}
+  .rules-modal>.rules-modal-card{
+    width:min(100%,calc(100vw - 16px));
+    max-height:calc(100vh - 16px);
+    max-height:calc(100dvh - 16px);
+    padding:16px 14px;
+    scrollbar-gutter:stable;
+  }
+  .about-card,.settings-card,.career-card,.cosmetics-card,.tutorial-card{width:100%;max-width:100%}
+}
+
+@media(max-height:600px){
+  .rules-modal{align-items:flex-start;padding-top:8px;padding-bottom:8px}
+  .rules-modal>.rules-modal-card{max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px)}
+}
+
+/* V0.12.2b mobile QA: top-reset modals, clearer opponent intro, landscape table-first layout */
+@media (max-height:600px), (orientation:landscape) and (max-height:700px){
+  .match-intro-portrait{width:min(61vw,280px);margin-bottom:10px}
+}
+
+@media (max-width:0px){
+  main#gameApp:not([hidden]){display:flex;flex-direction:column;width:100%;max-width:none;padding-top:6px}
+  main#gameApp:not([hidden])>*{order:4}
+  main#gameApp:not([hidden])>header{order:1;width:min(100%,760px);margin-inline:auto}
+  main#gameApp:not([hidden])>.table-wrap{order:2;width:min(100%,calc((100dvh - 122px) * 1.81632653));margin:6px auto 0}
+  main#gameApp:not([hidden])>.status{order:3;width:min(100%,760px);margin:8px auto 10px}
+  main#gameApp:not([hidden])>.table-wrap canvas{width:100%;height:auto;max-height:calc(100dvh - 122px);object-fit:contain}
+}
+\n\n/* V0.12.2c mobile landscape guidance */
+.landscape-mobile-notice{display:none;margin:0;color:#e8c477;font-size:11px;line-height:1.25;max-width:330px;text-align:center}
+@media (max-width:0px){
+  main#gameApp:not([hidden]){overflow-y:scroll;scrollbar-gutter:stable}
+  main#gameApp:not([hidden])::-webkit-scrollbar{width:14px}
+  main#gameApp:not([hidden])::-webkit-scrollbar-track{background:#241a12;border-left:1px solid #59432c}
+  main#gameApp:not([hidden])::-webkit-scrollbar-thumb{background:linear-gradient(#d1a65c,#7f5729);border:3px solid #241a12;border-radius:10px}
+  main#gameApp:not([hidden])>header{position:relative}
+  main#gameApp:not([hidden]) .landscape-mobile-notice{display:block;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(42vw,330px);pointer-events:none;z-index:2;text-shadow:0 1px 2px #000}
+}
+@media (max-width:0px){
+  main#gameApp:not([hidden]) .landscape-mobile-notice{font-size:10px;width:min(40vw,300px)}
+}
+
+
+/* V0.12.2d: universal table-first order + robust mobile-landscape detection.
+   Aspect ratio is used rather than orientation alone because device emulation can report
+   orientation inconsistently. Portrait viewports can never satisfy min-aspect-ratio:4/3. */
+main#gameApp:not([hidden]){display:flex;flex-direction:column}
+main#gameApp:not([hidden])>header{order:1}
+main#gameApp:not([hidden])>.table-wrap{order:2}
+main#gameApp:not([hidden])>.status{order:3}
+main#gameApp:not([hidden])>*{order:4}
+
+@media (max-width:950px) and (max-height:700px) and (min-aspect-ratio:4/3){
+  html{overflow-y:scroll;scrollbar-gutter:stable}
+  body{overflow-y:scroll;min-height:101dvh}
+  main#gameApp:not([hidden]){width:100%;max-width:none;padding-top:6px}
+  main#gameApp:not([hidden])>header{width:min(100%,760px);margin-inline:auto;position:relative}
+  main#gameApp:not([hidden])>.table-wrap{width:min(100%,calc((100dvh - 122px) * 1.81632653));margin:6px auto 0}
+  main#gameApp:not([hidden])>.status{width:min(100%,760px);margin:8px auto 10px}
+  main#gameApp:not([hidden])>.table-wrap canvas{width:100%;height:auto;max-height:calc(100dvh - 122px);object-fit:contain}
+  main#gameApp:not([hidden]) .landscape-mobile-notice{display:block;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(42vw,330px);pointer-events:none;z-index:2;text-shadow:0 1px 2px #000}
+  html::-webkit-scrollbar,body::-webkit-scrollbar{width:14px}
+  html::-webkit-scrollbar-track,body::-webkit-scrollbar-track{background:#241a12;border-left:1px solid #59432c}
+  html::-webkit-scrollbar-thumb,body::-webkit-scrollbar-thumb{background:linear-gradient(#d1a65c,#7f5729);border:3px solid #241a12;border-radius:10px}
+}
+@media (max-width:950px) and (max-height:430px) and (min-aspect-ratio:4/3){
+  main#gameApp:not([hidden]) .landscape-mobile-notice{font-size:10px;width:min(40vw,300px)}
+}
+
+/* V0.12.2e: JS-controlled landscape notice. Never infer visibility from CSS media queries. */
+.landscape-mobile-notice{display:none !important}
+html.seamen-phone-landscape main#gameApp:not([hidden]) .landscape-mobile-notice{
+  display:block !important;
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(42vw,330px);pointer-events:none;z-index:2;text-shadow:0 1px 2px #000
+}
+
+/* V0.12.2f mobile match convenience: freeze the game header + table while
+   everything from Playing now/status downward scrolls beneath them. */
+@media (max-width:950px){
+  main#gameApp:not([hidden]){
+    --seamen-mobile-header-h:72px;
+    overflow:visible;
+  }
+  main#gameApp:not([hidden])>header{
+    position:sticky;
+    top:0;
+    z-index:90;
+    background:#17120d;
+    padding-top:max(6px,env(safe-area-inset-top));
+    padding-bottom:6px;
+    box-shadow:0 5px 10px rgba(0,0,0,.38);
+  }
+  main#gameApp:not([hidden])>.table-wrap{
+    position:sticky;
+    top:var(--seamen-mobile-header-h);
+    z-index:80;
+    background:#17120d;
+    padding-bottom:5px;
+    box-shadow:0 8px 12px rgba(0,0,0,.34);
+  }
+  /* The status and all controls remain in normal document flow, so they slide
+     underneath the frozen header/table rather than moving the table itself. */
+  main#gameApp:not([hidden])>.status{position:relative;z-index:1}
+}
+
+
+/* V0.12.2g: true split-pane mobile match layout.
+   Header + table live outside the scroll pane. Everything after the table is
+   contained in .mobile-scroll-zone, which is the ONLY vertically scrolling
+   region during a mobile match. This avoids relying on position:sticky. */
+.mobile-scroll-zone{display:contents}
+@media (max-width:950px){
+  html,body{height:100%;overflow:hidden}
+  main#gameApp:not([hidden]){
+    height:100dvh;
+    max-height:100dvh;
+    width:100%;
+    overflow:hidden !important;
+    display:flex;
+    flex-direction:column;
+    padding-bottom:0;
+  }
+  main#gameApp:not([hidden])>header{
+    position:relative !important;
+    top:auto !important;
+    flex:0 0 auto;
+    z-index:20;
+    width:100%;
+    box-sizing:border-box;
+  }
+  main#gameApp:not([hidden])>.table-wrap{
+    position:relative !important;
+    top:auto !important;
+    flex:0 0 auto;
+    z-index:10;
+    width:100%;
+    box-sizing:border-box;
+    margin-top:4px;
+  }
+  main#gameApp:not([hidden])>.mobile-scroll-zone{
+    display:block;
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:scroll;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+    padding:0 0 max(18px,env(safe-area-inset-bottom));
+    position:relative;
+    z-index:1;
+  }
+  main#gameApp:not([hidden])>.mobile-scroll-zone::-webkit-scrollbar{width:12px}
+  main#gameApp:not([hidden])>.mobile-scroll-zone::-webkit-scrollbar-track{background:#241a12;border-left:1px solid #59432c}
+  main#gameApp:not([hidden])>.mobile-scroll-zone::-webkit-scrollbar-thumb{background:linear-gradient(#d1a65c,#7f5729);border:3px solid #241a12;border-radius:10px}
+  main#gameApp:not([hidden])>.mobile-scroll-zone{scrollbar-color:#b88a45 #241a12;scrollbar-width:auto}
+  main#gameApp:not([hidden])>.mobile-scroll-zone>.status{margin-top:8px}
+}
+
+/* V0.13.0 universal match split-pane layout.
+   Keep the SEAMEN header and complete table at the top on desktop and mobile.
+   Everything from Playing now/status downward scrolls independently. */
+@media (min-width:951px){
+  body:has(main#gameApp:not([hidden])){
+    height:100vh;
+    height:100dvh;
+    overflow:hidden;
+  }
+  main#gameApp:not([hidden]){
+    height:100vh;
+    height:100dvh;
+    max-height:100dvh;
+    overflow:hidden !important;
+    display:flex;
+    flex-direction:column;
+    padding-bottom:0;
+  }
+  main#gameApp:not([hidden])>header{
+    position:relative !important;
+    top:auto !important;
+    flex:0 0 auto;
+    z-index:20;
+    width:100%;
+  }
+  main#gameApp:not([hidden])>.table-wrap{
+    position:relative !important;
+    top:auto !important;
+    flex:0 0 auto;
+    z-index:10;
+    width:100%;
+    margin-top:4px;
+  }
+  main#gameApp:not([hidden])>.mobile-scroll-zone{
+    display:block;
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:scroll;
+    overflow-x:hidden;
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+    padding:0 0 20px;
+    position:relative;
+    z-index:1;
+    scrollbar-color:#b88a45 #241a12;
+    scrollbar-width:auto;
+  }
+  main#gameApp:not([hidden])>.mobile-scroll-zone::-webkit-scrollbar{width:14px}
+  main#gameApp:not([hidden])>.mobile-scroll-zone::-webkit-scrollbar-track{background:#241a12;border-left:1px solid #59432c}
+  main#gameApp:not([hidden])>.mobile-scroll-zone::-webkit-scrollbar-thumb{background:linear-gradient(#d1a65c,#7f5729);border:3px solid #241a12;border-radius:10px}
+  main#gameApp:not([hidden])>.mobile-scroll-zone>.status{margin-top:8px}
+}
+
+
+/* V0.13.4 — Captain Blackball's private quarters story + unlockable table */
+.table-mini-privates{border-color:#b88b35;background:#202020;box-shadow:inset 0 0 0 2px #f0c767,0 0 13px rgba(232,190,91,.28)}
+.cosmetic-card-choice.locked{opacity:.58;filter:saturate(.55);cursor:not-allowed}.cosmetic-card-choice.locked .cosmetic-state{color:#c8b9a0}
+.blackball-story{position:fixed;inset:0;z-index:12000;background:#000;display:flex;align-items:center;justify-content:center;padding:18px;opacity:1;transition:opacity 1.1s ease}.blackball-story[hidden]{display:none}.blackball-story.fading{opacity:0}
+.blackball-story-scene{position:relative;width:min(94vw,760px);min-height:min(88vh,720px);overflow:hidden;border:1px solid #5b4a2d;border-radius:14px;background:#050504;box-shadow:0 20px 70px #000;display:flex;flex-direction:column;justify-content:flex-end}
+.blackball-room{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 42%,rgba(128,89,39,.16),transparent 42%),linear-gradient(#080706,#020202);overflow:hidden}
+.blackball-private-table{position:absolute;left:18%;right:18%;top:34%;height:22%;border:12px solid #9d772d;border-radius:8px;background:#202020;transform:perspective(520px) rotateX(61deg);box-shadow:0 0 20px rgba(225,174,70,.2),inset 0 0 0 3px #d5ad55}
+.blackball-silhouette{position:absolute;left:50%;bottom:29%;width:112px;height:250px;transform:translateX(-50%);background:#020202;border-radius:48% 48% 20% 20%;filter:drop-shadow(0 0 12px #000)}.blackball-silhouette:before{content:'';position:absolute;left:25px;top:-45px;width:64px;height:72px;border-radius:48%;background:#010101}.blackball-hat{position:absolute;left:8px;top:-67px;width:98px;height:25px;background:#010101;border-radius:50%}.blackball-hat:before{content:'';position:absolute;left:20px;bottom:8px;width:60px;height:38px;background:#010101;clip-path:polygon(0 100%,18% 10%,50% 45%,82% 10%,100% 100%)}
+.blackball-cannon{position:absolute;width:88px;height:22px;background:#111;border-radius:50%;box-shadow:0 0 28px rgba(255,153,48,.22)}.blackball-cannon:after{content:'';position:absolute;width:8px;height:8px;border-radius:50%;background:#f2a34b;box-shadow:0 0 16px 7px rgba(255,139,31,.28)}.cannon-a{left:5%;top:22%;transform:rotate(9deg)}.cannon-b{right:6%;top:27%;transform:rotate(-8deg)}.cannon-c{left:10%;bottom:32%;transform:rotate(-5deg)}
+.story-candle{position:absolute;width:5px;height:24px;background:#c9a96d;box-shadow:0 0 13px 5px rgba(255,170,68,.14)}.story-candle:before{content:'';position:absolute;left:-2px;top:-9px;width:9px;height:11px;border-radius:60% 60% 45% 45%;background:#ffc76a;box-shadow:0 0 14px 5px rgba(255,171,55,.25)}.candle-a{left:24%;top:31%}.candle-b{right:25%;top:36%}.candle-c{right:14%;bottom:33%}
+.blackball-story-copy{position:relative;z-index:2;margin-top:330px;padding:24px;background:linear-gradient(transparent,rgba(0,0,0,.88) 18%,rgba(0,0,0,.97));text-align:center}.blackball-story-copy small{letter-spacing:.16em;color:#c6a45e;font-weight:900}.blackball-story-copy h2{font-family:Georgia,serif;color:#efd18b;margin:7px 0 10px}.blackball-story-copy p{white-space:pre-line;line-height:1.55;min-height:5.2em;color:#f2e8d3}.blackball-story-copy button{min-width:220px}
+@media(max-width:560px){.blackball-story{padding:8px}.blackball-story-scene{min-height:92dvh}.blackball-story-copy{margin-top:280px;padding:18px 14px}.blackball-silhouette{transform:translateX(-50%) scale(.82);transform-origin:bottom center}}
+\n/* V0.13.5 main pirate campaign completion acknowledgement */
+.campaign-completion{margin-top:16px;padding:14px 15px;display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:start;border:1px solid #a27d3d;border-radius:11px;background:linear-gradient(135deg,#1b120d,#2b1d11);box-shadow:inset 0 0 22px rgba(232,196,119,.055),0 4px 16px #0005}
+.campaign-completion[hidden]{display:none!important}.campaign-completion-crown{font-size:2rem;line-height:1;filter:drop-shadow(0 0 7px rgba(255,207,91,.4))}.campaign-completion small{display:block;color:#d9b85d;font-size:.67rem;font-weight:900;letter-spacing:.12em}.campaign-completion h3{margin:4px 0 7px!important;color:#fff0b6!important;font-size:1rem;letter-spacing:.035em}.campaign-completion p{margin:0;color:#dbcdb6;font-size:.86rem;line-height:1.45}.uncharted-waters-tease{margin-top:11px;padding-top:10px;border-top:1px solid #5e452d;display:grid;gap:2px}.uncharted-waters-tease b{color:#d8c28b;font-family:Georgia,serif}.uncharted-waters-tease span{color:#9f9483;font-size:.78rem;font-style:italic}
+@media(max-width:520px){.campaign-completion{grid-template-columns:1fr;text-align:center}.campaign-completion-crown{font-size:1.8rem}.uncharted-waters-tease{justify-items:center}}
+
+/* v0.14.0b: developer-only modes must never appear in the normal Play menu. */
+.dev-mode-entry[hidden]{display:none!important}
+
+
+/* V0.14.1 — integrated progression / reward presentation */
+.progression-rewards{margin:14px 0 2px;padding:12px;border:1px solid #9b7a3d;border-radius:10px;background:rgba(23,16,12,.94);text-align:left;box-shadow:inset 0 0 20px rgba(232,196,119,.05)}
+.progression-rewards h3{margin:0 0 9px;color:#f0cf82;font:900 1rem Georgia,serif;text-align:center;letter-spacing:.03em}
+.progression-rewards>div{display:flex;gap:10px;align-items:center;padding:7px 0;border-top:1px solid rgba(232,196,119,.14)}
+.progression-rewards>div:first-of-type{border-top:0}.progression-rewards>div>span{width:30px;text-align:center;font-size:1.25rem}.progression-rewards p{margin:0;min-width:0}.progression-rewards small,.progression-rewards b{display:block}.progression-rewards small{color:#bca98c;font-size:.68rem;letter-spacing:.08em}.progression-rewards b{color:#f5ead5;margin-top:2px}
+.progression-reward-card{width:min(92vw,520px);text-align:center}.progression-reward-card>small{color:#e8c477;letter-spacing:.12em;font-weight:900}.progression-rewards.standalone{margin:14px 0}
+.pirate-progress-item span{display:block;margin-top:5px;color:#bca98c;font-size:.72rem;line-height:1.25}.pirate-progress-item.defeated span{color:#cdbb9f}
+
+/* V0.14.1c — end-of-frame result modal must always sit above the frozen table.
+   The split-pane match layout creates its own stacking layers, so promote the
+   result/log overlays explicitly without moving or altering the table. */
+#winModal.rules-modal,
+#gameLogModal.rules-modal{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:15000 !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  padding-top:max(14px,env(safe-area-inset-top)) !important;
+  isolation:isolate;
+}
+#winModal.rules-modal>.rules-modal-card,
+#gameLogModal.rules-modal>.rules-modal-card{
+  position:relative !important;
+  z-index:1 !important;
+  margin-top:0 !important;
+  max-height:calc(100dvh - 28px) !important;
+}
+
+/* V0.14.1c: win/log modals are portalled to body by game.js, escaping the split-pane stacking context. */
+body>#winModal.rules-modal,body>#gameLogModal.rules-modal{z-index:15000!important}
+body>#winModal.rules-modal>.rules-modal-card,body>#gameLogModal.rules-modal>.rules-modal-card{z-index:2!important}
+
+
+/* V0.14.2 achievement system v2 */
+.trophy-grid{display:block}
+.achievement-category{margin:0 0 18px}.achievement-category>h3{margin:12px 0 8px;padding-bottom:5px;border-bottom:1px solid #5e452d;color:#f0cf82;letter-spacing:.12em;font-size:.82rem}
+.achievement-category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px}
+.trophy-tier{display:inline-block;margin-bottom:7px;padding:3px 7px;border:1px solid #6b5940;border-radius:999px;font-size:.62rem;font-weight:900;letter-spacing:.11em;color:#d7c5a5;background:#211711}
+.trophy-item.unlocked .trophy-tier{border-color:#b58a3e;color:#ffe5a0;background:#332410}
+.trophy-item .tier-prestige-i{border-color:#9c78c7;color:#d9c2ff;background:#281d35}
+.trophy-item.unlocked .tier-prestige-i{box-shadow:0 0 12px rgba(191,145,255,.18)}
+.trophy-item .tier-platinum,.trophy-item .tier-platinum-ii,.trophy-item .tier-platinum-iii{border-color:#8b9ca8;color:#dce8ef;background:#20282c}
+@media(max-width:560px){.achievement-category-grid{grid-template-columns:1fr}}
+
+/* V0.14.2b developer achievement preview */
+.dev-achievement-test{display:block;margin-top:8px;font-weight:700}.dev #devAchievementSelect{max-width:100%;min-width:220px;padding:7px;margin:4px 4px 4px 0;background:#20170f;color:#f4dfad;border:1px solid #795b36;border-radius:5px}
+
+/* V0.14.3 — richer career statistics and player history */
+.career-stats-grid{display:block}.career-stat-section{margin:0 0 14px}.career-stat-section>h3,.career-history>h3{margin:12px 0 7px;color:#e8c477;font-family:Georgia,serif;font-size:.9rem;letter-spacing:.08em}.career-stat-section-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pirate-record{display:block;margin:7px 0;color:#e8c477;font-size:.82rem}.career-history{margin-top:15px}.career-history-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.career-history-grid>div{padding:9px;border:1px solid #57422e;border-radius:8px;background:#17100c}.career-history-grid small,.career-history-grid b{display:block}.career-history-grid small{color:#a9987e;margin-bottom:3px}.career-history-grid b{color:#e8c477;font-size:.9rem}@media(max-width:560px){.career-stat-section-grid{grid-template-columns:repeat(2,1fr)}.career-history-grid{grid-template-columns:1fr}}
+
+/* V0.14.4 cosmetics ownership + unlock presentation */
+.cosmetic-source{display:inline-flex;align-items:center;width:max-content;margin-bottom:6px;padding:3px 7px;border:1px solid #65583f;border-radius:999px;font-size:.56rem;font-weight:900;letter-spacing:.11em;color:#cdbf9f;background:#15130f}
+.cosmetic-source[data-source="campaign"]{border-color:#9a7435;color:#efd18b}.cosmetic-source[data-source="achievement"]{border-color:#8a6aa4;color:#dec0f2}.cosmetic-source[data-source="supporter"]{border-color:#9b5e72;color:#f0b8c9}.cosmetic-source[data-source="special"]{border-color:#4f8a82;color:#a9e0d8}
+.cosmetic-card-choice.new,.cue-preview-card.new{border-color:#e8c75d;box-shadow:0 0 0 1px rgba(232,199,93,.5) inset,0 0 20px rgba(232,199,93,.18)}
+.cosmetic-card-choice.new::after,.cue-preview-card.new::after{content:'NEW';position:absolute;top:8px;right:8px;padding:4px 7px;border-radius:999px;background:#e4bd4f;color:#1b1408;font-size:.58rem;font-weight:1000;letter-spacing:.12em;box-shadow:0 2px 8px #0008}
+.cosmetic-card-choice.locked .cosmetic-state,.cue-preview-card.locked .cosmetic-state{white-space:normal;max-width:100%;line-height:1.25;border-color:#665348;color:#bfae99}
+.cosmetic-card-choice.locked,.cue-preview-card.locked{filter:saturate(.7)}
+.cosmetic-tab{border-radius:8px 8px 0 0!important}.cosmetic-tab[aria-selected="true"]{background:linear-gradient(180deg,#272116,#171713)!important}
+
+.cosmetic-status-filters{display:flex;flex-wrap:wrap;gap:7px;margin:-5px 0 15px}.cosmetic-status-filter{min-height:34px;padding:6px 10px;border:1px solid #5f533d;border-radius:999px;background:#12110e;color:#bdb39d;font-size:.66rem;font-weight:900;letter-spacing:.09em}.cosmetic-status-filter.active{border-color:#e1bd62;color:#fff0b6;background:#211c12;box-shadow:0 0 10px rgba(221,183,89,.12)}.cosmetic-filter-empty{grid-column:1/-1;margin:8px 0 2px;padding:14px;border:1px dashed #5f533d;border-radius:9px;text-align:center;color:#a99e87;font-style:italic}.cosmetic-filter-hidden{display:none!important}
+
+/* V0.14.5 in-match Game menu */
+#gameMenuModal,#rulesHelpModal{z-index:12000}
+.game-menu-card{max-width:520px}
+.game-paused-note{margin:-4px 0 16px;text-align:center;color:#d9c8aa;font-style:italic;font-size:.92rem}
+.game-menu-actions{display:grid;gap:10px}
+.game-menu-actions>.button-link{display:flex;align-items:center;justify-content:center;text-align:center;box-sizing:border-box;width:100%;padding:10px 12px;line-height:1.2}
+.game-menu-aim{margin:2px 0;padding:12px 14px;border:1px solid #5b4228;border-radius:10px;background:#17100bcc}
+.game-menu-aim small{display:block;margin-top:7px;color:#bcae98}
+
+/* V0.14.6: gently point first-time Pirates o’ the Tavern players toward Deckhand Dave. */
+.pirate-choice.first-pirate-attention{animation:firstPirateAttention 1.7s ease-in-out infinite;z-index:1}
+@keyframes firstPirateAttention{0%,100%{box-shadow:inset 0 1px #fff8,0 3px 9px #0005,0 0 0 rgba(239,204,124,0);filter:brightness(1)}50%{box-shadow:inset 0 1px #fff8,0 3px 9px #0005,0 0 18px rgba(239,204,124,.72);filter:brightness(1.12)}}
+@media(prefers-reduced-motion:reduce){.pirate-choice.first-pirate-attention{animation:none;outline:2px solid #efcc7c;outline-offset:3px}}
+
+/* V0.14.6f: first-run visual breadcrumb from title to the first Dave rack. */
+.first-run-attention{animation:firstRunAttention 1.7s ease-in-out infinite;position:relative;z-index:1}
+@keyframes firstRunAttention{0%,100%{box-shadow:inset 0 1px #fff8,0 3px 9px #0005,0 0 0 rgba(239,204,124,0);filter:brightness(1)}50%{box-shadow:inset 0 1px #fff8,0 3px 9px #0005,0 0 18px rgba(239,204,124,.72);filter:brightness(1.12)}}
+@media(prefers-reduced-motion:reduce){.first-run-attention{animation:none;outline:2px solid #efcc7c;outline-offset:3px}}
+
+
+/* V0.15.1 PWA/app presentation */
+.install-game-button{border-color:#8b6b35!important;box-shadow:inset 0 0 0 1px #d4aa5a33}
+.pwa-notice{position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:4200;width:min(92vw,520px);box-sizing:border-box;padding:10px 12px;border:1px solid #8b6b35;border-radius:10px;background:#17100bf2;color:#ead9bc;box-shadow:0 8px 28px #000a;display:flex;gap:10px;align-items:center;justify-content:space-between;font-size:13px}
+.pwa-notice[hidden]{display:none!important}.pwa-notice button{flex:0 0 auto;padding:7px 10px;min-height:36px}
+@media(max-width:460px){.pwa-notice{align-items:stretch;flex-direction:column;text-align:center}.pwa-notice button{width:100%}}
+
+
+/* V0.15.2 player-facing Support / Extras area */
+.support-menu-button small{display:block;margin-top:3px;color:#c8b895;font-size:.72em}.support-card{max-width:620px}.support-kicker{display:block;text-align:center;color:#d7ad5b;font-weight:900;letter-spacing:.16em;margin-bottom:5px}.support-card>h2{text-align:center}.support-lead{text-align:center;color:#e3d4ba;line-height:1.45}.support-section{margin:15px 0;padding:14px;border:1px solid #5b4228;border-radius:10px;background:#17100bcc}.support-section h3{margin:0 0 7px;color:#e8c477;font-family:Georgia,serif}.support-section p{line-height:1.45}.support-reward-card{display:grid;gap:6px;margin:12px 0;padding:12px;border:1px solid #705345;border-radius:9px;background:#211610}.support-reward-card b{color:#f0d69a}.support-reward-card small{color:#bcae98;line-height:1.35}.support-reward-card em{width:max-content;max-width:100%;padding:4px 8px;border:1px solid #665348;border-radius:999px;color:#bfae99;font-size:.68rem;font-weight:900;font-style:normal;letter-spacing:.08em}.support-reward-card em.owned{border-color:#9b5e72;color:#f0b8c9}.support-availability{margin-bottom:0!important;color:#cdbf9f;font-size:.86rem}
+\n\n/* V0.15.7a — physical Android title-menu polish.\n   Keep desktop/tablet presentation intact; give phone menus smaller type and\n   more breathing room. Native wrappers never expose the browser/PWA installer. */\n.seamen-native #installGame{display:none!important}\n@media(max-width:460px){\n  .title-screen .title-menu-actions{gap:11px}\n  .title-screen .title-menu-actions button,\n  .title-screen .title-menu-actions .button-link{font-size:12px;line-height:1.22}\n  .title-screen .title-menu-actions .rules-link-button>span{font-size:11px;line-height:1.25}\n}\n
+/* V0.15.7b — hidden must beat generic authored button display rules. */
+#installGame[hidden],html.seamen-native #installGame{display:none!important}
+
+/* V0.15.7b: first-run opponent profile stability on Android/mobile.
+   Suspend the roster pulse while its modal is open, and keep Challenge highlighted
+   without running a second competing animation. Keep profile identity left-aligned
+   beside the portrait on narrow native screens. */
+#pirateProfileModal #challengePirate.first-run-attention{
+  animation:none;
+  outline:2px solid #efcc7c;
+  outline-offset:3px;
+  box-shadow:inset 0 1px #fff8,0 3px 9px #0005,0 0 14px rgba(239,204,124,.42);
+  filter:none;
+}
+.pirate-profile-title{min-width:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
+.pirate-profile-title small,.pirate-profile-title h2,.pirate-profile-title .pirate-difficulty{text-align:left}
+
+/* V0.15.7bb — opponent profile header: repair the 7ba stylesheet block and
+   make the portrait/text columns explicit on phones. */
+@media(max-width:520px){
+  #pirateProfileModal .pirate-profile-top{
+    display:grid !important;
+    grid-template-columns:84px minmax(0,1fr) !important;
+    column-gap:14px !important;
+    align-items:center !important;
+  }
+  #pirateProfileModal .pirate-portrait{
+    width:84px !important;
+    min-width:84px !important;
+    height:84px !important;
+    aspect-ratio:auto !important;
+    align-self:center !important;
+  }
+  #pirateProfileModal .pirate-profile-title{
+    min-width:0 !important;
+    width:100%;
+    overflow:visible;
+    margin:0 !important;
+    padding:0 !important;
+  }
+  #pirateProfileModal .pirate-profile-title small{
+    display:block;
+    margin:0 0 3px !important;
+    font-size:10px;
+    line-height:1.15;
+    letter-spacing:.05em;
+  }
+  #pirateProfileModal .pirate-profile-title h2{
+    display:block;
+    width:100%;
+    max-width:100%;
+    margin:0 0 7px !important;
+    font-size:22px !important;
+    line-height:1.02;
+    overflow-wrap:normal;
+    word-break:normal;
+  }
+  #pirateProfileModal .pirate-difficulty{
+    display:inline-block;
+    max-width:100%;
+    box-sizing:border-box;
+    padding:4px 7px;
+    font-size:9px;
+    line-height:1.15;
+    white-space:normal;
+  }
+}
+
+
+/* V0.15.8b — touch/mobile precision slider locks retained from frozen Android baseline. */
+.touch-slider-lock{display:none!important}
+@media(pointer:coarse){
+  .controls .touch-slider-lock{display:block!important;margin:-2px 0 10px;min-height:38px;background:#3a2a1c;color:#f5ead5;border:1px solid #6b5033;font-size:13px;letter-spacing:.035em}
+  .controls .touch-slider-lock[aria-pressed='true']{background:#c9963c;color:#17120d}
+  .controls input.touch-slider-locked{opacity:.48}
+}
+/* V0.17.0 build 1526: chapter headings are generated with the pirate roster catalogue. */
+.pirate-chapter-heading{margin:12px 2px 2px;padding:8px 10px;border:1px solid #6b5033;border-radius:9px;background:#1d1712;color:#e8c477}
+.pirate-chapter-heading:first-child{margin-top:2px}.pirate-chapter-heading b{display:block;font-family:Georgia,serif;font-size:14px;letter-spacing:.08em}.pirate-chapter-heading small{display:block;margin-top:2px;color:#bda98a;font-size:11px}
+/* V0.17.0 Phase 5 generic catalogue-driven story scene */
+.generic-story-mode .blackball-room{background:radial-gradient(circle at 50% 34%,#262626 0,#101010 55%,#050504 100%)}
+.generic-story-mode .blackball-cannon,.generic-story-mode .blackball-private-table,.generic-story-mode .blackball-silhouette,.generic-story-mode .story-candle{display:none}
+.generic-story-image{position:absolute;left:50%;top:24px;transform:translateX(-50%);width:min(62vw,360px);height:min(62vw,360px);max-height:42vh;object-fit:cover;border-radius:14px;border:2px solid #8d7446;box-shadow:0 12px 38px #000}
+.generic-story-mode .blackball-story-copy{position:relative;z-index:2}
+@media(max-width:560px){.generic-story-image{top:18px;width:min(76vw,330px);height:min(76vw,330px);max-height:40vh}}
+/* V0.17.0 build 1528 / Phase 5B: lightweight layered scene compositor. */
+.generic-story-mode .blackball-room{overflow:hidden}
+.generic-scene-stage{position:absolute;inset:0;overflow:hidden;z-index:1;pointer-events:none}
+.generic-scene-background,.generic-scene-characters,.generic-scene-props{position:absolute;inset:0}
+.generic-scene-background{background-position:center;background-size:cover;background-repeat:no-repeat;transition:background .22s ease}
+.scene-layer{position:absolute;display:block;max-width:none;transform-origin:center;filter:drop-shadow(0 8px 12px rgba(0,0,0,.45))}
+.scene-layer[data-anchor='top-center']{transform:translateX(-50%)}
+.scene-layer[data-anchor='center']{transform:translate(-50%,-50%)}
+.scene-layer[data-anchor='bottom-center']{transform:translate(-50%,-100%)}
+.scene-prop-text{font:700 clamp(38px,10vw,88px)/1 Georgia,serif;color:#e8c477;text-align:center;text-shadow:0 3px 8px #000;filter:none}
+.scene-motion-bounce{animation:sceneBounce var(--scene-motion-duration,500ms) ease-in-out var(--scene-motion-count,1)}
+.scene-motion-shake{animation:sceneShake var(--scene-motion-duration,420ms) ease-in-out var(--scene-motion-count,1)}
+.scene-motion-slide{animation:sceneSlide var(--scene-motion-duration,600ms) ease-out var(--scene-motion-count,1)}
+.scene-motion-fade{animation:sceneFade var(--scene-motion-duration,500ms) ease-in-out var(--scene-motion-count,1)}
+@keyframes sceneBounce{0%,100%{margin-top:0}50%{margin-top:-5%}}
+@keyframes sceneShake{0%,100%{margin-left:0}25%{margin-left:-2%}75%{margin-left:2%}}
+@keyframes sceneSlide{0%{margin-left:-35%;opacity:.15}100%{margin-left:0;opacity:1}}
+@keyframes sceneFade{0%,100%{opacity:1}50%{opacity:.15}}
+@media(prefers-reduced-motion:reduce){.scene-motion-bounce,.scene-motion-shake,.scene-motion-slide,.scene-motion-fade{animation:none!important}}
+/* Build 1530 Candidate E3: approved Theatre character/far-voice presentation. */
+.generic-scene-fx{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+.generic-story-mode .scene-character{transition:opacity 1.625s ease,transform 1.625s ease}
+.generic-story-mode .scene-character.scene-character-entering{opacity:0;scale:.84}
+.generic-story-mode .scene-character.scene-character-leaving{opacity:0;scale:1.12}
+.generic-story-mode .scene-character.scene-character-talking{animation:sceneSpeakerWiggle .34s ease-in-out infinite alternate}
+@keyframes sceneSpeakerWiggle{from{margin-top:0;rotate:-.35deg}to{margin-top:-3px;rotate:.35deg}}
+.scene-voicewaves{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.scene-wave{position:absolute;left:50%;top:50%;width:18%;height:20%;border:5px solid rgba(38,38,38,.78);border-top-color:transparent;border-bottom-color:transparent;border-radius:50%;transform:translate(-50%,-50%) scale(.25);opacity:0;animation:sceneWaveOut 1.15s ease-out forwards}
+.scene-wave:nth-child(2){animation-delay:.12s}.scene-wave:nth-child(3){animation-delay:.24s}.scene-wave:nth-child(4){animation-delay:.36s}
+.scene-voicewaves.slurp .scene-wave{animation-duration:1.75s;filter:blur(.5px)}
+@keyframes sceneWaveOut{0%{opacity:.85;transform:translate(-50%,-50%) scale(.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(5.2)}}
+@media(prefers-reduced-motion:reduce){.generic-story-mode .scene-character.scene-character-talking,.scene-wave{animation:none!important}.generic-story-mode .scene-character{transition:none!important}}
+/* Build 1530 Candidate E8: Theatre stage and dialogue are separate vertical regions.
+   Dialogue no longer overlays/obscures the artwork. */
+.generic-story-mode .blackball-story-scene{height:min(94dvh,820px);min-height:0;overflow:hidden;justify-content:flex-start}
+.generic-story-mode .blackball-room{position:relative;flex:1 1 auto;min-height:0;width:100%;overflow:hidden}
+.generic-story-mode .generic-scene-stage{position:absolute;inset:0}
+.generic-story-mode .blackball-story-copy{position:relative;z-index:8;flex:0 0 auto;margin-top:0;padding:18px 22px 20px;background:#0b0907;border-top:1px solid #5b4a2d;text-align:center;box-shadow:0 -8px 24px rgba(0,0,0,.38)}
+.generic-story-mode .blackball-story-copy p{min-height:4.7em;margin:8px auto 12px;max-width:680px}
+@media(max-width:560px){
+  .generic-story-mode .blackball-story-scene{height:96dvh;min-height:0}
+  .generic-story-mode .blackball-story-copy{margin-top:0;padding:12px 12px 14px}
+  .generic-story-mode .blackball-story-copy small{font-size:10px}
+  .generic-story-mode .blackball-story-copy h2{font-size:18px;margin:4px 0 6px}
+  .generic-story-mode .blackball-story-copy p{font-size:13px;line-height:1.4;min-height:4.2em;margin:5px auto 8px}
+  .generic-story-mode .blackball-story-copy button{min-width:180px;padding:9px 14px}
+}
+
+/* Candidate G: authoritative Mr Wiggles reveal title; Wiggles' own 8-frame animation replaces generic speaker wobble. */
+.scene-reveal-title{font:900 clamp(28px,7vw,68px)/1 Georgia,serif;color:#f2dfb6;text-align:center;text-shadow:0 4px 12px #000;filter:none;z-index:12}
+.scene-motion-reveal{animation:sceneRevealFlash var(--scene-motion-duration,900ms) ease both var(--scene-motion-count,1)}
+@keyframes sceneRevealFlash{0%{opacity:0}20%,70%{opacity:1}100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.scene-motion-reveal{animation:none!important}}
+.table-mini-strangevoice{border-color:#59452f;background:#6d5d46;box-shadow:inset 0 0 0 2px #7b6749,inset 0 7px 12px rgba(0,0,0,.28),0 3px 8px #0008}
+
+/* Candidate H2 — locked Chapter 2 opponent cue cosmetics. */
+.cue-preview-sandy{background:linear-gradient(90deg,#f4e8c7 0 7%,#b17a42 7% 100%);position:relative}
+.cue-preview-sandy::after{content:'✣';position:absolute;right:-10px;top:50%;transform:translateY(-50%);font-size:25px;line-height:1;color:#e8c65a;text-shadow:5px 0 #d95757,0 5px #65a8d8,-4px 0 #79b85a,0 2px 5px #000}
+.cue-preview-shelle{background:linear-gradient(90deg,#fffdf4,#e7e3dc 25%,#fff 48%,#d9d4cd 72%,#faf8f0);box-shadow:0 4px 7px #0009,0 0 8px rgba(255,255,255,.32);position:relative}
+.cue-preview-shelle::after{content:'';position:absolute;right:-8px;top:50%;width:17px;height:17px;border-radius:50%;transform:translateY(-50%);background:radial-gradient(circle at 35% 30%,#fff 0 16%,#fff9df 38%,#d8d3c8 100%);box-shadow:0 0 7px #fff,0 0 15px rgba(255,250,225,.9)}
+.cue-preview-graham{background:linear-gradient(90deg,#ddd,#aaa 18%,#777 68%,#555)}
+.cue-preview-papa{background:linear-gradient(90deg,#e9f7ff 0 5%,#42a9ef 14%,#0876c9 65%,#034d8d);box-shadow:0 4px 7px #0009,0 0 7px rgba(91,190,255,.42)}
+/* Candidate H2c — Cosmetics cue previews use the same canvas renderer as gameplay. */
+.cue-preview-live{display:block;width:100%;height:auto;max-height:74px;margin:12px 0 18px;transform:none;border-radius:0;background:none!important;box-shadow:none!important;overflow:visible}
+/* H3: Mr Wiggles' unlockable boss table cosmetic preview. */
+.table-mini-wiggles{border-color:#73517f;background:#dfbad0;box-shadow:inset 0 0 0 2px #b99555,inset 0 7px 12px rgba(74,42,80,.20),0 3px 8px #0008}
+
+/* 0.17.1 Candidate J1: in-game aim mode selector */
+.aim-method-setting{display:grid;gap:7px;padding:10px 0}.aim-method-setting>b{font-weight:700}.aim-method-setting small{opacity:.8;line-height:1.35}.aim-method-choices{display:flex;gap:8px}.aim-method-choices button{flex:1;min-height:38px;border:1px solid #ac9468;border-radius:8px;background:#30291e;color:#f4e6c8;font-weight:700}.aim-method-choices button.is-selected{background:#806436;border-color:#efcf88;color:#fff;box-shadow:inset 0 0 0 1px #efcf88}
+
+/* Candidate J3: compact status and isolated horizontal Cue Helm */
+.j3-compact-status{display:flex;align-items:center;justify-content:space-between;gap:9px;background:linear-gradient(110deg,#302115,#201810);border:1px solid #7d603a;border-radius:9px;padding:5px 9px;margin:5px 0 7px;min-height:30px;font-size:11px;line-height:1.2}
+.j3-compact-status strong{color:#efd08e;white-space:nowrap;font-size:12px}
+.j3-compact-status span{color:#d2c1a9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;min-width:0}
+.cue-helm-wrap{margin:9px 0 8px;padding:9px 10px 11px;border:1px solid #755936;border-radius:12px;background:linear-gradient(180deg,#33271a,#201811);box-shadow:inset 0 1px #ffffff12,0 4px 12px #0004}
+.cue-helm-heading{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:7px;color:#e9cb8d;font-size:12px;font-weight:900;letter-spacing:.1em}
+.cue-helm-heading small{font-size:9px;color:#bba47e;letter-spacing:.035em}
+.cue-helm{height:49px;display:flex;align-items:center;justify-content:space-between;gap:5px;border:1px solid #a4834b;border-radius:25px;padding:0 12px;background:linear-gradient(180deg,#173d35,#0d2724);box-shadow:inset 0 3px 9px #0008,0 1px #ffffff15;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:ew-resize;overscroll-behavior-x:contain}
+.cue-helm.is-steering{border-color:#e5c27a;box-shadow:inset 0 2px 8px #0009,0 0 0 2px #cda65b55}
+.helm-end{font-size:10px;white-space:nowrap;color:#d9bf8b;font-weight:800;letter-spacing:.02em;pointer-events:none}
+.helm-track{display:flex;align-items:center;justify-content:space-evenly;flex:1;gap:3px;pointer-events:none;color:#cbb17b}
+.helm-track i{height:12px;width:1px;background:#927e56;display:block;transform:skewX(-12deg)}
+.helm-track b{font-size:22px;line-height:1;color:#f4d79c;text-shadow:0 0 8px #dbb97988}
+.rules-hud{display:none!important}
+.break-help{margin:10px auto 8px;max-width:100%;font-size:12px;min-height:32px}
+@media(max-width:390px){.cue-helm-heading small{font-size:8px}.helm-end{font-size:9px}.j3-compact-status{font-size:10px}.j3-compact-status strong{font-size:11px}}
+
+/* Candidate J4: gameplay hierarchy, helm symmetry, and optional power slider */
+#gameApp .j4-legacy-status{display:none!important}
+#gameApp #angle,#gameApp #angleTouchLock{display:none!important}
+#gameApp #power,#gameApp #powerTouchLock{display:none!important}
+body.show-power-slider #gameApp #power:not([hidden]){display:block!important}
+body.show-power-slider #gameApp #powerTouchLock:not([hidden]){display:block!important}
+#gameApp .cue-helm{display:grid;grid-template-columns:54px minmax(0,1fr) 54px;gap:5px;padding:4px 7px;height:54px}
+#gameApp .helm-track{min-width:0;display:flex;justify-content:space-evenly}
+#gameApp .helm-arrow{width:48px;height:44px;border:1px solid #b69a61;border-radius:22px;background:linear-gradient(#3d624f,#1d4136);color:#f2d99e;font-size:20px;font-weight:900;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer}
+#gameApp .helm-arrow:active{background:#886b38;color:#fff}
+#gameApp .cue-placement-controls{margin:8px 0 9px;border:2px solid #c8a15d;background:linear-gradient(130deg,#45351d,#231c14)}
+#gameApp .cue-placement-controls p:first-child{font-weight:800;color:#f1d48f}
+#gameApp .j3-compact-status{order:1;flex:0 0 auto;width:100%;margin:5px 0 4px}
+#gameApp>.table-wrap{order:2}
+#gameApp>.mobile-scroll-zone{order:3}
+#gameApp>.header{order:0}
+#gameApp>header{order:0}
+#gameApp .controls{margin-top:8px}
+#gameApp .controls label{margin-top:8px}
+#gameApp .cue-helm-wrap{margin-top:8px}
+@media(max-width:950px){#gameApp>.j3-compact-status{flex:0 0 auto}}
+
+/* Candidate J5: two-line compact match summary; maintain full text on narrow devices. */
+#gameApp .j3-compact-status{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:2px;padding:6px 10px;min-height:0;line-height:1.25}
+#gameApp .j3-compact-status strong{white-space:normal;text-align:left}
+#gameApp .j3-compact-status span{white-space:normal;overflow:visible;text-overflow:clip;text-align:left;overflow-wrap:anywhere}
+.game-menu-version{margin:4px 0 0;text-align:center;color:#bca984;font-size:12px;letter-spacing:.02em}
+
+/* J6: table-only feedback, never covering the Cue Helm */
+.j6-tap-flash{position:absolute;inset:0;border-radius:14px;background:rgba(170,174,179,.27);pointer-events:none;opacity:0;transition:opacity .18s ease;z-index:3}.j6-tap-flash.j6-flashing{opacity:1;transition:opacity .05s ease}
+.j6-dave-tip{position:absolute;top:7%;left:6%;right:6%;z-index:4;padding:10px 13px;border:1px solid #d6ba79;border-radius:10px;background:rgba(28,25,24,.94);color:#fff3d7;font-size:clamp(11px,2.7vw,15px);line-height:1.35;text-align:center;box-shadow:0 4px 15px #0008;max-height:47%;overflow:auto;touch-action:manipulation}.j6-dave-tip[hidden]{display:none!important}
+
+/* K2C: unobtrusive campaign-wide unseen cosmetics indicator. */
+.roster-new-cosmetics{font-size:12px;font-weight:800;letter-spacing:.08em;color:#e8c477;text-align:center;padding:7px 9px;border:1px solid rgba(232,196,119,.3);border-radius:8px;background:rgba(232,196,119,.055);}
+
+/* K2F: shared story-to-destination opaque hand-off, above all modal layers */
+.scene-handoff-cover{position:fixed;inset:0;background:#000;opacity:0;z-index:2147483000;pointer-events:all;transition:opacity 200ms ease;}
+@media(prefers-reduced-motion:reduce){.scene-handoff-cover{transition:none!important}}
+
+/* K2F.2 Patch 08: Captain Blockbeard's exuberant speech animation. */
+.generic-story-mode .scene-character.scene-blockbeard-talking{animation:sceneBlockbeardExcited .19s ease-in-out infinite alternate;}
+@keyframes sceneBlockbeardExcited{from{margin-top:2px;rotate:-1.3deg;transform:translateY(2px)}to{margin-top:-7px;rotate:1.3deg;transform:translateY(-4px)}}
+@media(prefers-reduced-motion:reduce){.generic-story-mode .scene-character.scene-blockbeard-talking{animation:none!important}}
+
+/* K2F.3: preserve stage anchor when Blockbeard speaks; no transform overrides. */
+@keyframes sceneBlockbeardExcited{from{margin-top:0;rotate:-.8deg}to{margin-top:-7px;rotate:.8deg}}
+/* K2F.3: Chapter 3 table Cosmetics cards */
+.table-mini-larper{border-color:#777d80;background:#50565a;box-shadow:inset 0 0 0 2px #c4c6c2,inset 0 0 0 5px #343a40,inset 0 7px 12px #0006,0 3px 8px #0008}
+.table-mini-blockbeard{border:9px solid transparent;border-image:repeating-linear-gradient(90deg,#b58a4d 0 14px,#6c4a31 14px 28px,#382c28 28px 42px) 9;background:#54804b;box-shadow:inset 0 0 0 3px #c3aa68,inset 0 7px 12px #0006,0 3px 8px #0008}
+
+/* K2F.3: Blockbeard bobs only on his own lines; never override stage positioning. */
+.generic-story-mode .scene-character.scene-blockbeard-talking{animation:sceneBlockbeardAnchored .23s ease-in-out infinite alternate!important;}
+@keyframes sceneBlockbeardAnchored{from{margin-top:0}to{margin-top:-9px}}
+@media(prefers-reduced-motion:reduce){.generic-story-mode .scene-character.scene-blockbeard-talking{animation:none!important}}
+
+/* K2F.4 — readable, speaker-scoped Theatre dialogue colours. */
+.blackball-story[data-speaker-colour="blackball"] .blackball-story-copy p{color:#f2a5ae}
+.blackball-story[data-speaker-colour="voice"] .blackball-story-copy p{color:#a9dfff}
+.blackball-story[data-speaker-colour="narrator"] .blackball-story-copy p{color:#d5afff}
+.blackball-story[data-speaker-colour="standard"] .blackball-story-copy p{color:#f5e6a8}
+
+/* Settings promo-code entry: visible to players, redemption gated in JS. */
+.promo-code-settings{margin:14px 0;padding:14px;border:1px solid #785b36;border-radius:12px;background:#21170f}
+.promo-code-settings h3{margin:0 0 5px;color:#f3d18b}
+.promo-code-form label{display:block;margin:9px 0 6px;color:#e6d6bd;font-weight:700}
+.promo-code-row{display:flex;gap:8px;align-items:stretch}
+.promo-code-row input{flex:1;min-width:0;padding:11px;border:1px solid #9b7a4d;border-radius:7px;background:#0d0a08;color:#fff0d3;font:inherit}
+.promo-code-row button{flex:0 0 auto;min-width:90px}
+.promo-code-status{min-height:1.3em;margin:8px 0 0;color:#bce6c1;font-size:.9em}
+.promo-code-status.is-error{color:#ffb4ad}
+@media(max-width:380px){.promo-code-row{flex-wrap:wrap}.promo-code-row button{width:100%}}
+
+/* K2F.5b: full-width, stacked promo controls; overrides global modal button sizing. */
+.promo-code-form .promo-code-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:10px;
+  width:100%;
+}
+.promo-code-form #promoCodeInput{
+  display:block;
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  min-height:46px;
+  padding:11px 12px;
+  font-size:16px;
+  line-height:1.35;
+  appearance:none;
+  -webkit-appearance:none;
+  pointer-events:auto;
+  user-select:text;
+  -webkit-user-select:text;
+}
+.promo-code-form .promo-code-row button{
+  display:block;
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  min-height:46px;
+  margin:0;
+}
+
+/* K2F.7: supporter table previews and non-blocking Theatre vapour. */
+.table-mini-vaper{border-color:#060d1d;background:radial-gradient(ellipse at 50% 60%,#182944,#070e1a);box-shadow:inset 0 0 0 3px #18a9ff,0 0 15px #087edc77}
+.table-mini-pokey{border-color:#79583b;background:linear-gradient(90deg,#c5b997 0 49%,#7c6c59 49% 50%,#c5b997 50%);box-shadow:inset 0 0 0 3px #d5d0b6,0 0 8px #0008}
+.generic-scene-stage.scene-vaper-vapour::after{content:'';position:absolute;inset:-12%;z-index:7;pointer-events:none;opacity:.38;background:radial-gradient(ellipse at 18% 80%,#a2c8ee44,transparent 38%),radial-gradient(ellipse at 72% 65%,#a5d4ff33,transparent 45%),radial-gradient(ellipse at 48% 95%,#d0e7ff55,transparent 36%);filter:blur(23px);animation:vaper-fog-drift 11s ease-in-out infinite alternate}
+@keyframes vaper-fog-drift{from{transform:translate(-6%,2%) scale(1)}to{transform:translate(7%,-5%) scale(1.14)}}
+@media(prefers-reduced-motion:reduce){.generic-scene-stage.scene-vaper-vapour::after{animation:none;opacity:.18}}
+
+/* K2F.11: Pokey Man song animation; bobbing is scoped to his spoken lines. */
+.generic-story-mode .scene-character.scene-pokey-singing{animation:pokeySongBounce .19s ease-in-out infinite alternate!important;transform-origin:50% 85%}
+@keyframes pokeySongBounce{from{margin-top:4px;rotate:-3.5deg;scale:1}to{margin-top:-19px;rotate:3.5deg;scale:1.055}}
+@media(prefers-reduced-motion:reduce){.generic-story-mode .scene-character.scene-pokey-singing{animation:none!important}}
+
+/* K2F.16: cue-ball sourced, independent 360-degree vapour flights. */
+#vaperRoomFog{position:fixed;inset:0;z-index:19;pointer-events:none!important;overflow:hidden;visibility:hidden;opacity:0;transition:opacity .7s ease}
+#vaperRoomFog.active{visibility:visible;opacity:1}
+.vaper-room-puff{position:absolute;pointer-events:none!important;opacity:0;border-radius:48% 52% 58% 42%;filter:blur(11px);background:radial-gradient(ellipse at 38% 47%,rgba(218,235,248,.38) 0%,rgba(191,220,238,.27) 26%,rgba(165,201,225,.14) 54%,transparent 78%),radial-gradient(ellipse at 67% 43%,rgba(230,239,247,.25),transparent 65%);transform:translate(-50%,-50%) scale(.35);will-change:transform,opacity}
+.vaper-room-puff.emitting{animation:vaper-puff-flight var(--duration) ease-out 0ms 1 both}
+@keyframes vaper-puff-flight{0%{transform:translate(-50%,-50%) scale(.35);opacity:0}12%{opacity:.34}40%{opacity:.32}70%{opacity:.21}100%{transform:translate(calc(-50% + var(--drift-x)),calc(-50% + var(--drift-y))) scale(2.05);opacity:0}}
+/* Stage: a little floor fog from the outset, plus quicker vapour rising around Vaper's mask. */
+.generic-scene-stage.scene-vaper-vapour::before{content:'';position:absolute;inset:0;z-index:7;pointer-events:none;background:radial-gradient(ellipse 24% 12% at 22% 87%,rgba(210,232,250,.38),transparent),radial-gradient(ellipse 28% 15% at 76% 85%,rgba(210,232,250,.34),transparent),radial-gradient(ellipse 21% 12% at 50% 77%,rgba(210,232,250,.26),transparent);filter:blur(13px);animation:vaper-stage-floor 5s ease-in-out infinite alternate}
+.generic-scene-stage.scene-vaper-vapour::after{content:'';position:absolute;inset:0;z-index:8;pointer-events:none;background:radial-gradient(ellipse 9% 11% at 48% 43%,rgba(222,235,248,.38),transparent),radial-gradient(ellipse 12% 14% at 53% 39%,rgba(220,237,250,.26),transparent),radial-gradient(ellipse 11% 10% at 46% 35%,rgba(218,233,247,.22),transparent);filter:blur(8px);animation:vaper-stage-breath 3.2s ease-out infinite}
+@keyframes vaper-stage-floor{from{transform:translateX(-4%) scale(1);opacity:.55}to{transform:translateX(5%) scale(1.14);opacity:.9}}
+@keyframes vaper-stage-breath{0%{transform:translateY(5%) scale(.55);opacity:0}22%{opacity:.7}100%{transform:translateY(-22%) scale(2);opacity:0}}
+@media(prefers-reduced-motion:reduce){.vaper-room-puff.emitting,.generic-scene-stage.scene-vaper-vapour::before,.generic-scene-stage.scene-vaper-vapour::after{animation:none;opacity:.2}}
+
+/* K3A.1: Chapter 0 lesson catalogue */
+.pool-school-card{max-width:650px}
+.pool-school-lessons{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin:16px 0}
+.pool-school-lesson{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:12px;border:1px solid rgba(180,180,180,.25);border-radius:10px;min-width:0}
+.pool-school-lesson>div{display:grid;gap:4px;min-width:0;overflow-wrap:anywhere}
+.pool-school-lesson small{opacity:.75;line-height:1.4}
+.pool-school-lesson button{width:100%;max-width:100%;min-width:0;margin:0;white-space:normal}
+.pool-school-progress{font-weight:600}
+
+
+.pool-school-coach{padding:16px;margin:12px 0;border:1px solid #b89250;border-radius:12px;background:#211a12;color:#f4e6c5}.pool-school-coach p{line-height:1.5}
+.pool-school-active details{display:none}
+
+/* Floating lesson tips do not participate in the match's fixed-height flex layout. */
+.school-tip{position:fixed;top:max(80px,calc(env(safe-area-inset-top) + 70px));right:max(10px,env(safe-area-inset-right));z-index:200;width:min(300px,calc(100vw - 20px));border:1px solid #b89250;border-radius:10px;background:#211a12f5;color:#f4e6c5;box-shadow:0 4px 16px #0006;font:13px/1.4 system-ui,sans-serif}
+.school-tip[hidden],#schoolTipBody[hidden],.school-menu-actions[hidden]{display:none!important}
+.school-tip.is-minimised{width:min(235px,calc(100vw - 20px))}
+.school-tip-heading{display:flex;align-items:stretch;min-width:0}
+.school-tip button{border:0;background:transparent;color:#f4e6c5;font:inherit;font-weight:700;cursor:pointer;min-width:0;min-height:36px;padding:6px 10px;border-radius:8px}
+.school-tip button:hover,.school-tip button:focus-visible{background:#59432c;outline:2px solid #d8b86e;outline-offset:-2px}
+#schoolTipToggle{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:1;text-align:left}
+#schoolTipTitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#schoolTipClose{flex:0 0 36px;font-size:20px;padding:2px}
+#schoolTipBody{max-height:min(190px,30dvh);overflow-y:auto;overscroll-behavior:contain;padding:0 10px 10px}
+#schoolTipBody p{margin:4px 0 10px}
+.school-tip-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.school-tip-actions button{border:1px solid #8a6a45;background:#3a2a1c;padding:5px;font-size:12px}
+.school-menu-actions{display:grid;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid #8a6a45}
+/* Keep a usable controls pane on short landscape screens as well as phones. */
+main#gameApp.pool-school-active:not([hidden])>.table-wrap{width:min(100%,calc(44dvh * 1.81632653));margin-left:auto;margin-right:auto}
+
+#schoolTipIndicator{flex-shrink:0;font-size:12px;color:#efd08e}
+/* K3B.1: preserve the existing rail, arrow button dimensions and swipe track. */
+.cue-helm-heading{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr);gap:6px;align-items:center}
+#spinInstruction{text-align:center;font-size:9px;line-height:1.35;letter-spacing:.01em;color:#efd294}
+#helmAimInstruction{font-size:9px;letter-spacing:0;white-space:nowrap}
+#helmAimInstruction[hidden]{display:none!important}
+#gameApp .helm-track{pointer-events:auto}
+#gameApp .helm-track i{pointer-events:none}
+#gameApp .helm-cue-ball{position:relative;flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px;margin:0;padding:0;border:1px solid #cabf9a;border-radius:50%;background:radial-gradient(circle at 32% 25%,#fff 0 12%,#f9f8f1 25%,#d7d5cd 72%,#96968f 100%);box-shadow:inset -2px -3px 4px #0003,0 2px 4px #0008;touch-action:none;cursor:ew-resize;color:#17120d}
+#gameApp .helm-cue-ball:focus-visible{outline:2px solid #ffdc74;outline-offset:2px}
+#gameApp .spin-open .helm-cue-ball{border-color:#ffcc59;box-shadow:0 0 7px #f5b83b,inset -2px -3px 4px #0003;cursor:crosshair}
+.spin-crosshair{display:none;position:absolute;inset:5px;border-radius:50%;background:linear-gradient(90deg,transparent calc(50% - .5px),#5558 50%,transparent calc(50% + .5px)),linear-gradient(transparent calc(50% - .5px),#5558 50%,transparent calc(50% + .5px));pointer-events:none}
+.spin-open .spin-crosshair{display:block}
+#spinMarker{position:absolute;left:50%;top:50%;width:7px;height:7px;border:2px solid #111;border-radius:50%;background:#fff9;pointer-events:none;transform:translate(-50%,-50%)}
+.spin-presets{display:grid;grid-template-rows:0fr;opacity:0;visibility:hidden;transition:grid-template-rows .2s ease,opacity .2s ease,visibility .2s}
+.spin-open .spin-presets{grid-template-rows:1fr;opacity:1;visibility:visible}
+.spin-presets-inner{min-height:0;overflow:hidden;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.spin-presets-inner>b{grid-column:1/-1;font-size:10px;color:#e9cb8d;margin-top:7px}
+.spin-presets button{min-width:0;min-height:34px;padding:5px 2px;border:1px solid #ab8a4b;border-radius:15px;background:linear-gradient(#175249,#0e302b);color:#f4e6c8;font-weight:800;font-size:12px;cursor:pointer}
+.spin-presets button[aria-pressed='true']{border-color:#ffe07b;box-shadow:inset 0 0 0 1px #ffe07b,0 0 4px #dcaf50}
+#spinGuideNote{grid-column:1/-1;font-size:10px;color:#cbb98f;line-height:1.35;margin-bottom:4px}
+@media(max-width:650px){.cue-helm-heading{grid-template-columns:auto 1fr}.cue-helm-heading>span{font-size:11px}#helmAimInstruction{grid-column:2;grid-row:1;text-align:right;font-size:8px}#spinInstruction{grid-column:1/-1;grid-row:2;font-size:9px}.spin-presets button{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.spin-presets{transition:none}}
+
+/* K3D.1: scene swaps happen under an opaque cover, not a second background fade. */
+.scene-preparing .generic-scene-background{transition:none}
+#sceneArtworkNotice[hidden]{display:none}
+#sceneArtworkNotice{display:block;margin:6px 0;color:#c6a45e;font-size:11px;letter-spacing:0}
+
+/* Failed optional artwork must not display a broken-image layer. */
+.scene-layer[hidden]{display:none!important}
+
+/* The existing Theatre responds to short windows independently of gameplay
+   layout/orientation. Preserve artwork proportions and keep Next reachable. */
+@media(max-height:540px){
+ .generic-story-mode .blackball-story-copy{padding:8px 12px}
+ .generic-story-mode .blackball-story-copy small{font-size:10px}
+ .generic-story-mode .blackball-story-copy h2{font-size:18px;line-height:1.2;margin:3px 0}
+ .generic-story-mode .blackball-story-copy p{font-size:13px;line-height:1.4;min-height:3em;max-height:28dvh;overflow-y:auto;margin:4px auto 8px}
+ .generic-story-mode .blackball-story-copy button{min-height:44px;margin-top:8px;padding:6px 14px}
+ .generic-story-mode img.scene-layer{max-height:var(--scene-fit-height,90%);object-fit:contain}
+}
+
+#matchIntroPortrait[hidden]{display:none!important}
+
+/* K3G.1 supporter information only; gameplay layout is unchanged. */
+.support-actions{display:grid;gap:8px;margin:12px 0}.support-actions button{min-height:44px}.support-card p{line-height:1.45;overflow-wrap:anywhere}
+
+.title-menu-actions #titleSupport:disabled{opacity:.55;filter:grayscale(1);cursor:default;background:#322c25;color:#b9b0a4;border-color:#61574b;box-shadow:none}
+
+.support-actions button:disabled{opacity:.55;filter:grayscale(1);cursor:default}
+
+/* Reserve feedback space so checking/results never move the tapped control. */
+.support-ownership-check{display:grid;gap:8px;min-width:0;overflow-anchor:none}
+.support-card .support-check-feedback{margin:0;padding:8px;box-sizing:content-box;block-size:8.4em;overflow:auto;font-size:14px;line-height:1.4;color:#dfd1b9;background:#1d150f;border:1px solid #654729;border-radius:8px;overflow-anchor:none}
+.support-card #supportPrice{min-block-size:4.35em}
+@media(orientation:landscape) and (max-height:540px){
+ .support-ownership-check{grid-template-columns:minmax(0,.9fr) minmax(0,1.3fr);gap:10px}
+ .support-ownership-check #restoreSupporter{align-self:stretch}
+}

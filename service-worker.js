@@ -1,81 +1,58 @@
-const CACHE_NAME = 'seamen-pwa-v0170-b1530';
-const CORE_ASSETS = [
-  './',
-  './index.html',
-  './style.css',
-  './game.js',
-  './dialogue.js',
-  './about.js',
-  './manifest.webmanifest',
-  './icon-192.png',
-  './icon-512.png',
-  './assets/portraits/holly.webp',
-  './assets/portraits/sweaty-simon.webp',
-  './assets/portraits/tornado-mick.webp',
-  './assets/portraits/deckhand-dave.webp',
-  './assets/portraits/captain-blackball.webp',
-  './assets/portraits/darth-vaper.webp',
-  './assets/portraits/ol-cyclops.webp'
-];
-
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(CORE_ASSETS))
-      .then(() => self.skipWaiting())
-  );
-});
-
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key.startsWith('seamen-') && key !== CACHE_NAME).map(key => caches.delete(key))))
-      .then(() => self.clients.claim())
-  );
-});
-
-function isMusic(url) {
-  return url.pathname.includes('/assets/music/');
+/* K3I.2: immutable, hash-verified browser bundle. No independently updated runtime files. */
+importScripts('./releases/v0.17.52-b1582/pwa-manifest.js');
+const BUILD=self.SEAMEN_BUILD,CACHE=BUILD.cache,ROOT=self.registration.scope;
+const urls=new Set(BUILD.files.map(([path])=>new URL(path,ROOT).href));
+async function verified(response,expected){
+ if(!response?.ok||response.type==='opaque')throw Error('Missing release resource');
+ const bytes=await response.clone().arrayBuffer();
+ const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),x=>x.toString(16).padStart(2,'0')).join('');
+ if(hash!==expected)throw Error('Incomplete or mismatched release');
+ return response;
 }
-
-function isCoreCode(url) {
-  return url.pathname.endsWith('/') ||
-    url.pathname.endsWith('/index.html') ||
-    url.pathname.endsWith('/style.css') ||
-    url.pathname.endsWith('/game.js') ||
-    url.pathname.endsWith('/dialogue.js') ||
-    url.pathname.endsWith('/about.js') ||
-    url.pathname.endsWith('/manifest.webmanifest');
-}
-
-self.addEventListener('fetch', event => {
-  const request = event.request;
-  if (request.method !== 'GET') return;
-  const url = new URL(request.url);
-  if (url.origin !== self.location.origin || isMusic(url)) return;
-
-  if (request.mode === 'navigate' || isCoreCode(url)) {
-    event.respondWith(
-      fetch(request, {cache:'no-store'})
-        .then(response => {
-          if (response && response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
-          }
-          return response;
-        })
-        .catch(() => caches.match(request).then(cached => cached || caches.match('./index.html')))
-    );
-    return;
-  }
-
-  event.respondWith(
-    caches.match(request).then(cached => cached || fetch(request).then(response => {
-      if (response && response.ok) {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
-      }
-      return response;
-    }))
-  );
+self.addEventListener('install',event=>event.waitUntil((async()=>{
+ const existed=(await caches.keys()).includes(CACHE),cache=await caches.open(CACHE);
+ try{
+  // Sequential batches bound memory/network pressure on mobile devices.
+  for(let i=0;i<BUILD.files.length;i+=4)await Promise.all(BUILD.files.slice(i,i+4).map(async([path,hash])=>{
+   const url=new URL(path,ROOT).href;
+   await cache.put(url,await verified(await fetch(url,{cache:'no-store'}),hash));
+  }));
+  // Only a complete build can replace the worker. Old loaded frames are not reloaded.
+  await self.skipWaiting();
+ }catch(error){if(!existed)await caches.delete(CACHE);throw error;}
+})()));
+self.addEventListener('activate',event=>event.waitUntil(self.clients.claim()));
+self.addEventListener('message',event=>{
+ if(event.data?.type==='SEAMEN_ACTIVATE')event.waitUntil(self.skipWaiting());
+ if(event.data?.type==='SEAMEN_BUILD')event.ports[0]?.postMessage({build:BUILD.id});
+});
+self.addEventListener('fetch',event=>{
+ const request=event.request,url=new URL(request.url);
+ if(request.method!=='GET'||url.origin!==self.location.origin)return;
+ const canonical=new URL(url.pathname, url.origin).href;
+ if(urls.has(canonical)){
+  event.respondWith((async()=>{
+   const cache=await caches.open(CACHE),cached=await cache.match(canonical);
+   if(cached)return cached;
+   // Never fall back to unrelated HTML or another build's JavaScript.
+   const entry=BUILD.files.find(([path])=>new URL(path,ROOT).href===canonical);
+   try{const response=await verified(await fetch(canonical,{cache:'no-store'}),entry[1]);await cache.put(canonical,response.clone());return response;}
+   catch(_){return new Response('This release file is unavailable. Reconnect and restart the game.',{status:503,headers:{'Content-Type':'text/plain'}});}
+  })());return;
+ }
+ // Directory index aliases must resolve to this same verified build.
+ if(url.pathname===new URL('releases/'+BUILD.id+'/',ROOT).pathname){
+  event.respondWith(caches.open(CACHE).then(c=>c.match(new URL('releases/'+BUILD.id+'/index.html',ROOT).href)));return;
+ }
+ // Old active frames keep their old URLs, cache and source assets. No cache or
+ // user data is purged on upgrade; music keeps the established network-only policy.
+ if(!url.pathname.includes('/assets/music/')&&!url.pathname.startsWith(new URL('releases/'+BUILD.id+'/',ROOT).pathname)){
+  event.respondWith((async()=>{
+   for(const name of await caches.keys()){
+    if(name===CACHE||!name.startsWith('seamen-'))continue;
+    const response=await (await caches.open(name)).match(request,{ignoreSearch:true});if(response)return response;
+   }
+   return fetch(request);
+  })());
+ }
 });
