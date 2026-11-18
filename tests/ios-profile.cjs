@@ -1,6 +1,6 @@
 // Chromium with iOS UA/touch/viewport/standalone fixtures. NOT Safari or iOS hardware certification.
 const assert=require('node:assert/strict'),{chromium,devices}=require('playwright');
-const url='http://127.0.0.1:8020/releases/v0.17.52-b1582/';
+const url=process.env.TEST_URL||'http://127.0.0.1:8020/releases/v0.17.52-b1582/';
 (async()=>{const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});try{
  for(const [name,width,height,landscape,ipad] of [['iPhone portrait',390,844,false,false],['iPhone landscape',844,390,true,false],['iPad desktop-UA portrait',834,1194,false,true],['iPad desktop-UA landscape',1194,834,true,true]]){
   const profile=devices[ipad?'iPad Pro 11':'iPhone 13'];

@@ -1,0 +1,90 @@
+{
+  "version": "1.0.0",
+  "build": 1595,
+  "source": "f7a53ba73880c1a12997ff3320b88be6044a2fd5:www",
+  "counts": {
+    "PASS": 18,
+    "FAIL": 0
+  },
+  "checks": [
+    {
+      "name": "committed broken release reproduced in fresh context",
+      "status": "PASS"
+    },
+    {
+      "name": "fresh verified v1.0.0/build1595; all offline entries and music load; single root worker; browser purchases/ownership unavailable",
+      "status": "PASS"
+    },
+    {
+      "name": "installed PWA root launches offline, saved state remains, real local frame shot works offline",
+      "status": "PASS"
+    },
+    {
+      "name": "real v0.17.52 upgrade: active frame unchanged, explicit restart reaches v1, saves/trophies/cosmetics/settings retained; old caches retained",
+      "status": "PASS"
+    },
+    {
+      "name": "corrupt update rejected; old version works offline without clearing data; retry recovers v1",
+      "status": "PASS"
+    },
+    {
+      "name": "missing update rejected; old version works offline without clearing data; retry recovers v1",
+      "status": "PASS"
+    },
+    {
+      "name": "interrupt update rejected; old version works offline without clearing data; retry recovers v1",
+      "status": "PASS"
+    },
+    {
+      "name": "fresh integrity failure remains blocked; retry succeeds after complete deployment",
+      "status": "PASS"
+    },
+    {
+      "name": "independently reproduced committed failure: stale old release target and both root launcher hashes differ",
+      "status": "PASS"
+    },
+    {
+      "name": "100 approved files match explicit browser projection; all static asset paths resolve; all 91 offline hashes and checksums match; old release, Android www/native, PWA identity and entitlement source unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "Chromium iOS-profile simulation: iPhone portrait; touch/placement/power/spin, reload, synthetic safe areas and scroll containment",
+      "status": "PASS"
+    },
+    {
+      "name": "Chromium iOS-profile simulation: iPhone landscape; touch/placement/power/spin, reload, synthetic safe areas and scroll containment",
+      "status": "PASS"
+    },
+    {
+      "name": "Chromium iOS-profile simulation: iPad desktop-UA portrait; touch/placement/power/spin, reload, synthetic safe areas and scroll containment",
+      "status": "PASS"
+    },
+    {
+      "name": "Chromium iOS-profile simulation: iPad desktop-UA landscape; touch/placement/power/spin, reload, synthetic safe areas and scroll containment",
+      "status": "PASS"
+    },
+    {
+      "name": "media-policy simulation: no pre-gesture playback, initial trusted gesture, rejected play is non-blocking and retried on next gesture",
+      "status": "PASS"
+    },
+    {
+      "name": "media race fixture: stale playback rejection cannot pause or overwrite the newer gesture/track",
+      "status": "PASS"
+    },
+    {
+      "name": "standalone/metadata simulation: existing PWA identity, icon and manual iOS installation metadata; no unsupported install prompt",
+      "status": "PASS"
+    },
+    {
+      "name": "JavaScript syntax: 14 generated release/root worker scripts; inline launcher exercised by browser suite",
+      "status": "PASS"
+    }
+  ],
+  "notVerified": [
+    "Live Pages configuration/site response (environment network policy blocks target hosts and settings API)",
+    "Physical iPhone/iPad Safari/Home Screen lifecycle",
+    "Physical Android/browser/PWA lifecycle"
+  ],
+  "noDeployment": true,
+  "androidSourcesUnchanged": true
+}

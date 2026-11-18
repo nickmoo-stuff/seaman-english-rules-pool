@@ -1,5 +1,5 @@
 /* K3I.2: immutable, hash-verified browser bundle. No independently updated runtime files. */
-importScripts('./releases/v0.17.52-b1582/pwa-manifest.js');
+importScripts('./releases/v1.0.0-b1595/pwa-manifest.js');
 const BUILD=self.SEAMEN_BUILD,CACHE=BUILD.cache,ROOT=self.registration.scope;
 const urls=new Set(BUILD.files.map(([path])=>new URL(path,ROOT).href));
 async function verified(response,expected){
@@ -30,6 +30,16 @@ self.addEventListener('fetch',event=>{
  const request=event.request,url=new URL(request.url);
  if(request.method!=='GET'||url.origin!==self.location.origin)return;
  const canonical=new URL(url.pathname, url.origin).href;
+ // Old immutable games remain running until the player explicitly reloads.
+ // Their Restart action reloads the old URL: route that navigation to the launcher,
+ // never reload an existing client or mix its runtime files with the new release.
+ const relative=url.pathname.slice(new URL(ROOT).pathname.length);
+ if(request.mode==='navigate'&&url.pathname.startsWith(new URL(ROOT).pathname)&&
+    /^releases\/v[^/]+\/(?:index\.html)?$/.test(relative)&&
+    !relative.startsWith('releases/'+BUILD.id+'/')){
+  event.respondWith(Promise.resolve(Response.redirect(ROOT,302)));return;
+ }
+
  if(urls.has(canonical)){
   event.respondWith((async()=>{
    const cache=await caches.open(CACHE),cached=await cache.match(canonical);

@@ -1,0 +1,8 @@
+PASS Chromium iOS-profile simulation: iPhone portrait; touch/placement/power/spin, reload, synthetic safe areas and scroll containment
+PASS Chromium iOS-profile simulation: iPhone landscape; touch/placement/power/spin, reload, synthetic safe areas and scroll containment
+PASS Chromium iOS-profile simulation: iPad desktop-UA portrait; touch/placement/power/spin, reload, synthetic safe areas and scroll containment
+PASS Chromium iOS-profile simulation: iPad desktop-UA landscape; touch/placement/power/spin, reload, synthetic safe areas and scroll containment
+PASS media-policy simulation: no pre-gesture playback, initial trusted gesture, rejected play is non-blocking and retried on next gesture
+PASS media race fixture: stale playback rejection cannot pause or overwrite the newer gesture/track
+PASS standalone/metadata simulation: existing PWA identity, icon and manual iOS installation metadata; no unsupported install prompt
+UNVERIFIED: actual iPhone/iPad Safari audio, Home Screen installation/storage lifecycle, browser chrome/keyboard/notches and Safari worker updates; WebKit/hardware unavailable
