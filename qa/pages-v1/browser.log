@@ -1,0 +1,8 @@
+PASS committed broken release reproduced in fresh context
+PASS fresh verified v1.0.0/build1595; all offline entries and music load; single root worker; browser purchases/ownership unavailable
+PASS installed PWA root launches offline, saved state remains, real local frame shot works offline
+PASS real v0.17.52 upgrade: active frame unchanged, explicit restart reaches v1, saves/trophies/cosmetics/settings retained; old caches retained
+PASS corrupt update rejected; old version works offline without clearing data; retry recovers v1
+PASS missing update rejected; old version works offline without clearing data; retry recovers v1
+PASS interrupt update rejected; old version works offline without clearing data; retry recovers v1
+PASS fresh integrity failure remains blocked; retry succeeds after complete deployment

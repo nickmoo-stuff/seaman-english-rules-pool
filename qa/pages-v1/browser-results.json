@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-18T10:56:26.220Z",
+  "tests": [
+    {
+      "name": "committed broken release reproduced in fresh context",
+      "status": "PASS"
+    },
+    {
+      "name": "fresh verified v1.0.0/build1595; all offline entries and music load; single root worker; browser purchases/ownership unavailable",
+      "status": "PASS"
+    },
+    {
+      "name": "installed PWA root launches offline, saved state remains, real local frame shot works offline",
+      "status": "PASS"
+    },
+    {
+      "name": "real v0.17.52 upgrade: active frame unchanged, explicit restart reaches v1, saves/trophies/cosmetics/settings retained; old caches retained",
+      "status": "PASS"
+    },
+    {
+      "name": "corrupt update rejected; old version works offline without clearing data; retry recovers v1",
+      "status": "PASS"
+    },
+    {
+      "name": "missing update rejected; old version works offline without clearing data; retry recovers v1",
+      "status": "PASS"
+    },
+    {
+      "name": "interrupt update rejected; old version works offline without clearing data; retry recovers v1",
+      "status": "PASS"
+    },
+    {
+      "name": "fresh integrity failure remains blocked; retry succeeds after complete deployment",
+      "status": "PASS"
+    }
+  ],
+  "counts": {
+    "PASS": 8,
+    "FAIL": 0
+  },
+  "limitations": [
+    "Chromium on Linux; no physical Safari/iOS/Android hardware",
+    "Local Pages-equivalent server; live site, Pages settings API and actual deployment not accessible",
+    "No Android builds, purchase transactions or entitlement changes performed"
+  ]
+}

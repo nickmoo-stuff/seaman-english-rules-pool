@@ -1,0 +1,2 @@
+PASS independently reproduced committed failure: stale old release target and both root launcher hashes differ
+PASS 100 approved files match explicit browser projection; all static asset paths resolve; all 91 offline hashes and checksums match; old release, Android www/native, PWA identity and entitlement source unchanged

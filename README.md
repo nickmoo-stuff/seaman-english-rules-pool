@@ -1,3 +1,9 @@
+# Browser deployment: v1.0.0 / build 1595
+
+The public browser entry uses `releases/v1.0.0-b1595/`, with a verified root worker. See [deployment correction, tests and review checklist](docs/PAGES-V1.0.0-REVIEW.md). The copied Android `www` remains unchanged; do not deploy it directly over this launcher. Rebuild browser inventories with `python tools/prepare-v1-browser.py` after any relevant change.
+
+---
+
 # seamen-pool-development
 Seamen English Rules Pool — development and QA
 
