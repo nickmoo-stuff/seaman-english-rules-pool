@@ -1,0 +1,8 @@
+Command: node tests/mobile-table-first.cjs
+TEST_URL=http://127.0.0.1:8000/
+PASS table-first {"viewport":"855×384","dpr":2.625,"portrait":{"width":360,"height":198.1875},"expanded":{"width":450.4375,"height":247.984375},"collapsed":{"width":450.4375,"height":247.984375},"expandedGain":25.121527777777786,"collapsedGain":25.121527777777786}
+PASS table-first {"viewport":"844×390","dpr":1,"portrait":{"width":366,"height":201.5},"expanded":{"width":461.34375,"height":253.984375},"collapsed":{"width":461.34375,"height":253.984375},"expandedGain":26.050204918032783,"collapsedGain":26.050204918032783}
+PASS table-first {"viewport":"740×360","dpr":1,"portrait":{"width":336,"height":184.984375},"expanded":{"width":396,"height":218.015625},"collapsed":{"width":406.84375,"height":223.984375},"expandedGain":17.85714285714286,"collapsedGain":21.084449404761905}
+PASS table-first {"viewport":"960×540","dpr":1,"portrait":{"width":516,"height":284.078125},"expanded":{"width":616,"height":339.140625},"collapsed":{"width":733.78125,"height":403.984375},"expandedGain":19.379844961240302,"collapsedGain":42.20566860465116}
+PASS table-first {"viewport":"844×340","dpr":1,"portrait":{"width":316,"height":173.96875},"expanded":{"width":370.515625,"height":203.984375},"collapsed":{"width":370.515625,"height":203.984375},"expandedGain":17.251780063291132,"collapsedGain":17.251780063291132}
+PASS expanded/individual/all minimised panels, spin, values, real shots, cancellation, reload/new-session preferences and orientation

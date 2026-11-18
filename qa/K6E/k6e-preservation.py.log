@@ -1,0 +1,4 @@
+Command: python tests/k6e-preservation.py
+TEST_URL=http://127.0.0.1:8030/
+PASS all approved dialogue/art/audio/AI/physics/progression/saves and historical native/tools untouched; game.js changes limited to version and supporter availability; ownership/ack/retry unchanged; both gates OFF
+PASS HTML changes limited to version, initial availability and accurate release ownership disclosure; main-menu wording and all story text untouched

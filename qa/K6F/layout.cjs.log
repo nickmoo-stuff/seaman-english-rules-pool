@@ -1,0 +1,10 @@
+Command: node tests/layout.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS desktop 1920x1080: default/toggles/settings/state/persistence/resize/canvas geometry
+PASS desktop 1366x768: default/toggles/settings/state/persistence/resize/canvas geometry
+PASS desktop 600x760: default/toggles/settings/state/persistence/resize/canvas geometry
+PASS desktop 500x700: default/toggles/settings/state/persistence/resize/canvas geometry
+PASS mobile 960x540: orientation, hidden desktop controls, rotation state, placement coordinates and vertical power
+PASS mobile 844x390: orientation, hidden desktop controls, rotation state, placement coordinates and vertical power
+PASS mobile 740x360: orientation, hidden desktop controls, rotation state, placement coordinates and vertical power
+PASS device classification and shared audio/settings persistence, save validation and new-session restoration

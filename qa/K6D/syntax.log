@@ -1,0 +1,1 @@
+PASS node --check: www/about.js, www/chapter4-runtime.js, www/chapter4.js, www/dialogue.js, www/game.js, www/layout.js, www/service-worker.js, www/spin-physics.js, www/supporter.js, www/sw.js, www/theatre.js, tests/k6d-boss-music.cjs, tests/k6d-vaper-spin.cjs

@@ -1,0 +1,14 @@
+Command: node tests/theatre-offline.cjs
+TEST_URL=http://127.0.0.1:8030/
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+1589 !== 1582
+
+    at /workspace/seamen-pool-development/tests/theatre-offline.cjs:4:148 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 1589,
+  expected: 1582,
+  operator: 'strictEqual',
+  diff: 'simple'
+}

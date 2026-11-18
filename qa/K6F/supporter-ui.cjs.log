@@ -1,0 +1,19 @@
+Command: node tests/supporter-ui.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS 1366x768 not_owned: truthful menu, disabled ownership/payment state, information, dynamic fixture price, no local native grant, usable navigation
+PASS 1366x768 verified_owner: truthful menu, disabled ownership/payment state, information, dynamic fixture price, no local native grant, usable navigation
+PASS 1366x768 pending: truthful menu, disabled ownership/payment state, information, dynamic fixture price, no local native grant, usable navigation
+PASS 1366x768 verification_unavailable: truthful menu, disabled ownership/payment state, information, dynamic fixture price, no local native grant, usable navigation
+PASS 1366x768 checking: truthful menu, disabled ownership/payment state, information, dynamic fixture price, no local native grant, usable navigation
+PASS 390x844 not_owned: truthful menu, disabled ownership/payment state, information, dynamic fixture price, no local native grant, usable navigation
+PASS 390x844 verified_owner: truthful menu, disabled ownership/payment state, information, dynamic fixture price, no local native grant, usable navigation
+PASS 390x844 pending: truthful menu, disabled ownership/payment state, information, dynamic fixture price, no local native grant, usable navigation
+PASS 390x844 verification_unavailable: truthful menu, disabled ownership/payment state, information, dynamic fixture price, no local native grant, usable navigation
+PASS 390x844 checking: truthful menu, disabled ownership/payment state, information, dynamic fixture price, no local native grant, usable navigation
+PASS 855x384 not_owned: truthful menu, disabled ownership/payment state, information, dynamic fixture price, no local native grant, usable navigation
+PASS 855x384 verified_owner: truthful menu, disabled ownership/payment state, information, dynamic fixture price, no local native grant, usable navigation
+PASS 855x384 pending: truthful menu, disabled ownership/payment state, information, dynamic fixture price, no local native grant, usable navigation
+PASS 855x384 verification_unavailable: truthful menu, disabled ownership/payment state, information, dynamic fixture price, no local native grant, usable navigation
+PASS 855x384 checking: truthful menu, disabled ownership/payment state, information, dynamic fixture price, no local native grant, usable navigation
+PASS web/PWA fallback and legacy developer test pass are never labelled as a verified purchase
+PASS Android web-update without installed bridge remains unknown and disables unavailable actions; local flag ignored

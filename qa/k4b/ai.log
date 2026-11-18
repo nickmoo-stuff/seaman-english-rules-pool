@@ -1,0 +1,4 @@
+PASS K4 AI socks_sandals: [{"kind":"CUSHION ESCAPE","forecastFirst":"red","first":"red","spin":{"x":0,"y":0.65},"pots":[],"white":false,"turn":1}]
+PASS K4 AI most_evil: [{"kind":"DIRECT POT","forecastFirst":"red","first":"red","spin":{"x":-0.55,"y":0},"pots":["red"],"white":false,"turn":2}]
+PASS K4 AI lucy_fir: [{"kind":"DIRECT POT","forecastFirst":"red","first":"red","spin":{"x":0,"y":0},"pots":["red"],"white":false,"turn":2},{"kind":"DIRECT POT","forecastFirst":"red","first":"red","spin":{"x":0,"y":0},"pots":["red"],"white":false,"turn":2}]
+PASS Cyclops level-6 profile preserved independently of Lucy

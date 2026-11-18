@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-16T08:44:30.575928+00:00",
+  "baseline": "bd794909aed197ec85d3338e9af682856fdba6a9",
+  "version": "0.17.59",
+  "build": 1589,
+  "tests": [
+    {
+      "suite": "theatre.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 49.26
+    },
+    {
+      "suite": "k5a-freeze.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.18
+    }
+  ],
+  "limitations": [
+    "Chromium on Linux, HTTP; no physical Android/iOS or real Google Play transactions.",
+    "Ownership bridge replies are fixtures.",
+    "Historical alpha packaging and milestone-specific diff-only audits are excluded."
+  ]
+}

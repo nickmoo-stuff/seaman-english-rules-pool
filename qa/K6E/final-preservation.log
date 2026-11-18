@@ -1,0 +1,3 @@
+PASS all approved dialogue/art/audio/AI/physics/progression/saves and historical native/tools untouched; game.js changes limited to version and supporter availability; ownership/ack/retry unchanged; both gates OFF
+PASS HTML changes limited to version, initial availability and accurate release ownership disclosure; main-menu wording and all story text untouched
+PASS ownership/purchase/restore state machine byte-preserved except native capability publication; existing stylesheet unchanged before scoped additions

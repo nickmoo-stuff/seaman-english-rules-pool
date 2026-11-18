@@ -1,0 +1,6 @@
+Command: node tests/theatre.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS fresh opening, all Chapters 1–3 encounter/victory/ending triggers, supporter Theatre/cards, seen flags, spoiler gates, duplicate entry, saved layout and full catalogue preservation
+PASS interrupted earned victory recovery after reload, completion recorded on exit, no repeat
+PASS Chapter 1/2/3 defeat/results/rematch branches: no victory Theatre or unlock
+PASS mid-Chapter 1/2/3 missing-flag compatibility, unchanged saves and optional five-lesson/trophy access

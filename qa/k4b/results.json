@@ -1,0 +1,31 @@
+{
+  "milestone": "K4B",
+  "version": "0.17.59",
+  "build": 1589,
+  "baseline": "63f1b4dbe1f084eb84db1318c15bc0d1735f4c1b",
+  "branch": "stage4-k4b-spinball-wizard",
+  "tests": {
+    "focused": "PASS",
+    "assets": "PASS",
+    "theatre-responsive": "PASS",
+    "native-security": "PASS",
+    "unlock": "PASS",
+    "k4": "PASS",
+    "ai": "PASS",
+    "previous-qa": "PASS",
+    "layout": "PASS",
+    "campaign": "PASS",
+    "spin": "PASS",
+    "mobile": "PASS",
+    "offline": "PASS",
+    "consistency": "PASS"
+  },
+  "limitations": [
+    "Chromium over HTTP; Windows file:// and physical Android/iOS unverified.",
+    "Native ownership responses are fixtures, not real Google Play transactions.",
+    "Manual difficulty and artwork judgement remains for desktop/mobile QA."
+  ],
+  "deployed": false,
+  "androidBuildPerformed": false,
+  "purchasesEnabled": false
+}

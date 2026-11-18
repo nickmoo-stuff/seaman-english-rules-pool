@@ -1,0 +1,7 @@
+Command: node tests/theatre-responsive.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS 1366x768: all 31 original scenes and every dialogue beat, decoded portraits, usable Next, no gameplay layout or save changes
+PASS 1920x1080: all 31 original scenes and every dialogue beat, decoded portraits, usable Next, no gameplay layout or save changes
+PASS 390x844: all 31 original scenes and every dialogue beat, decoded portraits, usable Next, no gameplay layout or save changes
+PASS 740x360: all 31 original scenes and every dialogue beat, decoded portraits, usable Next, no gameplay layout or save changes
+PASS 855x384: all 31 original scenes and every dialogue beat, decoded portraits, usable Next, no gameplay layout or save changes

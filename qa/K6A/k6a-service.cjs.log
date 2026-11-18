@@ -1,0 +1,5 @@
+Command: node tests/k6a-service.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS completed/pending/cancelled/failed/already-owned/unavailable, regional Play price/currency, duplicate purchase/restore coalescing and pending completion
+PASS long interactive flow, refund/revocation query and background/resume preserves cancellation while rechecking ownership
+PASS no grant from callback alone, restore after fresh service, native gate/configuration/empty-price guards and web has no Play purchase path

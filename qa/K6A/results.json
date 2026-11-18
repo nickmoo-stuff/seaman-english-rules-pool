@@ -1,0 +1,322 @@
+{
+  "date": "2026-11-16T10:35:12.874171+00:00",
+  "baseline": "8228903dbb50f5f3fd6418e872cb5bcf2e55fccd",
+  "version": "0.17.60",
+  "build": 1590,
+  "tests": [
+    {
+      "suite": "k6a-java-check.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 2.28
+    },
+    {
+      "suite": "k6a-installer.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 14.36
+    },
+    {
+      "suite": "k6a-preservation.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 1.19
+    },
+    {
+      "suite": "k4-consistency.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.58
+    },
+    {
+      "suite": "k4a4-artwork.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.5
+    },
+    {
+      "suite": "k4b-assets.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.19
+    },
+    {
+      "suite": "campaign-regression.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 15.16
+    },
+    {
+      "suite": "helm-responsive.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 30.9
+    },
+    {
+      "suite": "k4-ai.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 5.94
+    },
+    {
+      "suite": "k4-artwork.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 29.42
+    },
+    {
+      "suite": "k4-audio.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 6.56
+    },
+    {
+      "suite": "k4-entitlement.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 16.17
+    },
+    {
+      "suite": "k4-mobile.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 29.32
+    },
+    {
+      "suite": "k4-offline.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 2.63
+    },
+    {
+      "suite": "k4.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 22.7
+    },
+    {
+      "suite": "k4a1-dev-supporter.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 26.64
+    },
+    {
+      "suite": "k4a2.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 27.37
+    },
+    {
+      "suite": "k4a4-cutouts.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 20.99
+    },
+    {
+      "suite": "k4a4.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 26.3
+    },
+    {
+      "suite": "k4b.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 14.44
+    },
+    {
+      "suite": "k5a-dev.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 17.96
+    },
+    {
+      "suite": "k5a-file-origin.cjs",
+      "exitCode": 77,
+      "status": "NOT TESTED",
+      "seconds": 1.16
+    },
+    {
+      "suite": "k5a-multiplayer.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 13.94
+    },
+    {
+      "suite": "k5a-opponents.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 6.92
+    },
+    {
+      "suite": "k5a-rules.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 6.0
+    },
+    {
+      "suite": "k5a-saves.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 6.44
+    },
+    {
+      "suite": "k6a-service.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.12
+    },
+    {
+      "suite": "k6a-ui.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 90.97
+    },
+    {
+      "suite": "layout-correction.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 78.31
+    },
+    {
+      "suite": "layout-preservation.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 37.45
+    },
+    {
+      "suite": "layout.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 62.09
+    },
+    {
+      "suite": "lesson-one-completion.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 53.98
+    },
+    {
+      "suite": "lesson-three-hotfix.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 27.58
+    },
+    {
+      "suite": "mobile-table-first.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 84.45
+    },
+    {
+      "suite": "placement-controls.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 17.99
+    },
+    {
+      "suite": "pool-school-layout.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 73.41
+    },
+    {
+      "suite": "pool-school.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 21.35
+    },
+    {
+      "suite": "spin-offline.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 6.7
+    },
+    {
+      "suite": "spin-physics.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 3.53
+    },
+    {
+      "suite": "spin-ui.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 39.02
+    },
+    {
+      "suite": "story-reminder-layout.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 37.93
+    },
+    {
+      "suite": "story-reminder.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 31.53
+    },
+    {
+      "suite": "supporter-restore.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 121.66
+    },
+    {
+      "suite": "supporter-service.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.17
+    },
+    {
+      "suite": "supporter-ui.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 72.66
+    },
+    {
+      "suite": "theatre-offline.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 8.36
+    },
+    {
+      "suite": "theatre-readiness.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 40.73
+    },
+    {
+      "suite": "theatre-responsive.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 120.37
+    },
+    {
+      "suite": "theatre.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 60.24
+    },
+    {
+      "suite": "unlock-all-pirates.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 16.92
+    }
+  ],
+  "counts": {
+    "PASS": 49,
+    "FAIL": 0,
+    "NOT TESTED": 1
+  },
+  "limitations": [
+    "Chromium on Linux, HTTP; no physical Android/iOS or real Google Play transactions.",
+    "Ownership bridge replies are fixtures.",
+    "Historical alpha packaging and milestone-specific diff-only audits are excluded."
+  ],
+  "branch": "stage6-k6a-google-play-billing",
+  "nativeBuildPerformed": false,
+  "purchasesEnabled": false,
+  "trustModel": "google_play_device, not server verification"
+}

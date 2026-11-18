@@ -1,0 +1,42 @@
+// K6E: verification only. No build type, signing, SDK or dependency is changed.
+def seamenBillingHashes = [
+    'SeamenBillingPlugin.java': '6f707d741d6a29c9ad7088354223023ce7f4dd7dfce34ffc4e1a33122103d886',
+    'PurchaseTestPolicy.java': 'ac8da1a180290ca16b7201a9d0cea8fa657cb5dec4a56f1712d36acf7962250c',
+    'BillingRetryJob.java': '411805fad0eb95705d5e2119675644bcb56f3addeece2ae2e20f8fc66275931e',
+    'PlayBillingClient.java': 'c2b3ed1a52b367fed0deacb3485d1e8cf78309cf2eee243e75b20ae808eb37b2',
+    'ProductionPurchasePolicy.java': '84249a7bf84dd6a38f742a28ffd1e6e50b9b27f73dcf24b4b12da5190bfdfc6b',
+    'SupporterBillingCore.java': 'd9a45c40f1c60db1c9b4e39d8385a57f11b12f56d998a90085175be43a247a6d'
+]
+
+def seamenVerifyRelease = tasks.register('verifySeamenReleaseBilling') {
+    doLast {
+        def nativeRoot = file('src/main/java/com/seamenpool/billing')
+        seamenBillingHashes.each { name, expected ->
+            def source = new File(nativeRoot, name)
+            if (!source.isFile()) throw new GradleException("Missing Seamen billing source: ${name}")
+            def value = source.getText('UTF-8').replace('\uFEFF', '').replace('\r\n', '\n')
+            if (name == 'PurchaseTestPolicy.java' && !value.contains('TEST_PURCHASES_ENABLED=false;'))
+                throw new GradleException('Seamen release blocked: turn the debug test gate OFF first.')
+            value = value.replace('PRODUCTION_PURCHASES_ENABLED=true;', 'PRODUCTION_PURCHASES_ENABLED=false;')
+            def digest = java.security.MessageDigest.getInstance('SHA-256').digest(value.getBytes('UTF-8')).encodeHex().toString()
+            if (digest != expected) throw new GradleException("Unrecognised Seamen billing source: ${name}")
+        }
+        def publicRoot = file('src/main/assets/public')
+        def game = new File(publicRoot, 'game.js')
+        if (!game.isFile() || !game.getText('UTF-8').contains("const BUILD_MODE='release'"))
+            throw new GradleException('Seamen release blocked: sync the supplied release-mode www first.')
+        def sourceText = game.getText('UTF-8')
+        def version = sourceText =~ /const APP_VERSION='([^']+)'/
+        def build = sourceText =~ /const APP_BUILD_NUMBER=(\d+)/
+        if (!version.find() || !build.find() || version.group(1) != android.defaultConfig.versionName.toString() || build.group(1) != android.defaultConfig.versionCode.toString())
+            throw new GradleException('Seamen release blocked: web version/build and Android defaultConfig must match.')
+        publicRoot.eachFileRecurse { asset ->
+            if (asset.isFile() && asset.name.toLowerCase() ==~ /.*\.(jks|keystore|pem|key)$/)
+                throw new GradleException('Private signing/key material must not be packaged in web assets.')
+        }
+    }
+}
+tasks.configureEach { task ->
+    if (task.name != 'verifySeamenReleaseBilling' && task.name.toLowerCase().contains('release'))
+        task.dependsOn(seamenVerifyRelease)
+}

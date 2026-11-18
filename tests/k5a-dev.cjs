@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict'),{chromium}=require('playwright');
+(async()=>{const b=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});try{
+ for(const release of [false,true]){
+  const p=await b.newPage({serviceWorkers:'block'});await p.goto(release?process.env.RELEASE_TEST_URL:process.env.TEST_URL,{waitUntil:'networkidle'});await p.locator('#enterTavern').click();await p.waitForTimeout(2700);
+  const before=await p.evaluate(()=>({defeated:JSON.stringify(career.piratesDefeated),earned:JSON.stringify(career.earnedAchievements),cosmetics:JSON.stringify(career.unlockedCosmetics),frames:career.framesPlayed}));await p.evaluate(()=>document.activeElement?.blur());await p.keyboard.press('i');
+  const arrival=await p.evaluate(()=>({chapter3:chapterIsUnlocked('chapter_3'),chapter2:chapterIsUnlocked('chapter_2'),defeated:JSON.stringify(career.piratesDefeated),earned:JSON.stringify(career.earnedAchievements),cosmetics:JSON.stringify(career.unlockedCosmetics),frames:career.framesPlayed}));for(const key of Object.keys(before))assert.equal(arrival[key],before[key]);assert.equal(arrival.chapter3,!release);assert.equal(arrival.chapter2,!release);
+  if(!release){await p.evaluate(()=>{profiledPirateId='barley';startProfiledPirate();});await p.waitForFunction(()=>activeSceneId==='chapter_3_arrival'&&scenePhase==='ready');assert.equal(await p.evaluate(()=>chapterState('chapter_3').introSeen),false);}
+  await p.close();
+  const q=await b.newPage({serviceWorkers:'block'});await q.goto(release?process.env.RELEASE_TEST_URL:process.env.TEST_URL,{waitUntil:'networkidle'});await q.locator('#enterTavern').click();await q.waitForTimeout(2700);await q.evaluate(()=>{pendingPirateStart={level:1,pirateId:'dave',playerName:'Shortcut QA'};beginPendingPirateMatch(true);document.activeElement?.blur();});
+  for(let i=0;i<5;i++)await q.keyboard.press('t');assert.equal(await q.evaluate(()=>state.frameOver),false);await q.keyboard.press('t');assert.equal(await q.evaluate(()=>state.frameOver),!release);
+  if(!release){assert.deepEqual(await q.evaluate(()=>Object.keys(career.piratesDefeated).filter(k=>career.piratesDefeated[k])),['1']);assert.deepEqual(await q.evaluate(()=>[career.sevenBallWins,career.foulFreeWins,career.oneVisitClearances]),[0,0,0]);assert.equal(await q.evaluate(()=>career.framesWon),1);}else{assert.equal(await q.evaluate(()=>career.framesWon),0);assert.deepEqual(await q.evaluate(()=>career.piratesDefeated),{});}
+  await q.close();console.log(`PASS ${release?'release':'development'}: I roster/first Chapter 3 arrival without invented rewards; T×5 inert, T×6 ${release?'rejected':'wins only the active opponent without unearned perfect-play statistics'}`);
+ }
+}finally{await b.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

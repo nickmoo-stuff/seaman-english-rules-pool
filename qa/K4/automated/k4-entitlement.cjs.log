@@ -1,0 +1,8 @@
+Command: node tests/k4-entitlement.cjs
+TEST_URL=http://127.0.0.1:8013/
+PASS release native fixture verified_owner: Chapter 4 gate, imported ownership ignored, progress preserved, no payments
+PASS release native fixture not_owned: Chapter 4 gate, imported ownership ignored, progress preserved, no payments
+PASS release native fixture pending: Chapter 4 gate, imported ownership ignored, progress preserved, no payments
+PASS release native fixture verification_unavailable: Chapter 4 gate, imported ownership ignored, progress preserved, no payments
+PASS release native fixture checking: Chapter 4 gate, imported ownership ignored, progress preserved, no payments
+PASS native expiry fixture: one ownership requery, rack retained, play resumes after ownership reply and stops after revoked reply

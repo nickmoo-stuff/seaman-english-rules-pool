@@ -1,0 +1,7 @@
+Command: node tests/k6d-boss-music.cjs
+TEST_URL=http://127.0.0.1:8030/
+page.waitForFunction: Timeout 30000ms exceeded.
+    at /workspace/seamen-pool-development/tests/k6d-boss-music.cjs:9:395 {
+  log: [],
+  name: 'TimeoutError'
+}

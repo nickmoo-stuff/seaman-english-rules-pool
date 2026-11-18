@@ -1,0 +1,3 @@
+Command: python tests/k5a-freeze.py
+TEST_URL=http://127.0.0.1:8030/
+PASS frozen bd79490 payload: all 117 game/native files byte-identical, no additions/deletions, 151 literal media references resolve; physics, dialogue, artwork, saves, purchases-disabled bridge and version/build preserved

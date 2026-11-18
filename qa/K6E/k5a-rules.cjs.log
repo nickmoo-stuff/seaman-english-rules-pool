@@ -1,0 +1,4 @@
+Command: node tests/k5a-rules.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS 15 EPA adjudicator cases: breaks/re-rack/black respot, open groups, first contact/action, in-off, ball in hand, continuation/turn loss, early black; no two-visit or free-target exemption
+PASS 8 real-engine scenarios: group pot, wrong colour, in-off, no contact, no-action foul, legal/early black and full-rack break

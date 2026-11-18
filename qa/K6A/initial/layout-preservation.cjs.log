@@ -1,0 +1,6 @@
+Command: node tests/layout-preservation.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS desktop portrait: existing table/control geometry and styles match approved K3C.2
+PASS desktop landscape: existing table/control geometry and styles match approved K3C.2
+PASS large desktop landscape: existing table/control geometry and styles match approved K3C.2
+PASS mobile portrait: existing table/control geometry and styles match approved K3C.2

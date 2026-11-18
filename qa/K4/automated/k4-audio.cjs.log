@@ -1,0 +1,3 @@
+Command: node tests/k4-audio.cjs
+TEST_URL=http://127.0.0.1:8000/
+PASS mocked media: first-intro/match/victory continuity, loop, one deck, mute/volume, loss restart, replay from zero, menu cleanup, rejected autoplay retry and in-place resume

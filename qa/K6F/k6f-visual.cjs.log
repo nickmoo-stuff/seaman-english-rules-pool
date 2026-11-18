@@ -1,0 +1,3 @@
+Command: node tests/k6f-visual.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS 2-second shimmer, saturated palette, 180ms hover/leave brightness/border/glow, stable geometry/wording, visible keyboard focus, static colourful reduced motion and no disabled animation across desktop/portrait/landscape

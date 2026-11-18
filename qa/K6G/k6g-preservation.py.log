@@ -1,0 +1,2 @@
+Command: python tests/k6g-preservation.py
+PASS frozen billing/native/purchase/tokens, art/audio/dialogue/physics/AI; save schemas unchanged; modifications scoped to naming, safe name display, UI and version metadata

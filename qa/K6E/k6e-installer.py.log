@@ -1,0 +1,5 @@
+Command: python tests/k6e-installer.py
+Final repeat adds a mid-operation failure after native writes; all sources restored.
+PASS LF/BOM-CRLF: install/idempotence; debug/production separate opt-ins; default/unsynced/release conflicts refused; OFF; exact rollback/idempotence
+PASS modified/duplicate/release/bundled-ON/backup-tamper refusals; forced failure preserves sources
+PASS 54 K6E PowerShell operation assertions; all positive payment permissions were disposable source fixtures, not transactions

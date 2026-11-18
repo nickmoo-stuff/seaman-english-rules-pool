@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-16T22:41:10.976995+00:00",
+  "baseline": "ff5c1b9",
+  "version": "1.0.0",
+  "build": 1595,
+  "tests": [
+    {
+      "suite": "k6g-migration.cjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 31.55
+    },
+    {
+      "suite": "k4-consistency.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 0.59
+    },
+    {
+      "suite": "k6g-preservation.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 1.11
+    }
+  ],
+  "counts": {
+    "PASS": 3,
+    "FAIL": 0,
+    "NOT TESTED": 0
+  },
+  "limitations": [
+    "Linux Chromium, not a physical Android app restart. Persistent Chromium profile is closed/reopened on disk.",
+    "Compact Story win uses real physics/EPA rules on a test fixture; no artificial success button.",
+    "Native ownership replies are mocks, not real Play transactions.",
+    "Android wrapper/signing/AAB and Play code availability are unavailable."
+  ]
+}

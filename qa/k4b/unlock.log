@@ -1,0 +1,6 @@
+PASS real developer button unlocks all 27 available opponents in Chapters 1–4, without defeats/selection/intro flags, saves, rewards or entitlement changes; Chapter 5 stays locked
+PASS first-time Chapter 2 intro/boss reveal, Chapter 3 arrival/challenge, supporter intros and Lucy intro; actual K4 shot permitted by dev access without claiming ownership
+PASS reload ends unlock bypass, genuine watched sequences persist, J shortcut uses the same catalogue-based action
+PASS future playable catalogue entry unlocks automatically, missing optional chapter intro does not recurse, unreleased prototype remains unavailable
+PASS release rejects unlock action and injected session flag without changing progression or ownership
+PASS native rejects unlock action and injected session flag without changing progression or ownership

@@ -1,0 +1,11 @@
+Command: node tests/lesson-one-completion.cjs
+TEST_URL=http://127.0.0.1:8030/
+AssertionError [ERR_ASSERTION]: legal black pot available
+    at /workspace/seamen-pool-development/tests/lesson-one-completion.cjs:18:25 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: null,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

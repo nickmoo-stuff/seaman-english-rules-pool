@@ -1,0 +1,5 @@
+Command: node tests/placement-controls.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS 855x384: arrows visible with Details closed/all panels closed, all four move white, confirm enables shots and restores table, ball-in-hand placement
+PASS 740x360: arrows visible with Details closed/all panels closed, all four move white, confirm enables shots and restores table, ball-in-hand placement
+PASS 844x340: arrows visible with Details closed/all panels closed, all four move white, confirm enables shots and restores table, ball-in-hand placement

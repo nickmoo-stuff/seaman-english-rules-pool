@@ -1,0 +1,5 @@
+Command: node tests/k5a-saves.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS schema 1: statistics/records/ticks/trophies/selected cosmetic/settings/story flags survive reload; old-version portable round-trip, malformed/ownership rejection and transactional quota rollback preserve data
+PASS schema 6: statistics/records/ticks/trophies/selected cosmetic/settings/story flags survive reload; old-version portable round-trip, malformed/ownership rejection and transactional quota rollback preserve data
+PASS schema 7: statistics/records/ticks/trophies/selected cosmetic/settings/story flags survive reload; old-version portable round-trip, malformed/ownership rejection and transactional quota rollback preserve data

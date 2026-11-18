@@ -1,0 +1,29 @@
+(mark PASS / FAIL / N/T, attach evidence)
+01. Confirm approved baseline, branch and AGENTS.md instructions; no live deployment.
+02. Fresh save: Ch1–3 unaffected, Ch4 entitlement and progression gating correct.
+03. Existing migrated save: progress, trophies and cosmetics retained.
+04. All five story opponents in correct order; Spinball Wizard excluded from required ladder.
+05. All user-authored dialogue verbatim, no template prompts displayed.
+06. Each pre-match, win Theatre and opaque-black transition loads cleanly on slow device.
+07. Hedgehog zooms in then bobs; level 3 always 66% power/topspin.
+08. Youth slow face vapour, phone waves and 0.5-second match waves; level 3.
+09. Socks backspin and cushion preference; level 4.
+10. Most Evil Creature left/right spin, rain and glow; level 5.
+11. Lucy level 6, centered spin, strong chaining without cheating.
+12. Lucy darkness is 85% transparent and clears/fades correctly on shots.
+13. Flames render while balls move and never block controls.
+14. Exactly one cannonshot per shot by either player, no additional new SFX.
+15. First-time Lucy intro starts music at 0:00, uninterrupted through match/outro, loops.
+16. Lucy replay skipping intro starts music at 0:00 on match start.
+17. Lucy loss/rematch restarts music at 0:00; no overlapping audio.
+18. Music respects mute/volume and mobile audio restrictions; cleans up on exit.
+19. Each cue matches its catalogue preview; rings/glows/leaf/zigzag rendered correctly.
+20. First wins award correct trophies/cues and Lucy table; replay no duplicate.
+21. Lucy outro shows only Most Evil Creature entering, with Lucy and Blackball present.
+22. Golden Cue NOT awarded; €3 Vinted / One True Guy / Evri ending preserved.
+23. Chapter 5 remains locked/unimplemented; no premature Heaven reveal.
+24. Portrait/landscape, touch and keyboard, reduced-motion support where present.
+25. Offline/service worker caching and asset loading, no flashes or broken media.
+26. Ch0–3 regression: rules, spin, Theatre, supporters, cosmetics, saves, settings.
+27. Entitlement purchase/restore tests using safe test infrastructure only.
+28. Deliver version/build-labelled ZIP, commit SHA, changelog, PASS/FAIL/N/T list; no publish.

@@ -1,0 +1,29 @@
+Command: node tests/theatre.cjs
+TEST_URL=http://127.0.0.1:8030/
+AssertionError [ERR_ASSERTION]: chapter_3_blockbeard_victory
++ actual - expected
+... Skipped lines
+
+  {
+    assets: {
+      backgrounds: {
+        cathedral: {
+          src: 'assets/scenes/ch3-blockbeard-cathedral.webp'
+...
+        },
++       text: 'The voyage continues... somewhat further below sea level. Chapter 4 — Five Circles of Hell.'
+-       text: 'The voyage continues... somewhat further below sea level. Chapter 4 — Coming later.'
+      }
+    ],
+    theatreEffects: true,
+    title: 'Captain Blockbeard',
+    typewriterMs: 22
+
+    at /workspace/seamen-pool-development/tests/theatre.cjs:14:333 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [Object],
+  expected: [Object],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

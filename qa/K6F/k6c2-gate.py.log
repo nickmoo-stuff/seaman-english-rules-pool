@@ -1,0 +1,7 @@
+Command: python tests/k6c2-gate.py
+TEST_URL=http://127.0.0.1:8030/
+PASS OFF -> debug-test ON -> OFF, idempotent both modes, exact backups, LF/BOM-CRLF preserved; JVM ON admits debug only and OFF blocks both
+PASS 26 release/unexpected source/configuration/link/lock cases rejected without writes
+PASS OFF rejects an unrecognised edited ON source without overwriting it
+PASS omitted debug intent refused; forced write failure preserves source/backup and releases operation lock
+PASS historical native baseline untouched (K6E web changes audited separately); no Android build, install, upload, payment or Play query; 41 PowerShell operation assertions

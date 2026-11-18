@@ -1,0 +1,3 @@
+Command: node tests/k4a4-cutouts.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS all five actual Theatre images load, contain transparent and visible pixels, finish entrances and render above their backgrounds; exact replacement Socks path; no page errors

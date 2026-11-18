@@ -1,0 +1,7 @@
+PASS LF/BOM-CRLF, dry-run, exact backups, protected job manifest, scoped five native files, existing versions/config/web preserved, repeat installation
+PASS ten unsupported/conflicting wrapper fixtures refused without writes
+PASS forced manifest write failure rolls back Java replacement/new files
+PASS apply once before ordinary web-copy/sync/build: no www/source overlay needed, version/app/signing config unchanged, repeat run does nothing
+PASS five duplicate/comment-only registration conflicts stop before writes
+PASS standalone native folder without web files; altered enabled test-gate source refused without writes
+PASS all five K6A Java sources and complete web/game/historical-native payload unchanged; debug gate OFF and release guard retained

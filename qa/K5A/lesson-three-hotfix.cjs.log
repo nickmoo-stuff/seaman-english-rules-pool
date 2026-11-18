@@ -1,0 +1,17 @@
+Command: node tests/lesson-three-hotfix.cjs
+TEST_URL=http://127.0.0.1:8031/
+PASS 390x844 unchanged-position confirmation does not pass; corrective retry retained
+PASS 390x844 legal red contact and cushion without red pot does not pass; corrective retry retained
+PASS 390x844 yellow pot does not pass; corrective retry retained
+PASS 390x844 illegal red pot does not pass; corrective retry retained
+PASS 390x844 second in-off does not pass; corrective retry retained
+PASS 390x844 early black foul does not pass; corrective retry retained
+PASS 390x844 real opening/blocked rack/mobile arrows/confirmed red pot/immediate completion/persistence/trophy/career isolation
+PASS 855x384 unchanged-position confirmation does not pass; corrective retry retained
+PASS 855x384 legal red contact and cushion without red pot does not pass; corrective retry retained
+PASS 855x384 yellow pot does not pass; corrective retry retained
+PASS 855x384 illegal red pot does not pass; corrective retry retained
+PASS 855x384 second in-off does not pass; corrective retry retained
+PASS 855x384 early black foul does not pass; corrective retry retained
+PASS 855x384 real opening/blocked rack/mobile arrows/confirmed red pot/immediate completion/persistence/trophy/career isolation
+PASS Lessons 1/2/4 racks/groups/instructions match approved Alpha; Lesson 5 implementation untouched

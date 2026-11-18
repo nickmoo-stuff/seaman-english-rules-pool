@@ -1,0 +1,4 @@
+Command: node tests/k5a-dev.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS development: I roster/first Chapter 3 arrival without invented rewards; T×5 inert, T×6 wins only the active opponent without unearned perfect-play statistics
+PASS release: I roster/first Chapter 3 arrival without invented rewards; T×5 inert, T×6 rejected

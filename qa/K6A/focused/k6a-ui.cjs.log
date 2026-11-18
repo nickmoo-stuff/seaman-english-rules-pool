@@ -1,0 +1,21 @@
+Command: node tests/k6a-ui.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS 390x844 completed: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 390x844 pending: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 390x844 cancelled: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 390x844 failed: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 390x844 already_owned: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 390x844 unavailable: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 855x384 completed: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 855x384 pending: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 855x384 cancelled: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 855x384 failed: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 855x384 already_owned: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 855x384 unavailable: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 1366x768 completed: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 1366x768 pending: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 1366x768 cancelled: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 1366x768 failed: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 1366x768 already_owned: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS 1366x768 unavailable: native fixture, actual regional price, readable persistent feedback, one prompt, correct Chapters 1–4 gates and unchanged saves
+PASS public web/PWA service never exposes native purchase or restore

@@ -1,0 +1,2 @@
+Command: node tests/k6g-migration.cjs
+PASS eight old/default/custom/invalid/legacy-key migration cases without lost statistics; Enter saves without navigation; failed persistence reports failure and retains prior name; save/rename visible and usable at three viewports

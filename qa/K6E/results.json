@@ -1,0 +1,434 @@
+{
+  "date": "2026-11-16T19:38:17.313552+00:00",
+  "baseline": "108ede8",
+  "version": "0.17.62",
+  "build": 1592,
+  "tests": [
+    {
+      "suite": "k6a-java-check.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 3.15,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k6a-installer.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 15.19,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k6e-preservation.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.94,
+      "verification": "final focused verification"
+    },
+    {
+      "suite": "k6e-java-check.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 2.05,
+      "verification": "final focused verification"
+    },
+    {
+      "suite": "k6e-installer.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": null,
+      "verification": "final 54-operation repeat including partial-write rollback; PASS"
+    },
+    {
+      "suite": "k6c2-gate.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 45.89,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k4-consistency.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.51,
+      "verification": "final focused verification"
+    },
+    {
+      "suite": "k4a4-artwork.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.34,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k4b-assets.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.36,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "campaign-regression.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 15.63,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "helm-responsive.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 31.04,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k4-ai.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 5.71,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k4-artwork.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 30.5,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k4-audio.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 6.11,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k4-entitlement.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 15.74,
+      "verification": "final focused verification"
+    },
+    {
+      "suite": "k4-mobile.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 32.45,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k4-offline.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 3.31,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k4.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 25.39,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k4a1-dev-supporter.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 27.99,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k4a2.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 28.96,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k4a4-cutouts.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 21.46,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k4a4.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 27.97,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k4b.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 16.1,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k5a-dev.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 19.68,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k5a-file-origin.cjs",
+      "exitCode": 77,
+      "status": "NOT TESTED",
+      "seconds": 1.27,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k5a-multiplayer.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 15.29,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k5a-opponents.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 7.89,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k5a-rules.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 5.91,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k5a-saves.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 7.31,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k6a-service.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.12,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k6a-ui.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 106.86,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k6d-boss-music.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 12.29,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k6d-vaper-spin.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 6.36,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k6e-ui.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 14.57,
+      "verification": "final focused verification"
+    },
+    {
+      "suite": "layout-correction.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 88.09,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "layout-preservation.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 40.38,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "layout.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 81.19,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "lesson-one-completion.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 70.93,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "lesson-three-hotfix.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 32.96,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "mobile-table-first.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 101.82,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "placement-controls.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 21.38,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "pool-school-layout.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 79.98,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "pool-school.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 24.2,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "spin-offline.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 8.5,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "spin-physics.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 4.78,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "spin-ui.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 46.57,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "story-reminder-layout.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 40.81,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "story-reminder.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 33.86,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "supporter-restore.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 144.83,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "supporter-service.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.22,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "supporter-ui.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 90.33,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "theatre-offline.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 10.48,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "theatre-readiness.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 50.25,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "theatre-responsive.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 141.34,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "theatre.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 72.2,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "unlock-all-pirates.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 18.92,
+      "verification": "complete regression run"
+    },
+    {
+      "suite": "k6e-release-guard.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 2.26,
+      "verification": "final focused verification"
+    },
+    {
+      "suite": "k6e-release.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 9.02,
+      "verification": "final focused verification"
+    }
+  ],
+  "counts": {
+    "PASS": 57,
+    "FAIL": 0,
+    "NOT TESTED": 1
+  },
+  "limitations": [
+    "Chromium on Linux, HTTP; no physical Android/iOS or real Google Play transactions.",
+    "Ownership bridge replies are fixtures.",
+    "Historical alpha packaging and milestone-specific diff-only audits are excluded.",
+    "Groovy guard executed with a task DSL fixture, not actual Gradle/AGP.",
+    "PowerShell tested on Linux Core, not Windows 5.1.",
+    "Play versionCode 1592 availability unverified."
+  ],
+  "branch": "stage6-k6e-production-billing-rc",
+  "method": "Complete 56-suite regression plus eight final focused checks, including two new suites; 58 distinct suites.",
+  "sourceWebMode": "development",
+  "deliveredWebMode": "release",
+  "nativeBuildPerformed": false,
+  "purchasesEnabled": false,
+  "productionActivationPerformed": false
+}

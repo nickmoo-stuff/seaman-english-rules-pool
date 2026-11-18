@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-16T19:35:32.451532+00:00",
+  "baseline": "108ede8",
+  "version": "0.17.62",
+  "build": 1592,
+  "tests": [
+    {
+      "suite": "k6e-installer.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": null,
+      "verification": "final 54-operation repeat including partial-write rollback; PASS"
+    },
+    {
+      "suite": "k6e-release-guard.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 2.26
+    },
+    {
+      "suite": "k6e-java-check.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 2.05
+    },
+    {
+      "suite": "k6e-preservation.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.94
+    },
+    {
+      "suite": "k6e-ui.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 14.57
+    },
+    {
+      "suite": "k6e-release.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 9.02
+    },
+    {
+      "suite": "k4-consistency.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.51
+    },
+    {
+      "suite": "k4-entitlement.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 15.74
+    }
+  ],
+  "counts": {
+    "PASS": 8,
+    "FAIL": 0,
+    "NOT TESTED": 0
+  },
+  "limitations": [
+    "Chromium on Linux, HTTP; no physical Android/iOS or real Google Play transactions.",
+    "Ownership bridge replies are fixtures.",
+    "Historical alpha packaging and milestone-specific diff-only audits are excluded."
+  ]
+}

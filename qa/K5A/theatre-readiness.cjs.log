@@ -1,0 +1,8 @@
+Command: node tests/theatre-readiness.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS delayed entry/destination readiness, opaque covers, duplicate triggers/rotation, safe preview and exact match/save restoration
+PASS missing artwork: graceful story continuation and exit, no page errors or save changes
+PASS missing opponent portrait: original quote/name and match entry remain usable
+PASS unresponsive artwork deadline: no permanent black screen; story and exit stay available
+PASS original non-reduced fade and opaque screen replacement
+PASS release guard: normal story triggers without development diagnostics/preview

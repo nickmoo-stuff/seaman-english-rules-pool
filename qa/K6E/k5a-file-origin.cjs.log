@@ -1,0 +1,3 @@
+Command: node tests/k5a-file-origin.cjs
+TEST_URL=http://127.0.0.1:8030/
+NOT TESTED: managed Chromium blocks file:// navigation with ERR_BLOCKED_BY_ADMINISTRATOR; Windows direct-file QA still required.

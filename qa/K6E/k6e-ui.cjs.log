@@ -1,0 +1,3 @@
+Command: node tests/k6e-ui.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS native-true/false availability, regional price, pending/owner/unknown feedback; exact entry wording, scoped shimmer/reduced motion and portrait/landscape/desktop rendering

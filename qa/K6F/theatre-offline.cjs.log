@@ -1,0 +1,3 @@
+Command: node tests/theatre-offline.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS offline Theatre: cached runtime/artwork after reload, uncached-art fallback and exit, no page errors or progress changes

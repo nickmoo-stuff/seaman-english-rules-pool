@@ -1,0 +1,28 @@
+{
+  "asset": "www/assets/k4/09_spinball_wizard_2s.webp",
+  "byteIdenticalToApprovedK4A4Asset": true,
+  "sha256": "3ce91b8e35c38417090cb8c954f18adb23eb54854ae17a3340b89113edfec4b7",
+  "frames": 16,
+  "durationsMs": [
+    125,
+    125,
+    125,
+    125,
+    125,
+    125,
+    125,
+    125,
+    125,
+    125,
+    125,
+    125,
+    125,
+    125,
+    125,
+    125
+  ],
+  "totalMs": 2000,
+  "loop": 0,
+  "eachFrameHasTransparency": true,
+  "distinctFrames": 16
+}

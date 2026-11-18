@@ -1,0 +1,600 @@
+[
+  {
+    "id": "dave",
+    "targetLegal": true,
+    "aiLevel": 1,
+    "profile": "Wobbly",
+    "personality": "Enthusiastic Chaos",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "simon",
+    "targetLegal": true,
+    "aiLevel": 2,
+    "profile": "Learner",
+    "personality": "Geometry Enthusiast",
+    "kind": "DIRECT POT",
+    "power": 65,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": true,
+    "pots": [
+      "red",
+      "white"
+    ],
+    "cushion": true,
+    "frameOver": false,
+    "last": "FOUL: cue ball potted (in-off) • Opponent gets cue ball in hand anywhere."
+  },
+  {
+    "id": "holly",
+    "targetLegal": true,
+    "aiLevel": 3,
+    "profile": "Competent",
+    "personality": "Focused Amateur",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "mick",
+    "targetLegal": true,
+    "aiLevel": 4,
+    "profile": "Sharp",
+    "personality": "Tornado",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "blackball",
+    "targetLegal": true,
+    "aiLevel": 5,
+    "profile": "Captain",
+    "personality": "Veteran Strategist",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "cyclops",
+    "targetLegal": true,
+    "aiLevel": 6,
+    "profile": "Cyclops",
+    "personality": "One-Eyed Wrecking Ball",
+    "kind": "SAFETY",
+    "power": 100,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": true,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "vaper",
+    "targetLegal": true,
+    "aiLevel": 7,
+    "profile": "Perfect",
+    "personality": "Relentless Perfectionist",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "sandy",
+    "targetLegal": true,
+    "aiLevel": 2,
+    "profile": "Learner",
+    "personality": "Showy Positional Thinker",
+    "kind": "DIRECT POT",
+    "power": 65,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": true,
+    "pots": [
+      "red",
+      "white"
+    ],
+    "cushion": true,
+    "frameOver": false,
+    "last": "FOUL: cue ball potted (in-off) • Opponent gets cue ball in hand anywhere."
+  },
+  {
+    "id": "shelle",
+    "targetLegal": true,
+    "aiLevel": 3,
+    "profile": "Competent",
+    "personality": "Instinctive Potter",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "graham",
+    "targetLegal": true,
+    "aiLevel": 4,
+    "profile": "Sharp",
+    "personality": "Methodical Overthinker",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "papa_surf",
+    "targetLegal": true,
+    "aiLevel": 4,
+    "profile": "Sharp",
+    "personality": "Unsettling Safety Expert",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "chapter2_boss",
+    "targetLegal": true,
+    "aiLevel": 7,
+    "profile": "Perfect",
+    "personality": "Wiggly Unpredictability",
+    "kind": "DIRECT POT",
+    "power": 30,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "barley",
+    "targetLegal": true,
+    "aiLevel": 2,
+    "profile": "Learner",
+    "personality": "Patient Farmer",
+    "kind": "DIRECT POT",
+    "power": 65,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": true,
+    "pots": [
+      "red",
+      "white"
+    ],
+    "cushion": true,
+    "frameOver": false,
+    "last": "FOUL: cue ball potted (in-off) • Opponent gets cue ball in hand anywhere."
+  },
+  {
+    "id": "legolass",
+    "targetLegal": true,
+    "aiLevel": 4,
+    "profile": "Sharp",
+    "personality": "Long-Range Archer",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "aragoon",
+    "targetLegal": true,
+    "aiLevel": 5,
+    "profile": "Captain",
+    "personality": "Ranger Tactician",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "souronion",
+    "targetLegal": true,
+    "aiLevel": 6,
+    "profile": "Cyclops",
+    "personality": "Dark-Lord Attacker",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "blockbeard",
+    "targetLegal": true,
+    "aiLevel": 7,
+    "profile": "Perfect",
+    "personality": "Square-Dimension Master",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "gimlet",
+    "targetLegal": true,
+    "aiLevel": 6,
+    "profile": "Cyclops",
+    "personality": "Cushion-Averse Power",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "bam_bam",
+    "targetLegal": true,
+    "aiLevel": 5,
+    "profile": "Captain",
+    "personality": "Bam Bam — Wild Visit",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "vile_hedgehog",
+    "targetLegal": true,
+    "aiLevel": 3,
+    "profile": "Competent",
+    "personality": "Straight Shooter",
+    "kind": "DIRECT POT",
+    "power": 66,
+    "spin": {
+      "x": 0,
+      "y": -0.7
+    },
+    "first": "red",
+    "planned": "red",
+    "white": true,
+    "pots": [
+      "red",
+      "white"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "FOUL: cue ball potted (in-off) • Opponent gets cue ball in hand anywhere."
+  },
+  {
+    "id": "filthy_youth",
+    "targetLegal": true,
+    "aiLevel": 3,
+    "profile": "Competent",
+    "personality": "Straight Shooter",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "socks_sandals",
+    "targetLegal": true,
+    "aiLevel": 4,
+    "profile": "Sharp",
+    "personality": "Cagey First Mate",
+    "kind": "CUSHION ESCAPE",
+    "power": 57,
+    "spin": {
+      "x": 0,
+      "y": 0.65
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": true,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "most_evil",
+    "targetLegal": true,
+    "aiLevel": 5,
+    "profile": "Captain",
+    "personality": "Tactical Captain",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": -0.55,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "lucy_fir",
+    "targetLegal": true,
+    "aiLevel": 6,
+    "profile": "Lucy Fir",
+    "personality": "Lucy Fir — Chaining",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "spinball_wizard",
+    "targetLegal": true,
+    "aiLevel": 5,
+    "profile": "Captain",
+    "personality": "Chaotic Show-off",
+    "kind": "SAFETY",
+    "power": 38,
+    "spin": {
+      "x": 0,
+      "y": -0.75
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": true,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "pokey_man",
+    "targetLegal": true,
+    "aiLevel": 5,
+    "profile": "Captain",
+    "personality": "Tactical Captain",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  },
+  {
+    "id": "izzy",
+    "targetLegal": true,
+    "aiLevel": 5,
+    "profile": "Captain",
+    "personality": "Tactical Captain",
+    "kind": "DIRECT POT",
+    "power": 35,
+    "spin": {
+      "x": 0,
+      "y": 0
+    },
+    "first": "red",
+    "planned": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "frameOver": false,
+    "last": "LEGAL POT: 1 RED potted • continue"
+  }
+]

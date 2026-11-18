@@ -1,0 +1,38 @@
+{
+  "version": "0.17.56",
+  "build": 1586,
+  "baseline": "3a54fffd02555a2c98b75730b5f2d8823622e671",
+  "checks": [
+    {
+      "suite": "k4-artwork.py (uploaded source ZIP comparison)",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "k4-artwork.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "k4-consistency.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "k4.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "k4-offline.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    }
+  ],
+  "imageModification": false,
+  "runtimeChanges": "Image references plus version/cache metadata only",
+  "limitations": [
+    "Browser checks used Chromium over HTTP; actual Windows Chrome file:// navigation remains unavailable in this managed environment",
+    "No Android build, hardware testing, publication or deployment"
+  ]
+}

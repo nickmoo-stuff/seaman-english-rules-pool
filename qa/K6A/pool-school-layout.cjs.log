@@ -1,0 +1,7 @@
+Command: node tests/pool-school-layout.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS 320x568: stacked contained buttons, usable controls, expand/minimise/close/reopen, real shot, hidden phase updates, restart/exit after failure
+PASS 390x844: stacked contained buttons, usable controls, expand/minimise/close/reopen, real shot, hidden phase updates, restart/exit after failure
+PASS 480x800: stacked contained buttons, usable controls, expand/minimise/close/reopen, real shot, hidden phase updates, restart/exit after failure
+PASS 800x600: stacked contained buttons, usable controls, expand/minimise/close/reopen, real shot, hidden phase updates, restart/exit after failure
+PASS 1366x768: stacked contained buttons, usable controls, expand/minimise/close/reopen, real shot, hidden phase updates, restart/exit after failure

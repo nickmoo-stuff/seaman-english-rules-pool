@@ -1,0 +1,3 @@
+Command: python tests/k6f-preservation.py
+TEST_URL=http://127.0.0.1:8030/
+PASS approved game, billing/ownership/state/UI text, artwork, audio, physics, AI, saves and all native tools frozen; only candidate metadata and scoped supporter styling changed

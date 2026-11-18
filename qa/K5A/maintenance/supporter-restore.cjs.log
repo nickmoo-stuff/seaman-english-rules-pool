@@ -1,0 +1,28 @@
+Command: node tests/supporter-restore.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS 390x844 backend: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 390x844 not_owned: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 390x844 pending: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 390x844 rejected: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 390x844 timeout: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 390x844 unverified_owner: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 390x844 verified_owner: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 390x844 device_unavailable: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 855x384 backend: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 855x384 not_owned: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 855x384 pending: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 855x384 rejected: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 855x384 timeout: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 855x384 unverified_owner: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 855x384 verified_owner: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 855x384 device_unavailable: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 740x360 backend: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 740x360 not_owned: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 740x360 pending: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 740x360 rejected: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 740x360 timeout: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 740x360 unverified_owner: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 740x360 verified_owner: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 740x360 device_unavailable: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 1366x768 backend: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves
+PASS 320x568 backend: real-global bridge response fixture, visible checking/persistent result, no scroll/geometry jump, coalesced requests and unchanged saves

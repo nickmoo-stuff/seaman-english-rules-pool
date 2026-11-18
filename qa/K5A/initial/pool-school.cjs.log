@@ -1,0 +1,3 @@
+Command: node tests/pool-school.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS: menu fixes; lessons 1–5 engine outcomes, failures, control requirements, placement, early black, persistence, trophy, future lesson stability, career isolation, normal multiplayer tracking.

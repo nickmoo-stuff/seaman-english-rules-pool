@@ -1,0 +1,17 @@
+{
+  "version": "0.17.57",
+  "build": 1587,
+  "baseline": "95f1a0758c102eb8ed269c0fdf2f3a1a755c3fb4",
+  "checks": {
+    "focused": "PASS",
+    "campaign": "PASS",
+    "k4": "PASS",
+    "native-security": "PASS",
+    "consistency": "PASS"
+  },
+  "limitations": [
+    "Browser tests use Chromium over HTTP; managed browser blocks direct file navigation.",
+    "Physical Android/iOS and real Google Play transactions not tested.",
+    "Native ownership responses use test fixtures."
+  ]
+}

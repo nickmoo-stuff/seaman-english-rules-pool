@@ -1,0 +1,2325 @@
+Command: node tests/theatre.cjs
+TEST_URL=http://127.0.0.1:8030/
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+... Skipped lines
+
+  {
+    blackball_ending: {
+      assets: {
+        backgrounds: {
+          quarters: {
+...
+          },
++         text: 'The voyage continues... somewhat further below sea level. Chapter 4 — Five Circles of Hell.'
+-         text: 'The voyage continues... somewhat further below sea level. Chapter 4 — Coming later.'
+        }
+      ],
+      theatreEffects: true,
+      title: 'Captain Blockbeard',
+      typewriterMs: 22
+...
+    },
++   chapter_4_filthy_youth_challenge: {
++     assets: {
++       backgrounds: {
++         hell: {
++           src: 'assets/k4/06_Shared_Fiery_Pits_Theatre.png'
++         }
++       },
++       characters: {
++         blackball: {
++           alt: 'Captain Blackball',
++           anchor: 'bottom-center',
++           src: 'assets/scenes/captain-blackball-main.png',
++           width: 36,
++           x: 23,
++           y: 96
++         },
++         filthy_youth: {
++           alt: 'Filthy Youth with a Phone',
++           anchor: 'bottom-center',
++           className: 'k4-character k4-youth',
++           src: 'assets/k4/02_Filthy_Youth_With_Phone_approved.png',
++           suppressSpeakerWobble: false,
++           width: 38,
++           x: 73,
++           y: 96
++         }
++       },
++       props: {}
++     },
++     chapter: 'chapter_4',
++     finishFadeMs: 1625,
++     finishLabel: 'Begin match',
++     id: 'chapter_4_filthy_youth_challenge',
++     kicker: 'FIVE CIRCLES OF HELL',
++     lines: [
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'filthy_youth'
++           ]
++         },
++         text: 'Can you smell bubblegum?'
++       },
++       {
++         speaker: 'Filthy youth with a phone',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'filthy_youth'
++           ]
++         },
++         text: 'Wagwan. Bruh what? Ya claat.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'filthy_youth'
++           ]
++         },
++         text: 'The blue creature sent me this way. Friendly chap. Horrifically vile. Do you know Lucy? Pray, I must parley with her post-haste.'
++       },
++       {
++         speaker: 'Filthy youth with a phone',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'filthy_youth'
++           ]
++         },
++         text: "Lol. Man can't 'ear ya."
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'filthy_youth'
++           ]
++         },
++         text: "Did you just say lol? Why is your phone vomiting? You really think that's a shanty?"
++       },
++       {
++         speaker: 'Filthy youth with a phone',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'filthy_youth'
++           ]
++         },
++         text: 'Fr, fr, beta.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'filthy_youth'
++           ]
++         },
++         text: 'Indeed. Pool, then?'
++       },
++       {
++         speaker: 'Filthy youth with a phone',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'filthy_youth'
++           ]
++         },
++         text: '*spits on the floor, then nods*'
++       },
++       {
++         speaker: 'Filthy Youth with a Phone',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'filthy_youth'
++           ]
++         },
++         text: 'Nahhhhh mush'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'filthy_youth'
++           ]
++         },
++         text: 'I have a feeling that phone will be making those awful noisewaves throughout this whole match.'
++       }
++     ],
++     theatreEffects: true,
++     title: 'Filthy Youth with a Phone',
++     typewriterMs: 22
++   },
++   chapter_4_filthy_youth_victory: {
++     assets: {
++       backgrounds: {
++         hell: {
++           src: 'assets/k4/06_Shared_Fiery_Pits_Theatre.png'
++         }
++       },
++       characters: {
++         blackball: {
++           alt: 'Captain Blackball',
++           anchor: 'bottom-center',
++           src: 'assets/scenes/captain-blackball-main.png',
++           width: 36,
++           x: 23,
++           y: 96
++         },
++         filthy_youth: {
++           alt: 'Filthy Youth with a Phone',
++           anchor: 'bottom-center',
++           className: 'k4-character k4-youth',
++           src: 'assets/k4/02_Filthy_Youth_With_Phone_approved.png',
++           suppressSpeakerWobble: false,
++           width: 38,
++           x: 73,
++           y: 96
++         }
++       },
++       props: {}
++     },
++     chapter: 'chapter_4',
++     finishFadeMs: 1625,
++     finishLabel: 'Return to roster',
++     id: 'chapter_4_filthy_youth_victory',
++     kicker: 'FIVE CIRCLES OF HELL',
++     lines: [
++       {
++         speaker: 'Filthy youth with a phone',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'filthy_youth'
++           ]
++         },
++         text: 'Tsssss.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'filthy_youth'
++           ]
++         },
++         text: 'Is that Lynx Africa?'
++       },
++       {
++         speaker: 'Filthy youth with a phone',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'filthy_youth'
++           ]
++         },
++         text: "Ayyyy! Man's smelt. G."
++       }
++     ],
++     theatreEffects: true,
++     title: 'Filthy Youth with a Phone',
++     typewriterMs: 22
++   },
++   chapter_4_lucy_fir_challenge: {
++     assets: {
++       backgrounds: {
++         hell: {
++           src: 'assets/k4/07_Lucy_Dungeon_Theatre.png'
++         }
++       },
++       characters: {
++         blackball: {
++           alt: 'Captain Blackball',
++           anchor: 'bottom-center',
++           src: 'assets/scenes/captain-blackball-main.png',
++           width: 36,
++           x: 23,
++           y: 96
++         },
++         lucy_fir: {
++           alt: 'Lucy Fir',
++           anchor: 'bottom-center',
++           className: 'k4-character k4-lucy',
++           src: 'assets/k4/05_Lucy_Fir_Adobe_Express_Cutout.png',
++           suppressSpeakerWobble: false,
++           width: 15.2,
++           x: 73,
++           y: 96
++         },
++         most_evil: {
++           alt: 'The Most Evil Creature Imaginable',
++           anchor: 'bottom-center',
++           className: 'k4-character k4-tmeci',
++           src: 'assets/k4/04_Most_Evil_Creature_Imaginable_approved.png',
++           suppressSpeakerWobble: false,
++           width: 33.75,
++           x: 49,
++           y: 95
++         }
++       },
++       props: {}
++     },
++     chapter: 'chapter_4',
++     finishFadeMs: 1625,
++     finishLabel: 'Begin match',
++     id: 'chapter_4_lucy_fir_challenge',
++     kicker: 'FIVE CIRCLES OF HELL',
++     lines: [
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Hissss!!'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Hello there to you too!'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Who... enters... my domain?'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: "Captain Blackball and his right-hand man of course, did you not know we were coming? The blue thing said he'd tell you."
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'I know what you seek.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: "Oh do you? Great! Well, shall we just play pool for it and we'll see if it's any good?"
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: "You can't just 'play pool' for a hat. It's a legendary hat, I'm not exactly going to just GIVE IT AWAY after some stupid game, am I?"
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Hat?'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'You have come here for the legendary hat, no?'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: "No I'm here for the golden cue. What does the hat do?"
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Not telling you.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: "Good thing I didn't really want it then, isn't it! So, the mysterious artifact of legend, the mystical, the marvellous, the wonderful, the dazzling, the coveted... golden cue?"
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: "Yeah I've got that. But I'm not exactly going to just GIVE IT AWAY after some stupid game, am I?"
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: "Isn't that how you won it in the first place?"
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Well yeah, but...'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: "No buts! Come on now, let's play fair."
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'The only thing fair round here is the fiery chasm in which I dwell. Its flames will absorb you, charring your flesh, peeling away like a... potato.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: "No, we've done the potato stuff last chapter. Do flames even absorb?"
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Consume then.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Fitting.'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: "Remember what'll happen if you lose? Everything is at stake in this perilous ritual of the spheres."
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Even the hat?'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Except the hat, Blackball. Just the golden cue which you desire so much, for some reason.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: "Yes please, so let's have it, game of pool?"
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'And if you lose?'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: "I'm not playing. My friend here is."
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'If your friend loses, they will die. Simple as that.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Do I still get the cue?'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Yeah I reckon.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Great! Pool, then?'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: '*nods*'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Let us begin the ritual of the spheres. Your friend will die.'
++       }
++     ],
++     theatreEffects: true,
++     title: 'Lucy Fir',
++     typewriterMs: 22
++   },
++   chapter_4_lucy_fir_victory: {
++     assets: {
++       backgrounds: {
++         hell: {
++           src: 'assets/k4/07_Lucy_Dungeon_Theatre.png'
++         }
++       },
++       characters: {
++         blackball: {
++           alt: 'Captain Blackball',
++           anchor: 'bottom-center',
++           src: 'assets/scenes/captain-blackball-main.png',
++           width: 36,
++           x: 23,
++           y: 96
++         },
++         lucy_fir: {
++           alt: 'Lucy Fir',
++           anchor: 'bottom-center',
++           className: 'k4-character k4-lucy',
++           src: 'assets/k4/05_Lucy_Fir_Adobe_Express_Cutout.png',
++           suppressSpeakerWobble: false,
++           width: 15.2,
++           x: 73,
++           y: 96
++         },
++         most_evil: {
++           alt: 'The Most Evil Creature Imaginable',
++           anchor: 'bottom-center',
++           className: 'k4-character k4-tmeci',
++           src: 'assets/k4/04_Most_Evil_Creature_Imaginable_approved.png',
++           suppressSpeakerWobble: false,
++           width: 33.75,
++           x: 49,
++           y: 95
++         }
++       },
++       props: {}
++     },
++     chapter: 'chapter_4',
++     finishFadeMs: 1625,
++     finishLabel: 'Finish Chapter 4',
++     id: 'chapter_4_lucy_fir_victory',
++     kicker: 'FIVE CIRCLES OF HELL',
++     lines: [
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: "It's over. You won, etc."
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: "Brilliant! But... you weren't using the golden cue?"
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Nah, it sucks.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Well, are you going to hand it over anyway?'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Yeah, if you want.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: '...well?'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Well, what? You still here?'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'The cue?'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'Haha yeah, I actually sold it like... 5 minutes ago?'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: 'You told me 4 minutes ago that you had it though?'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir'
++           ]
++         },
++         text: "Oh cry me a bloody river. I lied. It was fun. I sold the golden plank thing on vinted. It's being shipped out now, The Most Evil Creature Imaginable is packaging it up as we speak."
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: 'You called, Lucy?'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: "This guy wants the golden plank. I told him we've already sold it lol."
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: 'Well yeah, we have. I need to get it to the parcel locker by 3pm.'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: "That's less than half an hour away, be quick!"
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: 'Sure thing, Lucy!'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: "WHAT!? Can't you just cancel the order and be a decent person?"
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: '*Laughs hysterically*'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: 'Hahahahaha. Haha! Mate. Seriously. You know sellers get a 1 star rating for cancelling an order? No chance.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: 'Hmm, that is rather risky, I understand. So what do we do?'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: 'Dunno. Maybe The Most Evil Creature Imaginable will have an idea. *winks*'
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: 'Jump in.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: 'What!?'
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: "Jump in the box. Don't question it, just do it. Get in the box. You're going with the cue. See that its new owner gets it safely, and make sure they give Lucy 5 stars. They need to confirm the order first otherwise there could be a payment delay."
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: 'Fine. How much did it sell for? And to whom?'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: '3 euros. To... "The One True Guy". Who lives in a sanctuary, high above, in the clouds.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: 'Oh god. Alright. Off we go I guess, in for a long journey. Before we go Lucy, who did you ship it with?'
++       },
++       {
++         speaker: 'Lucy',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: 'Evri.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'lucy_fir',
++             'most_evil'
++           ]
++         },
++         text: "We're doomed."
++       }
++     ],
++     theatreEffects: true,
++     title: 'Lucy Fir',
++     typewriterMs: 22
++   },
++   chapter_4_most_evil_challenge: {
++     assets: {
++       backgrounds: {
++         hell: {
++           src: 'assets/k4/06_Shared_Fiery_Pits_Theatre.png'
++         }
++       },
++       characters: {
++         blackball: {
++           alt: 'Captain Blackball',
++           anchor: 'bottom-center',
++           src: 'assets/scenes/captain-blackball-main.png',
++           width: 36,
++           x: 23,
++           y: 96
++         },
++         most_evil: {
++           alt: 'The Most Evil Creature Imaginable',
++           anchor: 'bottom-center',
++           className: 'k4-character k4-tmeci',
++           src: 'assets/k4/04_Most_Evil_Creature_Imaginable_approved.png',
++           suppressSpeakerWobble: false,
++           width: 47.5,
++           x: 73,
++           y: 96
++         }
++       },
++       props: {}
++     },
++     chapter: 'chapter_4',
++     finishFadeMs: 1625,
++     finishLabel: 'Begin match',
++     id: 'chapter_4_most_evil_challenge',
++     kicker: 'FIVE CIRCLES OF HELL',
++     lines: [
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: '...The...'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: 'The'
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: '...Most...'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: 'Most'
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: '...E...'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: 'The most evil creature imaginable?'
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: 'Bubble, bubble, toil and...'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: 'Trouble?'
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: "Do you always finish other people's sentences? That's so rude you know. You can get cancelled for that, I'm literally offended. Literally. Offended."
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: "What's wrong with you?"
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: "Oh isn't it obvious, you pompous capitalist tart? You're obviously swanning around here ragebaiting and trolling my safe space."
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: 'I actually really like the sound of that.'
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: "It's not really all about you though, is it? You're like, infringing on my human rights right now. I'm literally shaking."
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: 'You were literally offended a moment ago.'
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: "Yeah 'cos you're a fascist mysoginistic pig. I'm literally taking on the patriarchy right now. I'm taking you. Taking you in so many ways. I know how to get inside people like you."
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: '...ok?'
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: "Yeah it's not something your generation would understand. You're such a boomer. You don't even know what an emoji is, do you. And you shout at self-service checkouts. They actually help with my anxiety so there's literally nothing you can do about it."
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: 'Emoji? Erm... I think I have one on my ship?'
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: 'Too scared to admit reality huh? Is that why your entire dialogue has no emojis whatsoever?'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: "I've never really thought about it like that, no."
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: "You wouldn't, because your social bubble hasn't seen the outside world. You literally just swallow MSM. You must have a dry tongue from all the bootlicking you do for the super rich."
++       },
++       {
++         speaker: 'Blackball.',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: "My god, this is hell isn't it. You really are the most evil creature imaginable."
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: "Wow. So intelligent. Resorting to playground insults and name-calling. You're so self-absorbed, you're not even self-aware. Do you even know your Myers-Briggs? Doubt it. It's hardly your calibre."
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: 'You seem to have a bit of a chip on your shoulder.'
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: "Me? ME? I literally can't have chips, I'm on a carb-free diet. You don't even care what you eat. That's why nobody loves you."
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: "Oh god, it's true. Oh no. Oh well. Game of pool?"
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: 'Seriously though you need to go touch some grass.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: 'Alright... game of pool... outside then?'
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: '*nods*'
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: 'This whole thing is literally a joke rn.'
++       }
++     ],
++     theatreEffects: true,
++     title: 'TMECI',
++     typewriterMs: 22
++   },
++   chapter_4_most_evil_victory: {
++     assets: {
++       backgrounds: {
++         hell: {
++           src: 'assets/k4/06_Shared_Fiery_Pits_Theatre.png'
++         }
++       },
++       characters: {
++         blackball: {
++           alt: 'Captain Blackball',
++           anchor: 'bottom-center',
++           src: 'assets/scenes/captain-blackball-main.png',
++           width: 36,
++           x: 23,
++           y: 96
++         },
++         most_evil: {
++           alt: 'The Most Evil Creature Imaginable',
++           anchor: 'bottom-center',
++           className: 'k4-character k4-tmeci',
++           src: 'assets/k4/04_Most_Evil_Creature_Imaginable_approved.png',
++           suppressSpeakerWobble: false,
++           width: 47.5,
++           x: 73,
++           y: 96
++         }
++       },
++       props: {}
++     },
++     chapter: 'chapter_4',
++     finishFadeMs: 1625,
++     finishLabel: 'Return to roster',
++     id: 'chapter_4_most_evil_victory',
++     kicker: 'FIVE CIRCLES OF HELL',
++     lines: [
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: "Literally get away from me, you're like, in my personal space? Your aura sticks man."
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: "My aura doesn't stink because I borrowed some Lynx Africa from that other guy."
++       },
++       {
++         speaker: 'TMECI',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'most_evil'
++           ]
++         },
++         text: 'Literally offensive. Go and see Lucy if you want, creep.'
++       }
++     ],
++     theatreEffects: true,
++     title: 'TMECI',
++     typewriterMs: 22
++   },
++   chapter_4_socks_sandals_challenge: {
++     assets: {
++       backgrounds: {
++         hell: {
++           src: 'assets/k4/06_Shared_Fiery_Pits_Theatre.png'
++         }
++       },
++       characters: {
++         blackball: {
++           alt: 'Captain Blackball',
++           anchor: 'bottom-center',
++           src: 'assets/scenes/captain-blackball-main.png',
++           width: 36,
++           x: 23,
++           y: 96
++         },
++         socks_sandals: {
++           alt: 'Socks and Sandals',
++           anchor: 'bottom-center',
++           className: 'k4-character ',
++           src: 'assets/k4/03_Socks_And_Sandals_approved.png',
++           suppressSpeakerWobble: false,
++           width: 38,
++           x: 73,
++           y: 96
++         }
++       },
++       props: {}
++     },
++     chapter: 'chapter_4',
++     finishFadeMs: 1625,
++     finishLabel: 'Begin match',
++     id: 'chapter_4_socks_sandals_challenge',
++     kicker: 'FIVE CIRCLES OF HELL',
++     lines: [
++       {
++         speaker: 'Socks and Sandals',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: 'WOOF!'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: "Oh no. I thought I'd seen it all. This can't be good. No. This is not good. Oh god. Oh god no."
++       },
++       {
++         speaker: 'Socks and Sandals',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: '*snarling*'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: 'Are you a foot, or a dog?'
++       },
++       {
++         speaker: 'Socks and Sandals',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: 'Woof! Woof!'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: "Yes, I know, but that's not important right now. What cursed you in a previous life?"
++       },
++       {
++         speaker: 'Socks and Sandals',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: 'Woof! Woof!'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: 'You just said that! Do you know where Lucy is?'
++       },
++       {
++         speaker: 'Socks and Sandals',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: 'Woofff!!'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: "I see! Thank you, kind creature. So she's down the end of this path, take the second left at the crossroads, past Greggs, do not pass Go, and she's in the quaint little house at the end, but not before I come across the most EVIL creature imagineable?"
++       },
++       {
++         speaker: 'Socks and Sandals',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: 'WooF! *whimpers*'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: "You're surprisingly helpful, here, have a stick. And let's play pool with it!"
++       },
++       {
++         speaker: 'Socks and Sandals',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: '*nods*'
++       },
++       {
++         speaker: 'Socks and Sandals',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: 'Wooof!'
++       }
++     ],
++     theatreEffects: true,
++     title: 'Socks and Sandals',
++     typewriterMs: 22
++   },
++   chapter_4_socks_sandals_victory: {
++     assets: {
++       backgrounds: {
++         hell: {
++           src: 'assets/k4/06_Shared_Fiery_Pits_Theatre.png'
++         }
++       },
++       characters: {
++         blackball: {
++           alt: 'Captain Blackball',
++           anchor: 'bottom-center',
++           src: 'assets/scenes/captain-blackball-main.png',
++           width: 36,
++           x: 23,
++           y: 96
++         },
++         socks_sandals: {
++           alt: 'Socks and Sandals',
++           anchor: 'bottom-center',
++           className: 'k4-character ',
++           src: 'assets/k4/03_Socks_And_Sandals_approved.png',
++           suppressSpeakerWobble: false,
++           width: 38,
++           x: 73,
++           y: 96
++         }
++       },
++       props: {}
++     },
++     chapter: 'chapter_4',
++     finishFadeMs: 1625,
++     finishLabel: 'Return to roster',
++     id: 'chapter_4_socks_sandals_victory',
++     kicker: 'FIVE CIRCLES OF HELL',
++     lines: [
++       {
++         speaker: 'Socks and Sandals',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: 'Bork! Bork!'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'socks_sandals'
++           ]
++         },
++         text: 'Thanks mate, I was just thinking the same. Take care now yeah, all the best.'
++       }
++     ],
++     theatreEffects: true,
++     title: 'Socks and Sandals',
++     typewriterMs: 22
++   },
++   chapter_4_spinball_wizard_challenge: {
++     assets: {
++       backgrounds: {
++         lair: {
++           src: 'assets/k4/08_Spinball_Wizard_Lair_Theatre.png'
++         }
++       },
++       characters: {
++         blackball: {
++           alt: 'Captain Blackball',
++           anchor: 'bottom-center',
++           src: 'assets/scenes/captain-blackball-main.png',
++           width: 36,
++           x: 23,
++           y: 96
++         },
++         spinball_wizard: {
++           alt: 'Spinball Wizard',
++           anchor: 'bottom-center',
++           className: 'k4-character k4-wizard',
++           src: 'assets/k4/09_spinball_wizard_2s.webp',
++           suppressSpeakerWobble: false,
++           width: 36,
++           x: 73,
++           y: 90
++         }
++       },
++       props: {}
++     },
++     chapter: 'chapter_4',
++     finishFadeMs: 1625,
++     finishLabel: 'Begin match',
++     id: 'chapter_4_spinball_wizard_challenge',
++     kicker: 'OPTIONAL SUPPORTER BOSS',
++     lines: [
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: 'Well what do we have here then?'
++       },
++       {
++         speaker: 'Spinball Wizard',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: 'Rotation is my motivation'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: 'I see...'
++       },
++       {
++         speaker: 'Spinball Wizard',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: 'You wanna get dizz with the wizz?'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: "I must say I wasn't planning on it."
++       },
++       {
++         speaker: 'Spinball Wizard',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: 'The dizzy wizz with the rizz?'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: 'So it seems.'
++       },
++       {
++         speaker: 'Spinball Wizard',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: "Don't get too close or you'll catch my j..."
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: "I get it. So that's all you do? Spin about?"
++       },
++       {
++         speaker: 'Spinball Wizard',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: 'Mostly, but also: viva la revolution!'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: 'That sounds more up my neck of the islands, what does that involve?'
++       },
++       {
++         speaker: 'Spinball Wizard',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: 'Well, you have to revolve before you can evolve.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: "Oh. It's just more spinning. We seem to be going round in circles here."
++       },
++       {
++         speaker: 'Spinball Wizard',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: "THAT'S THE SPIRIT!"
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: "That's not... urgh. Whatever. Pool?"
++       },
++       {
++         silent: true,
++         speaker: 'Spinball Wizard',
++         stage: {
++           animate: [
++             {
++               duration: 550,
++               effect: 'bounce',
++               repeat: 1,
++               target: 'character:spinball_wizard'
++             }
++           ],
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         stageDirection: '*nods*',
++         text: ''
++       }
++     ],
++     theatreEffects: true,
++     title: 'Spinball Wizard',
++     typewriterMs: 22
++   },
++   chapter_4_spinball_wizard_victory: {
++     assets: {
++       backgrounds: {
++         lair: {
++           src: 'assets/k4/08_Spinball_Wizard_Lair_Theatre.png'
++         }
++       },
++       characters: {
++         blackball: {
++           alt: 'Captain Blackball',
++           anchor: 'bottom-center',
++           src: 'assets/scenes/captain-blackball-main.png',
++           width: 36,
++           x: 23,
++           y: 96
++         },
++         spinball_wizard: {
++           alt: 'Spinball Wizard',
++           anchor: 'bottom-center',
++           className: 'k4-character k4-wizard',
++           src: 'assets/k4/09_spinball_wizard_2s.webp',
++           suppressSpeakerWobble: false,
++           width: 36,
++           x: 73,
++           y: 90
++         }
++       },
++       props: {}
++     },
++     chapter: 'chapter_4',
++     finishFadeMs: 1625,
++     finishLabel: 'Return to roster',
++     id: 'chapter_4_spinball_wizard_victory',
++     kicker: 'OPTIONAL SUPPORTER BOSS',
++     lines: [
++       {
++         speaker: 'Spinball Wizard',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: 'My parents wanted me to become a doctor.'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: 'Oh did they, aye?'
++       },
++       {
++         speaker: 'Spinball Wizard',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: 'So I became a SPIN doctor. Haha!'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'lair',
++           characters: [
++             'blackball',
++             'spinball_wizard'
++           ]
++         },
++         text: 'Of course. Bye.'
++       }
++     ],
++     theatreEffects: true,
++     title: 'Spinball Wizard',
++     typewriterMs: 22
++   },
++   chapter_4_vile_hedgehog_challenge: {
++     assets: {
++       backgrounds: {
++         hell: {
++           src: 'assets/k4/06_Shared_Fiery_Pits_Theatre.png'
++         }
++       },
++       characters: {
++         blackball: {
++           alt: 'Captain Blackball',
++           anchor: 'bottom-center',
++           src: 'assets/scenes/captain-blackball-main.png',
++           width: 36,
++           x: 23,
++           y: 96
++         },
++         vile_hedgehog: {
++           alt: 'Vile Blue Hedgehog',
++           anchor: 'bottom-center',
++           className: 'k4-character k4-hedgehog',
++           src: 'assets/k4/01_Vile_Blue_Hedgehog_approved.png',
++           suppressSpeakerWobble: false,
++           width: 38,
++           x: 73,
++           y: 96
++         }
++       },
++       props: {}
++     },
++     chapter: 'chapter_4',
++     finishFadeMs: 1625,
++     finishLabel: 'Begin match',
++     id: 'chapter_4_vile_hedgehog_challenge',
++     kicker: 'FIVE CIRCLES OF HELL',
++     lines: [
++       {
++         speaker: 'Vile Blue Hedgehog',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: 'Howdy, stranger!'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: 'What in living hell is this?'
++       },
++       {
++         speaker: 'Vile Blue Hedgehog',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: "It's... living hell!"
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: 'I meant you. What are you?'
++       },
++       {
++         speaker: 'Vile Blue Hedgehog',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: "I'm a razzler! A dazzler! Here to zip around you like a jazzler!"
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: 'What does that even mean?'
++       },
++       {
++         speaker: 'Vile Blue Hedgehog',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: "Ooooo I'm fast. Fast like a stapler! Fastening like grassening!"
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: 'Right. Do you know Lucy?'
++       },
++       {
++         speaker: 'Vile Blue Hedgehog',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: 'Yeah?'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: 'Well? Where is she?'
++       },
++       {
++         speaker: 'Vile Blue Hedgehog',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: "Ooooo maybe I'll tell ya. Shall we take off our clothes first?"
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: "Well, it's not a bad idea. But I've a better one. How's about a game of pool?"
++       },
++       {
++         speaker: 'Vile Blue Hedgehog',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: '*nods*'
++       },
++       {
++         speaker: 'Vile Blue Hedgehog',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: "It's not the destinazzle, it's how you jazzle the journazzle."
++       }
++     ],
++     theatreEffects: true,
++     title: 'Vile Blue Hedgehog',
++     typewriterMs: 22
++   },
++   chapter_4_vile_hedgehog_victory: {
++     assets: {
++       backgrounds: {
++         hell: {
++           src: 'assets/k4/06_Shared_Fiery_Pits_Theatre.png'
++         }
++       },
++       characters: {
++         blackball: {
++           alt: 'Captain Blackball',
++           anchor: 'bottom-center',
++           src: 'assets/scenes/captain-blackball-main.png',
++           width: 36,
++           x: 23,
++           y: 96
++         },
++         vile_hedgehog: {
++           alt: 'Vile Blue Hedgehog',
++           anchor: 'bottom-center',
++           className: 'k4-character k4-hedgehog',
++           src: 'assets/k4/01_Vile_Blue_Hedgehog_approved.png',
++           suppressSpeakerWobble: false,
++           width: 38,
++           x: 73,
++           y: 96
++         }
++       },
++       props: {}
++     },
++     chapter: 'chapter_4',
++     finishFadeMs: 1625,
++     finishLabel: 'Return to roster',
++     id: 'chapter_4_vile_hedgehog_victory',
++     kicker: 'FIVE CIRCLES OF HELL',
++     lines: [
++       {
++         speaker: 'Vile Blue Hedgehog',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: 'Wazzle! You want to see Lucy yeah? Alrighty! Shall we skip over to her place together?'
++       },
++       {
++         speaker: 'Blackball',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ]
++         },
++         text: 'Pointing me in her direction will suffice.'
++       },
++       {
++         speaker: 'Vile Blue Hedgehog',
++         stage: {
++           background: 'hell',
++           characters: [
++             'blackball',
++             'vile_hedgehog'
++           ],
++           fadeHedgehog: true
++         },
++         text: "Alright, she's over there. But be careful! Many perilous beings inhabit this forsaken realm. So perilazzlous. The most evil creature imaginable... AAAAAAHHH!!!"
++       }
++     ],
++     theatreEffects: true,
++     title: 'Vile Blue Hedgehog',
++     typewriterMs: 22
++   },
+    supporter_pokey_intro: {
+      assets: {
+        backgrounds: {
+          centre: {
+            src: 'assets/scenes/supporter-pokey-centre.webp'
+
+    at /workspace/seamen-pool-development/tests/theatre.cjs:14:213 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [Object],
+  expected: [Object],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

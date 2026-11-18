@@ -1,0 +1,7 @@
+// K3F.1 infrastructure only: no BillingClient connection or purchase calls.
+// The official Google AAR contributes billing metadata and native components.
+dependencies {
+    implementation('com.android.billingclient:billing:9.1.0') {
+        version { strictly('9.1.0') }
+    }
+}

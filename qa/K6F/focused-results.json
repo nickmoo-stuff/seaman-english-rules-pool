@@ -1,0 +1,60 @@
+{
+  "date": "2026-11-16T21:53:27.762846+00:00",
+  "baseline": "c2f1eaa",
+  "version": "0.17.63",
+  "build": 1593,
+  "tests": [
+    {
+      "suite": "k6f-promotion.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 71.1
+    },
+    {
+      "suite": "k6f-visual.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 15.53
+    },
+    {
+      "suite": "k6f-preservation.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.84
+    },
+    {
+      "suite": "k4-offline.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 1.98
+    },
+    {
+      "suite": "spin-offline.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 6.19
+    },
+    {
+      "suite": "k4-consistency.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.5
+    },
+    {
+      "suite": "k6e-release.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 8.48
+    }
+  ],
+  "counts": {
+    "PASS": 7,
+    "FAIL": 0,
+    "NOT TESTED": 0
+  },
+  "limitations": [
+    "Chromium on Linux, HTTP; no physical Android/iOS or real Google Play transactions.",
+    "Ownership bridge replies are fixtures.",
+    "Historical alpha packaging and milestone-specific diff-only audits are excluded."
+  ]
+}

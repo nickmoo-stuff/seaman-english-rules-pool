@@ -1,0 +1,3 @@
+Command: python tests/k4a4-artwork.py
+TEST_URL=http://127.0.0.1:8030/
+PASS all five approved cutouts have alpha transparency; Socks SHA-256 matches exact supplied PNG; four other cutouts unchanged; obsolete Socks file/reference removed and both offline inventories updated

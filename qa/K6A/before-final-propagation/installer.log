@@ -1,0 +1,3 @@
+PASS LF/BOM-CRLF, dry-run, exact backups, protected job manifest, scoped five native files, existing versions/config/web preserved, repeat installation
+PASS eleven unsupported/conflicting wrapper fixtures refused without writes
+PASS forced manifest write failure rolls back Java replacement/new files

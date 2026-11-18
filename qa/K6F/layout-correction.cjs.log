@@ -1,0 +1,10 @@
+Command: node tests/layout-correction.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS Pixel-8-Pro-emulation: all essential targets unclipped, tappable; placement, four power buttons, groups, spin, details
+PASS 844x390: all essential targets unclipped, tappable; placement, four power buttons, groups, spin, details
+PASS 740x360: all essential targets unclipped, tappable; placement, four power buttons, groups, spin, details
+PASS 960x540: all essential targets unclipped, tappable; placement, four power buttons, groups, spin, details
+PASS browser-chrome: all essential targets unclipped, tappable; placement, four power buttons, groups, spin, details
+PASS mobile landscape optional Pool School: real first pot, expanded phase guidance, hide and usable controls
+PASS live Device Toolbar touch emulation / desktop restoration without UA override
+PASS native bridge classification; missing/false/true legacy flags cannot launch First Voyage, redirect, or force Pool School

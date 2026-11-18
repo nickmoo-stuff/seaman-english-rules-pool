@@ -1,0 +1,8 @@
+PASS developer buttons, visible feedback, immediate Chapter 4 gate, save preservation: storage=available, Chapter 3=false
+PASS developer buttons, visible feedback, immediate Chapter 4 gate, save preservation: storage=available, Chapter 3=true
+PASS developer buttons, visible feedback, immediate Chapter 4 gate, save preservation: storage=denied, Chapter 3=false
+PASS developer buttons, visible feedback, immediate Chapter 4 gate, save preservation: storage=denied, Chapter 3=true
+PASS tab-only grant reset, stored story progress retained
+PASS release rejects developer grant without ownership/progression change
+PASS native rejects developer grant without ownership/progression change
+PASS file-protocol resolver unit cases; real file:// navigation N/T: managed Chromium ERR_BLOCKED_BY_ADMINISTRATOR

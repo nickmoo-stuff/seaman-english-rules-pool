@@ -1,0 +1,173 @@
+{
+  "source": "SeamenPool-K4-APPROVED-Artwork-Assets-2026-11-15.zip",
+  "approval": "User ALL PASS, 15 November 2026",
+  "assets": [
+    {
+      "file": "01_Vile_Blue_Hedgehog_approved.png",
+      "sha256": "f2bd38ab6f2c05e05e2fca717a541a19c70f6cd700c1291f4140ae07a8ab69af",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "frames": 1,
+      "approved": true,
+      "modified": false,
+      "originalFile": "edited-vile-blue.png",
+      "sourceArchive": "threePNGs.zip",
+      "replaces": "01_Vile_Blue_Hedgehog.png",
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_Filthy_Youth_With_Phone_approved.png",
+      "sha256": "e670c584d1d1cac57a2dccb344ff052c284a490f4d7e5315c6eef416e2888082",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "frames": 1,
+      "approved": true,
+      "modified": false,
+      "originalFile": "edited-filthy-youth.png",
+      "sourceArchive": "threePNGs.zip",
+      "replaces": "02_Filthy_Youth_With_Phone.png",
+      "alphaExtrema": [
+        0,
+        254
+      ]
+    },
+    {
+      "file": "03_Socks_And_Sandals_approved.png",
+      "sha256": "5c57d1b1e95bb1c781a9b90ce531de5df960a28356e68aeeea51000838ec3834",
+      "size": [
+        1043,
+        1508
+      ],
+      "mode": "RGBA",
+      "frames": 1,
+      "approved": true,
+      "modified": false,
+      "originalFile": "edited-SAS.png",
+      "sourceArchive": "edited-SAS.zip",
+      "replaces": "03_Socks_And_Sandals.png",
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "04_Most_Evil_Creature_Imaginable_approved.png",
+      "sha256": "28d310c2c62814383ccbc1065a0e2ca520a0866edb38bad4180421e8e44b6b94",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "frames": 1,
+      "approved": true,
+      "modified": false,
+      "originalFile": "edited-most-evil-creature.png",
+      "sourceArchive": "threePNGs.zip",
+      "replaces": "04_Most_Evil_Creature_Imaginable.png",
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "05_Lucy_Fir_Adobe_Express_Cutout.png",
+      "sha256": "08e16b3bcadfbe5a7ae64e424a0532325d1ef5f0ccba396ac81dcacd07ce802e",
+      "size": [
+        1076,
+        1462
+      ],
+      "mode": "RGBA",
+      "frames": 1,
+      "approved": true,
+      "modified": false
+    },
+    {
+      "file": "06_Shared_Fiery_Pits_Theatre.png",
+      "sha256": "040493530b30322afabb33b7f70b6fd212817a1b919f67ad53a47fecb030331a",
+      "size": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "frames": 1,
+      "approved": true,
+      "modified": false
+    },
+    {
+      "file": "07_Lucy_Dungeon_Theatre.png",
+      "sha256": "81f06546d749f8987b5d363e4dfea5ebf53a7fcd2300daf94ddb2ea369ba9387",
+      "size": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "frames": 1,
+      "approved": true,
+      "modified": false
+    },
+    {
+      "file": "08_Spinball_Wizard_Lair_Theatre.png",
+      "sha256": "16c35ae7bf4c7a49591538a42d3d88f77bdd31a25e907befe19491c272beec27",
+      "size": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "frames": 1,
+      "approved": true,
+      "modified": false
+    },
+    {
+      "file": "09_spinball_wizard_2s.gif",
+      "sha256": "93b3b922ecc4c847eae7e416ae60509f58088b3d52cbee755421dd090f45a058",
+      "size": [
+        311,
+        302
+      ],
+      "mode": "P",
+      "frames": 16,
+      "approved": true,
+      "modified": false
+    },
+    {
+      "file": "09_spinball_wizard_2s.webp",
+      "sha256": "3ce91b8e35c38417090cb8c954f18adb23eb54854ae17a3340b89113edfec4b7",
+      "size": [
+        311,
+        302
+      ],
+      "mode": "RGBA",
+      "frames": 16,
+      "approved": true,
+      "modified": false,
+      "sourceArchive": "Spinball-Wizard-Theatre-Animation-Prototype.zip",
+      "originalFile": "spinball_wizard_2s.webp"
+    }
+  ],
+  "limitations": [
+    "Socks and Sandals retains its previously approved RGB source with a baked checkerboard; it is outside this three-image replacement request.",
+    "Spinball Wizard AI and dialogue unspecified; optional encounter staged without invented match."
+  ],
+  "soundtrack": {
+    "file": "Lucy Fir challenge.mp3",
+    "bytes": 5644038,
+    "sha256": "d14e9e0fb00c72f537f642cc7539142c9d169b005f9ac261e7fa0195434e047e",
+    "provenance": "Definitive original K4 handover ZIP, copied unchanged"
+  },
+  "additionalSources": [
+    {
+      "file": "threePNGs.zip",
+      "approval": "User-approved final K4A.2 artwork replacements",
+      "archiveSha256": "31788e078703aaa0c95d87bbe4f6669f4c808564b50d82bff9b63edaf53f5c83"
+    }
+  ]
+}

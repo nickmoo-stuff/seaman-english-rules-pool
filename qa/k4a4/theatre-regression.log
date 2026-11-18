@@ -1,0 +1,5 @@
+PASS all five opponents: standard 0.34s speaker-only animation, stationary during Blackball speech, stop on completion
+PASS Youth phone anchor after resizing, single repeating wave, slower persistent vapour, approved last line and observer cleanup
+PASS short TMECI label and rainbow text across all three Theatre appearances; other speakers unaffected
+PASS Lucy trophy/cosmetics concealment, five-main-opponent completion trophy, replay/reload/import idempotence, cosmetic-only cue text and locked Chapter 5 placeholder
+PASS 25% darkness and exact 1s fade, unchanged pocket geometry and pulsing rim parameters, 1.8s normalized cannon with measurable tail energy, per-strike counters and overlap cleanup

@@ -1,0 +1,3 @@
+Command: node tests/spin-offline.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS cached offline startup: current build, spin/layout modules, local frame and spin controls

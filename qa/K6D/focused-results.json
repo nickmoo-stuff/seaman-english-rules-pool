@@ -1,0 +1,72 @@
+{
+  "date": "2026-11-16T17:22:36.732770+00:00",
+  "baseline": "928a82f",
+  "version": "0.17.61",
+  "build": 1591,
+  "tests": [
+    {
+      "suite": "k6d-boss-music.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 9.6
+    },
+    {
+      "suite": "k6d-vaper-spin.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 5.46
+    },
+    {
+      "suite": "k6d-preservation.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 1.06
+    },
+    {
+      "suite": "k4-audio.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 5.28
+    },
+    {
+      "suite": "k5a-opponents.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 5.78
+    },
+    {
+      "suite": "campaign-regression.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 13.64
+    },
+    {
+      "suite": "k4-entitlement.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 15.38
+    },
+    {
+      "suite": "spin-physics.cjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 2.61
+    },
+    {
+      "suite": "k4-consistency.py",
+      "exitCode": 0,
+      "status": "PASS",
+      "seconds": 0.56
+    }
+  ],
+  "counts": {
+    "PASS": 9,
+    "FAIL": 0,
+    "NOT TESTED": 0
+  },
+  "limitations": [
+    "Chromium on Linux, HTTP; no physical Android/iOS or real Google Play transactions.",
+    "Ownership bridge replies are fixtures.",
+    "Historical alpha packaging and milestone-specific diff-only audits are excluded."
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "version": "0.17.55",
+  "build": 1585,
+  "baseline": "13eac760dbc31fd9dd9e7f9080d1e57475b92518",
+  "checks": [
+    {
+      "suite": "k4a2.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "k4.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "campaign-regression.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "k4-ai.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "k4-audio.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "theatre-responsive.cjs (K4 filter)",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "k4-mobile.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "k4-offline.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "k4a1-dev-supporter.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "k4-entitlement.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "k4-consistency.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "story-reminder.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    }
+  ],
+  "limitations": [
+    "Chromium HTTP browser tests and touch emulation; physical devices not tested",
+    "Windows Chrome file:// navigation blocked by managed environment; file-related protocol/storage cases tested separately",
+    "Audio graph/event and waveform duration/levels/tail checked; subjective loudness/reverb listening remains manual",
+    "Billing responses mocked; no actual transactions, Android build or purchase activation"
+  ],
+  "deployed": false
+}

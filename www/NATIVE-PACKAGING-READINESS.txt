@@ -1,0 +1,19 @@
+K6G CORRECTED PRE-RELEASE — v1.0.0/build 1595 (Play code availability unverified)
+
+This is a web-only Story-name persistence correction. No new native patch,
+Android project, SDK setup, signing key or deployment process is required.
+Copy the corrected complete www, run the usual sync and set Android
+versionName 1.0.0 / versionCode 1595 through the normal version/build step.
+The existing K6E release guard verifies matching web/native versions.
+
+Do not run the old K6F promotion on this package: it is already v1.0.0.
+Do not reinstall/reset the user's existing native billing configuration or gates
+for this correction. Keep the current separately approved policy and purchase.
+All native sources/tools and ownership/acknowledgement/retry logic are unchanged.
+Repository defaults remain OFF; no real wrapper or production policy was modified.
+
+Build 1595 avoids the previously planned 1594 if it was already uploaded, but
+Console availability still needs checking before ANY new upload. If taken, choose
+a consistently higher valid code. Preserve application ID, signing and app data;
+never uninstall or replace keys merely to force an update. See docs/K6G/REPORT.md.
+No Android/AAB build, upload, publication, purchase or activation was performed.

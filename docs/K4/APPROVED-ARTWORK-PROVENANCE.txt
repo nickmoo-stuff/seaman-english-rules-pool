@@ -1,0 +1,19 @@
+K4 APPROVED ARTWORK — USER CONFIRMED ALL 8 PASS (2026-11-15)
+These eight files correspond to positions 1–8 on K4_artwork_confirmation.png.
+Use the originals, not the confirmation sheet thumbnails.
+Spinball Wizard animation is supplied as an approved 2-second looping GIF and WebP.
+No modifications to artwork.
+
+01_Vile_Blue_Hedgehog.png | original=a_high_detail_hyper_real_3d_fluffy_mascot_charact.png | SHA256=98d65baa5515204d375f61348f680f3945ff831ba446497f9401639078a4de3c
+02_Filthy_Youth_With_Phone.png | original=full_body_character_on_a_transparent_background_a.png | SHA256=a29e86f0d0c442389ddaba24c5eb142fb0d65c111edd600ec95f4265cfabd814
+03_Socks_And_Sandals.png | original=a_clean_png_style_highly_detailed_photo_real_comi.png | SHA256=49fade98f48a86dbd80a484a1f9d3782618098d244e193b1c0562230446c351f
+04_Most_Evil_Creature_Imaginable.png | original=a_clean_transparent_background_checkerboard_alpha.png | SHA256=54dad7c51519459ca875c8f66ac4d6e6b21da773c23c0dc61a19b1d8f7939b8d
+05_Lucy_Fir_Adobe_Express_Cutout.png | original=edited-photo.png | SHA256=08e16b3bcadfbe5a7ae64e424a0532325d1ef5f0ccba396ac81dcacd07ce802e
+06_Shared_Fiery_Pits_Theatre.png | original=a_highly_detailed_dramatic_fantasy_hellish_lava_c.png | SHA256=040493530b30322afabb33b7f70b6fd212817a1b919f67ad53a47fecb030331a
+07_Lucy_Dungeon_Theatre.png | original=a_detailed_cinematic_highly_detailed_3d_style_sc.png | SHA256=81f06546d749f8987b5d363e4dfea5ebf53a7fcd2300daf94ddb2ea369ba9387
+08_Spinball_Wizard_Lair_Theatre.png | original=a_highly_detailed_cinematic_fantasy_interior_a_da.png | SHA256=16c35ae7bf4c7a49591538a42d3d88f77bdd31a25e907befe19491c272beec27
+
+CODEX HANDOFF:
+Continue on stage4-k4-five-circles-of-hell from commit 5d7e9552fc4ffbfc691d3b3344576b78aec126dd.
+These assets have now been confirmed by the user; proceed with K4 implementation following the existing authoritative specification and script.
+Do not deploy or publish. Report tests, commit and version/build.

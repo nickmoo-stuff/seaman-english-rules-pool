@@ -1,0 +1,10 @@
+Command: node tests/supporter-service.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS mock future-contract successful transition, acknowledged verified owner, regional price and duplicate prevention (not a Play purchase)
+PASS pending, cancelled/failed/interrupted recheck and already-owned mock paths
+PASS mock restore after a fresh service/reinstall, no persisted paid boolean and offline check becomes unknown
+PASS fail-closed verification, expiry, missing backend, purchase kill switch, web fallback and timeout
+PASS explicit device model, acknowledged owner, cross-model rejection and disabled payment gate
+PASS stale asynchronous owner result cannot overwrite invalidation or a fresh check
+PASS busy/result lifecycle, coalescing during price lookup, ownership-only restore and recovery from a synchronous native exception
+PASS invalidation also fences late ownership replies in future-contract purchase rechecks

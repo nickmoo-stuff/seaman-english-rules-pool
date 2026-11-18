@@ -1,0 +1,3 @@
+Command: python tests/k6e-release-guard.py
+TEST_URL=http://127.0.0.1:8030/
+PASS actual Groovy release-guard execution: 8 source/web/key/default/approved-production scenarios; release tasks depend on guard; debug tasks unaffected. Task DSL is a fixture, not an Android build.

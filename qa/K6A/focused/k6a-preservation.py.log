@@ -1,0 +1,3 @@
+Command: python tests/k6a-preservation.py
+TEST_URL=http://127.0.0.1:8030/
+PASS 116 frozen payload files/normalised version metadata; only supporter service/UI changed; all AI/physics/Theatre/dialogue/artwork/cosmetics/trophies/save/gating logic and historical native sources preserved; new native files isolated under K6A

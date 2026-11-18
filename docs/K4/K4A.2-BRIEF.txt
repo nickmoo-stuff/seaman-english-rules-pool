@@ -1,0 +1,133 @@
+# Seamen Pool — K4A.2 Desktop QA Corrections
+
+**Baseline:** v0.17.54/build 1584
+**Branch:** `stage4-k4-five-circles-of-hell`
+
+Implement the following corrections together in one new candidate. Preserve all approved dialogue and gameplay behaviour except where explicitly changed below.
+
+## 1. Theatre character bobbing — global Chapter 4 correction
+
+All five Chapter 4 opponents currently bob too slowly.
+
+- Match the standard Theatre bobbing speed and movement used by the established Chapter 1–3 characters.
+- **Do not use Mr Wiggles as the reference.**
+- Characters should bob ONLY while their own dialogue is being displayed/typewritten, following the existing Theatre behaviour.
+- When Blackball speaks, the opponent must remain completely stationary.
+- Apply consistently to Hedgehog, Filthy Youth, Socks and Sandals, TMECI and Lucy.
+- Ensure characters stop bobbing when dialogue completes, if that is the established behaviour elsewhere.
+
+Reuse existing Theatre animation mechanisms wherever possible rather than creating another independent system.
+
+## 2. Filthy Youth with a Phone — visual effects
+
+- Reposition the phone soundwaves so they originate from the actual phone, not the elbow.
+- Use the supplied screenshot as a visual reference.
+- Vapour clouds should rise **vertically upwards**, move slowly and linger noticeably longer before fading.
+- Preserve the magenta/cyan vapour colouring and existing soundwave repetition.
+
+## 3. Filthy Youth — additional dialogue
+
+Add one new Blackball line at the very end of the introductory Theatre, immediately before the transition into the pool match:
+
+**Blackball:** I have a feeling that phone will be making those awful noisewaves throughout this whole match.
+
+Preserve all other dialogue exactly.
+
+## 4. The Most Evil Creature Imaginable — speaker label
+
+The full name currently wraps to two lines and disrupts the Theatre layout.
+
+- Use **TMECI** as the short speaker label in all his Theatre dialogue.
+- Keep the full character name in the opponent roster, Cosmetics and other appropriate places.
+- Do not alter the actual spoken dialogue.
+
+## 5. TMECI — rainbow dialogue
+
+All dialogue spoken by TMECI must use rainbow-coloured text.
+
+This applies to:
+- His introductory Theatre.
+- His victory Theatre.
+- His appearances during Lucy's Chapter 4 outro.
+
+Do not apply rainbow colouring to Blackball's or Lucy's dialogue.
+
+Maintain legibility and ensure the effect doesn't disturb typewriter timing or dialogue layout.
+
+## 6. Lucy Fir — identity spoiler
+
+Lucy's trophy currently reveals her identity prematurely.
+
+- Hide the trophy's identifying name and description until Lucy has been defeated.
+- Preserve the actual trophy and its existing first-win award.
+- Follow the game's existing spoiler-concealment conventions.
+- Check that other locked Cosmetics entries do not reveal her identity.
+
+## 7. Chapter 4 completion trophy
+
+Add a separate trophy for defeating **all five main Chapter 4 opponents**.
+
+- Award once, upon completion of the fifth opponent.
+- Persist through save/reload and imports.
+- Never award twice on replays.
+- Spinball Wizard must not be required.
+- Use the working title **Five Circles of Hell** unless an existing approved trophy naming convention suggests otherwise.
+
+## 8. Vile Blue Hedgehog cue description
+
+Remove **“66% power and topspin”** from the cue's Cosmetics description.
+
+These are opponent AI attributes, not properties of the cue.
+
+Replace with a cosmetic-only description referring to its bright blue finish, white stripes and floating golden rings.
+
+Do not change the opponent's actual 66% power/topspin AI behaviour.
+
+## 9. Lucy Fir — dungeon table
+
+Increase the visibility of the glowing pocket rims.
+
+- Stronger orange-red glow.
+- Clearly noticeable pulsing animation.
+- Preserve the existing table design and collision geometry.
+- Ensure the effect is visible during actual gameplay, not just the Cosmetics preview.
+
+## 10. Chapter 5 roster placeholder
+
+Add **Chapter 5** to the opponent roster after Chapter 4.
+
+Display:
+
+**Chapter 5 — In development!**
+
+It must remain locked and non-playable, with no invented characters, dialogue or progression requirements.
+
+## 11. Lucy Fir — cannonshot sound
+
+The current cannonshot is inaudible or insufficiently prominent.
+
+- Make it clearly audible whenever either player strikes the cue ball.
+- Use a cannon-like impact with a noticeably longer reverberating tail.
+- Ensure exactly one cannonshot event per shot.
+- Respect the existing sound-effects volume/mute settings.
+- Avoid clipping and excessive overlap.
+- Do not introduce additional unrelated sound effects.
+
+## 12. Lucy Fir — darkness overlay
+
+The darkness effect is currently too subtle.
+
+- Change the overlay from **85% transparency to 75% transparency**, equivalent to increasing opacity from 15% to 25%.
+- On every shot, the overlay should still become fully transparent immediately.
+- Increase its fade-back duration from **0.5 seconds to 1.0 second**.
+- Preserve the existing flame effects, shot timing and pointer-input safety.
+
+## Delivery and testing
+
+- Implement these changes together, without unrelated gameplay modifications.
+- Include focused automated checks for Theatre animation timing, speaker switching, dialogue integrity, trophy unlocks/spoilers, audio triggering, overlay opacity and cosmetic descriptions.
+- Preserve existing saves and Chapter 4 progress.
+- Provide a fresh version/build-labelled source ZIP suitable for direct `www/index.html` desktop testing.
+- Include a concise numbered manual QA checklist.
+- Do not deploy, publish or activate purchases.
+- Continue autonomously through implementation and automated testing.

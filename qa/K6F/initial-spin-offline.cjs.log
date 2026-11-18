@@ -1,0 +1,11 @@
+Command: node tests/spin-offline.cjs
+TEST_URL=http://127.0.0.1:8030/
+AssertionError [ERR_ASSERTION]: false == true
+    at /workspace/seamen-pool-development/tests/spin-offline.cjs:6:2 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

@@ -1,0 +1,18 @@
+Command: python tests/k6a-java-check.py
+TEST_URL=http://127.0.0.1:8030/
+PASS purchased record must be acknowledged and re-queried before owner
+PASS pending is never granted or acknowledged; completed later is restored
+PASS ack failures/cache lag remain unknown and retry fresh idempotently
+PASS uncertain acknowledgement outcome is resolved by Google inventory
+PASS concurrent duplicate checks share query and acknowledge
+PASS reinstall/process interruption restores solely from current Play records
+PASS network outage/unavailable is not unpurchased; revocation uses fresh query
+PASS wrong product/package, missing token and unspecified state do not grant
+PASS already-owned and pending prevent a second purchase launch
+PASS future disabled-gate workflow success/cancel/failure/already-owned/pending
+PASS incorrect purchase option cannot launch
+PASS duplicate purchase preflights coalesce
+PASS successful/already-owned callback before inventory propagation remains unknown and retries
+PASS 13 production-core fixture tests; no real Google purchase or acknowledgement performed
+PASS K6A debug-only policy truth table, supplied switch OFF, release rejects even requested=true; exact Play price/currency fields
+PASS five K6A native sources compile against real Billing 9.1.0 / API 36 and Capacitor stubs; launch gate OFF. Not an APK/Gradle build.

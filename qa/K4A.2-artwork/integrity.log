@@ -1,0 +1,4 @@
+PASS exact PNG and alpha: edited-vile-blue.png (1254, 1254) (0, 255)
+PASS exact PNG and alpha: edited-filthy-youth.png (1024, 1536) (0, 254)
+PASS exact PNG and alpha: edited-most-evil-creature.png (1024, 1536) (0, 255)
+PASS all web files match baseline except the three image replacements/references, metadata and documentation; generator, scene settings and native Java unchanged

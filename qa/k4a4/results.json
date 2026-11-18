@@ -1,0 +1,23 @@
+{
+  "version": "0.17.58",
+  "build": 1588,
+  "status": "PASS_AUTOMATED_PENDING_MANUAL_QA",
+  "tests": {
+    "focused": "PASS",
+    "theatre-regression": "PASS",
+    "k4": "PASS",
+    "campaign": "PASS",
+    "unlock": "PASS",
+    "consistency": "PASS",
+    "artwork": "PASS",
+    "offline": "PASS",
+    "cutouts": "PASS"
+  },
+  "finalPackageProduced": true,
+  "deployed": false,
+  "limitations": [
+    "Physical Android/iOS not tested.",
+    "Windows Chrome direct-file testing unavailable in managed browser; tests use Chromium HTTP.",
+    "No Android build or real Google Play transactions."
+  ]
+}

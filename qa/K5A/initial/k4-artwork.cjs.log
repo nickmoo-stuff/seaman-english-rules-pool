@@ -1,0 +1,11 @@
+Command: node tests/k4-artwork.cjs
+TEST_URL=http://127.0.0.1:8030/
+AssertionError [ERR_ASSERTION]: {"src":"http://127.0.0.1:8030/assets/k4/01_Vile_Blue_Hedgehog_approved.png","alpha":true,"partial":true,"background":[18,72,121,255],"visible":true,"inStage":false}
+    at /workspace/seamen-pool-development/tests/k4-artwork.cjs:10:46 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

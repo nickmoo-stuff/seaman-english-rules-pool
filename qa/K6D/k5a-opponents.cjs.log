@@ -1,0 +1,3 @@
+Command: node tests/k5a-opponents.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS all 27 playable opponents: own approved profile/personality and legal target, real engine first-contact match and no early-black loss; Chapter 4 power/spin contracts retained. In-offs: 4

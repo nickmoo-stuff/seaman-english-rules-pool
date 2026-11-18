@@ -1,0 +1,9 @@
+Command: node tests/story-reminder-layout.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS menu 1366x768, text 100%: all seven messages wrap without clipping/overlap/horizontal scrolling, contrast, keyboard order, local/story navigation
+PASS menu 1920x1080, text 100%: all seven messages wrap without clipping/overlap/horizontal scrolling, contrast, keyboard order, local/story navigation
+PASS menu 320x568, text 100%: all seven messages wrap without clipping/overlap/horizontal scrolling, contrast, keyboard order, local/story navigation
+PASS menu 390x844, text 100%: all seven messages wrap without clipping/overlap/horizontal scrolling, contrast, keyboard order, local/story navigation
+PASS menu 740x360, text 100%: all seven messages wrap without clipping/overlap/horizontal scrolling, contrast, keyboard order, local/story navigation
+PASS menu 855x384, text 100%: all seven messages wrap without clipping/overlap/horizontal scrolling, contrast, keyboard order, local/story navigation
+PASS menu 390x844, text 200%: all seven messages wrap without clipping/overlap/horizontal scrolling, contrast, keyboard order, local/story navigation

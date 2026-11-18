@@ -1,0 +1,34 @@
+{
+  "verifiedCutouts": [
+    {
+      "file": "01_Vile_Blue_Hedgehog_approved.png",
+      "sha256": "f2bd38ab6f2c05e05e2fca717a541a19c70f6cd700c1291f4140ae07a8ab69af",
+      "unchanged": true,
+      "mode": "RGBA",
+      "transparentPixels": 558031
+    },
+    {
+      "file": "02_Filthy_Youth_With_Phone_approved.png",
+      "sha256": "e670c584d1d1cac57a2dccb344ff052c284a490f4d7e5315c6eef416e2888082",
+      "unchanged": true,
+      "mode": "RGBA",
+      "transparentPixels": 1001761
+    },
+    {
+      "file": "04_Most_Evil_Creature_Imaginable_approved.png",
+      "sha256": "28d310c2c62814383ccbc1065a0e2ca520a0866edb38bad4180421e8e44b6b94",
+      "unchanged": true,
+      "mode": "RGBA",
+      "transparentPixels": 518082
+    },
+    {
+      "file": "03_Socks_And_Sandals_approved.png",
+      "sha256": "5c57d1b1e95bb1c781a9b90ce531de5df960a28356e68aeeea51000838ec3834",
+      "exactSourceArchive": "edited-SAS.zip",
+      "exactSourceFile": "edited-SAS.png",
+      "unchanged": true,
+      "mode": "RGBA",
+      "transparentPixels": 839860
+    }
+  ]
+}

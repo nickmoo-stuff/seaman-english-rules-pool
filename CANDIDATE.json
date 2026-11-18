@@ -1,0 +1,17 @@
+{
+  "baseline": "ff5c1b9",
+  "milestone": "K6G",
+  "version": "1.0.0",
+  "build": 1595,
+  "branch": "stage6-k6g-player-name-persistence",
+  "commit": "8536474ccf39972c9f69918e994bed3c579f992d",
+  "sourceBranchMode": "development",
+  "packagedWebMode": "release",
+  "androidBuildPerformed": false,
+  "deployed": false,
+  "productionActivationPerformed": false,
+  "versionCodeAvailability": "unverified: confirm 1595 is unused before upload",
+  "nativeUpdateRequired": false,
+  "instructions": "docs/K6G/REPORT.md",
+  "warning": "Apply www only; preserve existing local native billing policy. Do not run historical K6F promotion."
+}

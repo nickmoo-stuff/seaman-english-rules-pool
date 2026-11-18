@@ -1,0 +1,5 @@
+Command: node tests/k4-mobile.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS K4 mobile 390x844 loaded photographic Theatre layers, touch-confirm/real shot, non-blocking effects, landscape controls and reduced motion
+PASS K4 mobile 855x384 loaded photographic Theatre layers, touch-confirm/real shot, non-blocking effects, landscape controls and reduced motion
+PASS K4 mobile 740x360 loaded photographic Theatre layers, touch-confirm/real shot, non-blocking effects, landscape controls and reduced motion

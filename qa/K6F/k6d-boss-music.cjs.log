@@ -1,0 +1,3 @@
+Command: node tests/k6d-boss-music.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS exactly five music assignments; actual boss introductions; one looping deck; match/outro continuity; clean exits. Lucy detailed retry/rematch/victory covered by k4-audio.

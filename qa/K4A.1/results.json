@@ -1,0 +1,41 @@
+{
+  "version": "0.17.54",
+  "build": 1584,
+  "baseline": "3137e5602f1dae43c4926117cc98a882d679c088",
+  "checks": [
+    {
+      "suite": "k4a1-dev-supporter.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "campaign-regression.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "k4.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "k4-entitlement.cjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "suite": "k4-consistency.py",
+      "status": "PASS",
+      "exitCode": 0
+    }
+  ],
+  "fileNavigation": {
+    "status": "N/T",
+    "reason": "Managed Chromium ERR_BLOCKED_BY_ADMINISTRATOR for file://; alternate browser download denied. No browser policy changed."
+  },
+  "fileRelatedCoverage": "Storage-denied browser UI matrix plus file-protocol detector/resolver/service-worker unit tests; not a direct-file Chrome pass.",
+  "nativeSources": "unchanged",
+  "purchaseActivation": false,
+  "androidBuild": false,
+  "deployment": false
+}

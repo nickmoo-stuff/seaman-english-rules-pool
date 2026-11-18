@@ -1,0 +1,6 @@
+Command: python tests/k6f-promotion.py
+TEST_URL=http://127.0.0.1:8030/
+PASS LF/BOM-CRLF promotion 13 metadata files, explicit approval, dry run, idempotence, public-source policy check, exact rollback and unchanged gameplay/native files
+PASS invalid code, altered assets/mixed versions/dev/native-ON/custom Gradle/linked files/lock/tampered backup refused; partial write failure restores all prior bytes
+PASS complete promoted v1.0.0 web: browser boot, displayed version/build, release safeguards, save-version compatibility and offline cache/reload; no native transactions
+PASS alternate confirmed release code 1595 supported without changing v1.0.0; 38 PowerShell assertions; no actual project, promotion, build or Play action

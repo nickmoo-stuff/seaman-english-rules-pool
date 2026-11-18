@@ -1,0 +1,3 @@
+Command: node tests/k6e-release.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS release-mode native UI supports future approved production capability and defaults-disabled capability; imported local flags/developer methods cannot grant; no payment calls; progress preserved

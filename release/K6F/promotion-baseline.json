@@ -1,0 +1,417 @@
+{
+  "schema": 1,
+  "candidateVersion": "0.17.63",
+  "candidateBuild": 1593,
+  "publicVersion": "1.0.0",
+  "defaultReleaseBuild": 1594,
+  "locallyObservedMaxBuild": 1592,
+  "playCodeAvailability": "unverified; user must confirm",
+  "files": {
+    "CONTENT-ARCHITECTURE-0.17.0.txt": {
+      "text": true,
+      "sha256": "8032ac8101d463153281668ac6da0c00dd7f10fb5568c5391b7f5ce0d1f8d46d"
+    },
+    "NATIVE-PACKAGING-READINESS.txt": {
+      "text": true,
+      "sha256": "1c760b33fd14d6e08633ec441ff20d1b787ee5542f7e1b37ab0f1df81e626d54",
+      "candidateSha256": "ca201b5e4b508cd3588afd46644c6ecf66d68ed3f88b378ff4cb5a7a6041cb20"
+    },
+    "README.txt": {
+      "text": true,
+      "sha256": "0be36bc4ca5ab686ddc9e2e00e6f476ebbafac3edc85064c4349e1da0818d3c9",
+      "candidateSha256": "d93c94fdc57f2bf09c2eaa7f6c324438e8dd8ec2cd0cf2db000a6e757860a24e"
+    },
+    "about.js": {
+      "text": true,
+      "sha256": "8c597b1fa9a90ff28aa700f09207265dc1556941b780e00621106027d4097571"
+    },
+    "assets/k4/01_Vile_Blue_Hedgehog_approved.png": {
+      "text": false,
+      "sha256": "f2bd38ab6f2c05e05e2fca717a541a19c70f6cd700c1291f4140ae07a8ab69af"
+    },
+    "assets/k4/02_Filthy_Youth_With_Phone_approved.png": {
+      "text": false,
+      "sha256": "e670c584d1d1cac57a2dccb344ff052c284a490f4d7e5315c6eef416e2888082"
+    },
+    "assets/k4/03_Socks_And_Sandals_approved.png": {
+      "text": false,
+      "sha256": "5c57d1b1e95bb1c781a9b90ce531de5df960a28356e68aeeea51000838ec3834"
+    },
+    "assets/k4/04_Most_Evil_Creature_Imaginable_approved.png": {
+      "text": false,
+      "sha256": "28d310c2c62814383ccbc1065a0e2ca520a0866edb38bad4180421e8e44b6b94"
+    },
+    "assets/k4/05_Lucy_Fir_Adobe_Express_Cutout.png": {
+      "text": false,
+      "sha256": "08e16b3bcadfbe5a7ae64e424a0532325d1ef5f0ccba396ac81dcacd07ce802e"
+    },
+    "assets/k4/06_Shared_Fiery_Pits_Theatre.png": {
+      "text": false,
+      "sha256": "040493530b30322afabb33b7f70b6fd212817a1b919f67ad53a47fecb030331a"
+    },
+    "assets/k4/07_Lucy_Dungeon_Theatre.png": {
+      "text": false,
+      "sha256": "81f06546d749f8987b5d363e4dfea5ebf53a7fcd2300daf94ddb2ea369ba9387"
+    },
+    "assets/k4/08_Spinball_Wizard_Lair_Theatre.png": {
+      "text": false,
+      "sha256": "16c35ae7bf4c7a49591538a42d3d88f77bdd31a25e907befe19491c272beec27"
+    },
+    "assets/k4/09_spinball_wizard_2s.gif": {
+      "text": false,
+      "sha256": "93b3b922ecc4c847eae7e416ae60509f58088b3d52cbee755421dd090f45a058"
+    },
+    "assets/k4/09_spinball_wizard_2s.webp": {
+      "text": false,
+      "sha256": "3ce91b8e35c38417090cb8c954f18adb23eb54854ae17a3340b89113edfec4b7"
+    },
+    "assets/k4/Lucy Fir challenge.mp3": {
+      "text": false,
+      "sha256": "d14e9e0fb00c72f537f642cc7539142c9d169b005f9ac261e7fa0195434e047e"
+    },
+    "assets/music/ale-in-the-hold.m4a": {
+      "text": false,
+      "sha256": "d5c8b1bd8b4312438e716a2e6a4a2e11f89ed0036d614a243e48692cc9b8fb88"
+    },
+    "assets/music/anthem.m4a": {
+      "text": false,
+      "sha256": "2cfe23bfec36a757c23f4b9da63774bf5659d3c622d5c44c7d2c71b01ae33675"
+    },
+    "assets/music/credits1.m4a": {
+      "text": false,
+      "sha256": "7fff3252afd0d4f5cf799bfb84d57ee1223cbee2863958003e0ed98275c9c8b6"
+    },
+    "assets/music/match1.m4a": {
+      "text": false,
+      "sha256": "e7a7039df2a27187f4142647dfdc3931f950e3006afcd301b1d48f3aa10f5a64"
+    },
+    "assets/music/match10.m4a": {
+      "text": false,
+      "sha256": "ba8f9840e3046cb90809b896855b21801a4d9c55834421557b218916ade34ea0"
+    },
+    "assets/music/match2.m4a": {
+      "text": false,
+      "sha256": "a1162657743c7943a6b75483f36f480813a0adf461366ab3f310fbdde44f7918"
+    },
+    "assets/music/match3.m4a": {
+      "text": false,
+      "sha256": "a3be2dc4b06d9bb59f5dfb39a52b658ca0ff45e1ab750c09dca3789a7140516e"
+    },
+    "assets/music/match4.m4a": {
+      "text": false,
+      "sha256": "65048eeeaa7d41fb4695c21217b9a1cd382df3ba67f85131edf33601dd22f8f6"
+    },
+    "assets/music/match5.m4a": {
+      "text": false,
+      "sha256": "3af2b0b0df2b4af2196a716151689f827e91781bb62a57accd49c13600bb74d0"
+    },
+    "assets/music/match6.m4a": {
+      "text": false,
+      "sha256": "17a52810275bf68d06c54c99d220ef1c52f5b03cbc17e5cea11b792e436d290e"
+    },
+    "assets/music/match7.m4a": {
+      "text": false,
+      "sha256": "eb043dce213e27b610933f50a400358dd3c366ff7a088b0c964e7b1260dd776a"
+    },
+    "assets/music/match8.m4a": {
+      "text": false,
+      "sha256": "115b38cbe9426910cc22d56b7a32d03527baac2f18779d002d1a518823bf022f"
+    },
+    "assets/music/match9.m4a": {
+      "text": false,
+      "sha256": "a4251b339fca4ff7a2420aa964e27dd4bba267fc4267740385c45566d24d1b0c"
+    },
+    "assets/music/outro1.m4a": {
+      "text": false,
+      "sha256": "eed76d56e10c3ee0a75bc4e45b58184f5d33b20c634012e625dd87ca3ba06628"
+    },
+    "assets/portraits/bam-bam.png": {
+      "text": false,
+      "sha256": "8848085392fa7f412f9a8e6d424bfddcccb59586e8bfa952158221f1ae4b80dd"
+    },
+    "assets/portraits/captain-blackball.webp": {
+      "text": false,
+      "sha256": "c2ffa368b0ba29027ac268ace1a1dbcb163d05ac97e70958039d10b12f899b40"
+    },
+    "assets/portraits/ch3-aragoon.png": {
+      "text": false,
+      "sha256": "f44e9b175b6105d3c69c4dae1d31de3c68a0e621bcf98a74b5bdc700b21cd87a"
+    },
+    "assets/portraits/ch3-barley.png": {
+      "text": false,
+      "sha256": "cb252e2e75437089f5a92505e06020cf5e3e7ab45e4d513df6063b7596f78cc9"
+    },
+    "assets/portraits/ch3-blockbeard.png": {
+      "text": false,
+      "sha256": "4622696b16ea11b971733daf9a5794d431b0ec67f44bb321c4e59d1e616fe091"
+    },
+    "assets/portraits/ch3-legolass.png": {
+      "text": false,
+      "sha256": "a7a96dc22ebd310b21adf79af459163cc3a61240849717e1d4ec581bd0cf645d"
+    },
+    "assets/portraits/ch3-lord_souronion.png": {
+      "text": false,
+      "sha256": "9b3cd8ef08bbc414aa1f18cb624c9378ac87f49363abcbd0951ab0208f919875"
+    },
+    "assets/portraits/darth-vaper.webp": {
+      "text": false,
+      "sha256": "65855f34f161461776272a5b4ba41491ca60b58abb4c7830bbc1e674b456eebb"
+    },
+    "assets/portraits/deckhand-dave.webp": {
+      "text": false,
+      "sha256": "f9d123702af116fa06f6615e455a670d658f2ba5922d985d0b51ce6e348c03fd"
+    },
+    "assets/portraits/graham-main.png": {
+      "text": false,
+      "sha256": "f5b9331dfc6e832aea269dcd2b2743bf51a15620f2ff7f92afcb84b4ec347044"
+    },
+    "assets/portraits/holly.webp": {
+      "text": false,
+      "sha256": "e7c43dcf8b297709eb650cf3880207b0cdd761e9987aaba5d0a5e09838be56ee"
+    },
+    "assets/portraits/izzy.webp": {
+      "text": false,
+      "sha256": "3ad0429d330997e409566e5d33fc4043d869f931494e62a35bdca8076aa17ced"
+    },
+    "assets/portraits/ol-cyclops.webp": {
+      "text": false,
+      "sha256": "08c5dcbc97ac934651fee6f1986771db4eab3fd8e73f9c9784aa0135acb418f5"
+    },
+    "assets/portraits/papa-surf-main.png": {
+      "text": false,
+      "sha256": "a87faa5a61ee96f70053b101541c684710bfc8820cddb9a3906155a2e2329170"
+    },
+    "assets/portraits/pokey-man.png": {
+      "text": false,
+      "sha256": "367b7bd172ca4b72f33d9d5dd6e9dbc8d29dfa143d9c77341af60534e5893da9"
+    },
+    "assets/portraits/pokey-man.webp": {
+      "text": false,
+      "sha256": "fed8293b27dc2b775ba8db9fb505b498397fc1d0fefeb920fb3e7c92df780f5e"
+    },
+    "assets/portraits/sandy-mandy-main.png": {
+      "text": false,
+      "sha256": "9a2f9e1446cdd2e8ffb7ba68796b3b4282646e2ce73522ee9214796f9db222a6"
+    },
+    "assets/portraits/shelle-main.png": {
+      "text": false,
+      "sha256": "cc31cc64e5848f7fb2d10e28a005b7e65789848b8afac993b1d985a5a9acfc45"
+    },
+    "assets/portraits/sweaty-simon.webp": {
+      "text": false,
+      "sha256": "c1047740f25d4b3527a367e2716418bee8f2f119aa6ca039736886b69c6e2798"
+    },
+    "assets/portraits/tornado-mick.webp": {
+      "text": false,
+      "sha256": "11940daa5d2f5ee92a4688564e1a11d75e731a8b14f792bde2e189458dbc2873"
+    },
+    "assets/scenes/blackball-private-quarters.png": {
+      "text": false,
+      "sha256": "f53a535e8217577d60f7e623584d8618be410b7ea3756a7548da4436d3162e92"
+    },
+    "assets/scenes/captain-blackball-main.png": {
+      "text": false,
+      "sha256": "b7a27cd7a0431df6768f2bb47ba5b46210ccdbddd60adc0d9e33772267cf6b35"
+    },
+    "assets/scenes/ch3-aragoon.png": {
+      "text": false,
+      "sha256": "4823eef2b60113093df8394755a3303c50f2d09f75331a0972af2302951e34b4"
+    },
+    "assets/scenes/ch3-barley-home.webp": {
+      "text": false,
+      "sha256": "99be6aaedd5da227e78802820c2af505b4168392a6d379010c248c34eb92c33e"
+    },
+    "assets/scenes/ch3-barley.png": {
+      "text": false,
+      "sha256": "03685c83746a7d605ab59af42a802269c566e9b09953c22d63ea62a9192e5062"
+    },
+    "assets/scenes/ch3-blockbeard-cathedral.webp": {
+      "text": false,
+      "sha256": "105c1f0acb10a49954a8aa09d0c756c49c6dbfd7a5322f6fd3dd88fe0fcaf465"
+    },
+    "assets/scenes/ch3-blockbeard.png": {
+      "text": false,
+      "sha256": "1276bfc00de22f7463317887033be177c73e18551b06da4303112ae9dd2d85df"
+    },
+    "assets/scenes/ch3-camp.webp": {
+      "text": false,
+      "sha256": "feabc2fa4bff1f498f3d98706c6ca0216da442b051d735da1d431324cdb48503"
+    },
+    "assets/scenes/ch3-deep-mine-shaft.webp": {
+      "text": false,
+      "sha256": "8a6996b81a9d01eeb00a7b36223c0f7eed0553bc4fcdecfdaaa2b54cc022282e"
+    },
+    "assets/scenes/ch3-glade.webp": {
+      "text": false,
+      "sha256": "c5a338c180bd13b7e090d05d1a5dd5489a35cfe7d5af0c0af0ad5c39fb22a63b"
+    },
+    "assets/scenes/ch3-legolass.png": {
+      "text": false,
+      "sha256": "d590466d686e6adf473886c64030debfdc5355954bfd03aca4edae0642826628"
+    },
+    "assets/scenes/ch3-lord_souronion.png": {
+      "text": false,
+      "sha256": "2bddd1a8b6b963d367af4270de0cdab3e4bd3ac0a12683b8be2922a188f9f02e"
+    },
+    "assets/scenes/ch3-mysterious-cave.webp": {
+      "text": false,
+      "sha256": "3f5318a716800395e2aebbe9e449df117604116f59f37794c7c0e166cb874e3f"
+    },
+    "assets/scenes/ch3-war.webp": {
+      "text": false,
+      "sha256": "d2252c26f92aa23c99094208a12bd9bc1c001418cf0a5ed2a74950b19e3e8e68"
+    },
+    "assets/scenes/graham-fossil.png": {
+      "text": false,
+      "sha256": "f0bd7f07aefab29e3b74139535cccdda448c3aa4f153f66fb7fdc4c31b2f5064"
+    },
+    "assets/scenes/graham-tongue.png": {
+      "text": false,
+      "sha256": "4f23c764910d1b19f702fccf36d36eb6d02ea619a675a575ad4aa1eae8db7726"
+    },
+    "assets/scenes/liver-island-tavern.png": {
+      "text": false,
+      "sha256": "72c634ea9be3082a82c0b89613f2213b1f004a7dd342d651303e526cd2216114"
+    },
+    "assets/scenes/mr-wiggles-main.png": {
+      "text": false,
+      "sha256": "d5e72eabd71c1d59255f86e7feaa7d412bdb266149aef6ea943a906965b9b246"
+    },
+    "assets/scenes/mr-wiggles-wiggle-01.png": {
+      "text": false,
+      "sha256": "cfaf978c8340e579bf10595e045d1f9d21914b86de361d9579f357fad2a8256d"
+    },
+    "assets/scenes/mr-wiggles-wiggle-02.png": {
+      "text": false,
+      "sha256": "84db30d2a0b108617aaaef12533ed4601703b3bb29371439e9607b970724c500"
+    },
+    "assets/scenes/mr-wiggles-wiggle-03.png": {
+      "text": false,
+      "sha256": "b562039dfc489e6c96feedec0ef932b9148205236b34d205946d0ebe9b24a21a"
+    },
+    "assets/scenes/mr-wiggles-wiggle-04.png": {
+      "text": false,
+      "sha256": "f7a39e6321b10982b163e7dc08152e4a1e81459afe31d83e29db0ad71e5f220d"
+    },
+    "assets/scenes/mr-wiggles-wiggle-05.png": {
+      "text": false,
+      "sha256": "c5bcfe1ee999236a4859b911b6ef0e00c158da9eb9b9a88dff7765ebae51b2c8"
+    },
+    "assets/scenes/mr-wiggles-wiggle-06.png": {
+      "text": false,
+      "sha256": "e795210fb2d2d0c602acb63adb5ff4285738f8722712e34241cc74fc7180b8a5"
+    },
+    "assets/scenes/mr-wiggles-wiggle-07.png": {
+      "text": false,
+      "sha256": "c40af7218eb1357abbcb7e8bb564157a69ae1ed698252397aff848c20374570a"
+    },
+    "assets/scenes/mr-wiggles-wiggle-08.png": {
+      "text": false,
+      "sha256": "e276a8f7337784bcaae1c4f6d7251bf5a10494d111108f2a37f465e806c26ca6"
+    },
+    "assets/scenes/open-ocean-ship-deck.png": {
+      "text": false,
+      "sha256": "1024fee8aee2df62d376900e4d0b688e8ef1cb0498864267842ec5e87f1ab63c"
+    },
+    "assets/scenes/papa-surf-stew.png": {
+      "text": false,
+      "sha256": "0a4a8244552043d8d4833966972ea5e03b1e5f8e5140cf843deb809c6435c7e4"
+    },
+    "assets/scenes/sandy-sandcastle.png": {
+      "text": false,
+      "sha256": "f39ae9e720816e25584317fb3580ae09192f45dc3a342fc851f74b9b5de33888"
+    },
+    "assets/scenes/shelle-pearl-shell.png": {
+      "text": false,
+      "sha256": "0b47a735ea65d0acb1b67bb23227aa14b82794bd788a99174ec72d8a41f42d28"
+    },
+    "assets/scenes/strangevoice-beach.png": {
+      "text": false,
+      "sha256": "80970a4e538beef4233da003e52874ed5e7f8b5ff9097077d04693e3b2703ec2"
+    },
+    "assets/scenes/strangevoice-tavern.png": {
+      "text": false,
+      "sha256": "77db0b48fb6d89c85403c8f1d27027daa542e482d3f7266d772e6d4a861b9449"
+    },
+    "assets/scenes/supporter-pokey-centre.webp": {
+      "text": false,
+      "sha256": "5640de69a57e4a51b8ece856e05955d2bb84ab79af699a14e1052513e5fa702a"
+    },
+    "assets/scenes/supporter-vaper-control-room.webp": {
+      "text": false,
+      "sha256": "e64b365258fdb6d680e6caea6ca8b5f5a3f74f765a4e7c048ce8829eafc51cf1"
+    },
+    "chapter4-runtime.js": {
+      "text": true,
+      "sha256": "7bba66cc704a889bdc9bd44c2edfd82b890683f59063eabf9a0b30b172e4936e"
+    },
+    "chapter4.css": {
+      "text": true,
+      "sha256": "a64067e4ee639fd5105482aa06cafa62573f08cca1b2f60a541bb25fd2c0f6a8"
+    },
+    "chapter4.js": {
+      "text": true,
+      "sha256": "e6a9f51ec2dec672ee0b4cea64b3294a35f3b9d125f6d66dea9a0089ecdba1f5"
+    },
+    "dialogue.js": {
+      "text": true,
+      "sha256": "50419e6e3d8bec06f201eedc396904f4d16b2523674a51929425be3af016f0e8"
+    },
+    "game.js": {
+      "text": true,
+      "sha256": "8fd762daf47f808402b3011cb923abb89682999480a36fdd80ebc000dbaf1060",
+      "candidateSha256": "66d47328d765f2ac20d3eb144af37a9091d9a26f7f7e948c23d60d0d1d6baaf6"
+    },
+    "icon-192.png": {
+      "text": false,
+      "sha256": "b04f93f8a72aca0390b1229e576a911f8330545aef12e0ff37647ef9a7198166"
+    },
+    "icon-512.png": {
+      "text": false,
+      "sha256": "cc88de01bda63df38d2dc76f79d49f3eb7d43908aae5cd6b545d7f9de308f9d9"
+    },
+    "index.html": {
+      "text": true,
+      "sha256": "3f8a7d11df055216214e95dbc391d23342284ce6e028485e849c6848c909173f",
+      "candidateSha256": "3798f16a208be8750a550db2d2cb597b7870e1c5516eb5ab8d227d67e89616b0"
+    },
+    "layout.css": {
+      "text": true,
+      "sha256": "1f452a6f60e299be9e907caf0f2324cfa60b111a5ad69503ced513be054a2c36"
+    },
+    "layout.js": {
+      "text": true,
+      "sha256": "a573893b3658a81e08fa036eb0c41b58fba6c5c9e3386ebd6f7429383e6d4a5c"
+    },
+    "manifest.webmanifest": {
+      "text": true,
+      "sha256": "049990cb554c5b74c48090a9125e23a23c4fb81054baa3b12170e24c95ebdc25"
+    },
+    "service-worker.js": {
+      "text": true,
+      "sha256": "ed54a4e1cd0e24a5fe5030ccd0aeb5eedc931cb0ed5765e29b3be0ba5304cc4d",
+      "candidateSha256": "92f8ce8fb29863d7269fc3e6fdd12425db45fba8b32db3b92b430fb715a7a994"
+    },
+    "spin-physics.js": {
+      "text": true,
+      "sha256": "5baab01b1fdd6c27b6e6502b83f70d4f0030493b396da616f667e3ad05648f5d"
+    },
+    "style.css": {
+      "text": true,
+      "sha256": "901357ae11f57ef5b8e657fd50b7da6153ab90627c48abb36e4479c86b795a26"
+    },
+    "supporter.js": {
+      "text": true,
+      "sha256": "0ff1de4d30a87b16de615be3ff252bb2fd03dc9203552df122220766035994bf"
+    },
+    "sw.js": {
+      "text": true,
+      "sha256": "9e1b25140369b7c192d268d7f8690943055768f9dd1786761003a1c25f4d8074",
+      "candidateSha256": "ea365e56b4f99e48340fb332ad0d6de859eaf7ba946f98dedc788e678548eefb"
+    },
+    "theatre.js": {
+      "text": true,
+      "sha256": "b4e8ea1c065fa35391d97cccbe05116727a981245a38183edb20bf5dbbcb3487"
+    }
+  }
+}

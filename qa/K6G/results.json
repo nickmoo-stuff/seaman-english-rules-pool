@@ -1,0 +1,80 @@
+{
+  "date": "2026-11-16T22:36:06.575339+00:00",
+  "baseline": "ff5c1b9",
+  "version": "1.0.0",
+  "build": 1595,
+  "tests": [
+    {
+      "suite": "k6g-names.cjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 25.56
+    },
+    {
+      "suite": "k6g-migration.cjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 31.55
+    },
+    {
+      "suite": "campaign-regression.cjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 14.3
+    },
+    {
+      "suite": "k5a-saves.cjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 5.28
+    },
+    {
+      "suite": "k5a-multiplayer.cjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 13.16
+    },
+    {
+      "suite": "k4-entitlement.cjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 15.02
+    },
+    {
+      "suite": "k6a-service.cjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 0.12
+    },
+    {
+      "suite": "k6e-release.cjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 8.43
+    },
+    {
+      "suite": "k4-consistency.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 0.59
+    },
+    {
+      "suite": "k6g-preservation.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 1.11
+    }
+  ],
+  "counts": {
+    "PASS": 10,
+    "FAIL": 0,
+    "NOT TESTED": 0
+  },
+  "limitations": [
+    "Linux Chromium, not a physical Android app restart. Persistent Chromium profile is closed/reopened on disk.",
+    "Compact Story win uses real physics/EPA rules on a test fixture; no artificial success button.",
+    "Native ownership replies are mocks, not real Play transactions.",
+    "Android wrapper/signing/AAB and Play code availability are unavailable."
+  ],
+  "finalFocusedRerun": "2026-11-16T22:41:10.976995+00:00"
+}

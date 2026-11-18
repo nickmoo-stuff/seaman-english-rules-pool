@@ -1,0 +1,4 @@
+Command: node tests/spin-ui.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS portrait desktop mouse: taps/drags/toggle, presets/diagonals/clamp, unchanged arrows, both-mode fine aim/power, reversed/simulation, slider, shot/frame reset and placement
+PASS portrait touch/Android pointer: taps/drags/toggle, presets/diagonals/clamp, unchanged arrows, both-mode fine aim/power, reversed/simulation, slider, shot/frame reset and placement

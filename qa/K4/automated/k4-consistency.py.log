@@ -1,0 +1,3 @@
+Command: python tests/k4-consistency.py
+TEST_URL=http://127.0.0.1:8000/
+PASS version/build, local HTML dependencies, approved asset hashes/cache inventory, deterministic dialogue rebuild, save schema, unchanged purchases-disabled native sources, all JavaScript syntax and diff whitespace

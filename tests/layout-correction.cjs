@@ -1,0 +1,48 @@
+const {doubleTap:touchDoubleTap}=require('./touch-input.cjs');
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),artifacts=process.env.TEST_ARTIFACT_DIR||'/tmp/seamen-k3c2';fs.mkdirSync(artifacts,{recursive:true});
+const {chromium,devices}=require('playwright');
+const url=process.env.TEST_URL||'http://127.0.0.1:8003/';
+async function enter(p){await p.goto(url,{waitUntil:'networkidle'});await p.locator('#enterTavern').click();await p.waitForTimeout(2700);await p.locator('#titleLocalMultiplayer').click();await p.getByRole('button',{name:'Start game',exact:true}).click();await p.waitForTimeout(350);}
+async function controls(p){return p.evaluate(()=>{
+ const ids=['power','powerPlus45','powerPlus5','powerMinus5','powerMinus45','shoot','angleMinus5','angleMinus','anglePlus','anglePlus5','helmPort','helmStarboard','helmCueBall','p1group','p1left','p2group','p2left','j3Turn'];if(!confirmCue.hidden)ids.push('confirmCue');if(helmSpinMode)ids.push(...[...document.querySelectorAll('[data-spin]')].map(el=>el.id).filter(Boolean));
+ return ids.map(id=>{const el=document.getElementById(id),r=el.getBoundingClientRect();let clipped=false;for(let a=el.parentElement;a&&a!==document.body;a=a.parentElement){const s=getComputedStyle(a),b=a.getBoundingClientRect();if(/auto|scroll|hidden|clip/.test(s.overflowY)&& (r.top<b.top-1||r.bottom>b.bottom+1))clipped=true;if(/auto|scroll|hidden|clip/.test(s.overflowX)&&(r.left<b.left-1||r.right>b.right+1))clipped=true;}
+ const hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return {id,x:r.x,y:r.y,w:r.width,h:r.height,clipped,hit:el===hit||el.contains(hit),inside:r.x>=0&&r.y>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1};});
+ });}
+function check(rows){for(const r of rows){assert(r.inside&&!r.clipped&&r.hit,`${r.id} visible without scroll ${JSON.stringify(r)}`);if(!/^(p[12]|j3)/.test(r.id))assert(r.w>=43&&r.h>=43,`${r.id} touch target ${r.w}x${r.h}`);}}
+(async()=>{const b=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});try{
+ for(const [w,h,label] of [[855,384,'Pixel-8-Pro-emulation'],[844,390,'844x390'],[740,360,'740x360'],[960,540,'960x540'],[844,340,'browser-chrome']]){
+  const dpr=label.startsWith('Pixel')?2.625:1;
+  const p=await b.newPage({...devices['Pixel 7'],userAgent:devices['Pixel 7'].userAgent.replace('Pixel 7','Pixel 8 Pro'),viewport:{width:w,height:h},screen:{width:w,height:h},deviceScaleFactor:dpr,serviceWorkers:'block'}),errors=[];p.on('pageerror',e=>errors.push(e.message));
+  const cdp=await p.context().newCDPSession(p);await cdp.send('Emulation.setDeviceMetricsOverride',{width:w,height:h,deviceScaleFactor:dpr,mobile:true,screenWidth:w,screenHeight:h,screenOrientation:{type:'landscapePrimary',angle:90}});
+  await enter(p);check(await controls(p));await p.locator('.mobile-panel-toggle[data-panel=details]').tap();assert(await p.locator('#j3Last').isVisible());const y=await p.evaluate(()=>cue().y);await p.locator('#cueUp').tap();assert(await p.evaluate(()=>cue().y)<y);await p.locator('.mobile-panel-toggle[data-panel=details]').tap();await p.locator('#confirmCue').tap();check(await controls(p));
+  assert.equal(await p.locator('#landscapeLast').evaluate(el=>el.parentElement.id),'mobilePanellastTurn');
+  assert(await p.locator('#headerLayoutControl').isHidden());await p.locator('#settingsButton').tap();assert(await p.locator('.layout-setting').isHidden());await p.locator('#closeSettings').tap();
+  await p.evaluate(()=>{powerEl.value=50;powerText.textContent='50%';});
+  for(const [id,value] of [['powerPlus45',95],['powerMinus45',50],['powerPlus5',55],['powerMinus5',50]]){await p.locator('#'+id).tap();assert.equal(await p.evaluate(()=>+powerEl.value),value);}
+  await p.evaluate(()=>{playerNames={1:'Captain Extremely Long Player Name',2:'Darth Vaper'};state.groups={1:'red',2:'yellow'};state.breakShot=false;lastShotEl.textContent='LEGAL POT: RED potted • continue';updateHUD();});check(await controls(p));
+  assert.match(await p.locator('#p1left').textContent(),/RED group\n7 balls left/);assert.match(await p.locator('#p2left').textContent(),/YELLOW group/);
+  await touchDoubleTap(p,p.locator('#helmCueBall'));await p.locator('[data-spin=Topspin]').tap();await p.waitForTimeout(300);await p.locator('[data-spin]').evaluateAll(xs=>xs.forEach((el,i)=>el.id='testSpin'+i));check(await controls(p));if(w===855||w===740)await p.screenshot({path:`${artifacts}/${label}-spin.png`});if(w===740){await p.locator('#gameApp').evaluate(el=>el.style.padding='5px 28px 20px');await p.waitForTimeout(100);check(await controls(p));await p.locator('#gameApp').evaluate(el=>el.style.padding='');}
+  await touchDoubleTap(p,p.locator('#helmCueBall'));await p.waitForTimeout(300);
+  await p.locator('.mobile-panel-toggle[data-panel=details]').tap();assert.equal(await p.locator('.mobile-panel-toggle[data-panel=details]').getAttribute('aria-expanded'),'true');await p.locator('.mobile-panel-toggle[data-panel=details]').tap();
+  assert.equal(await p.locator('#landscapePlayer').evaluate(el=>el.scrollTop),0);assert.equal(await p.locator('#landscapeRight').evaluate(el=>el.scrollTop),0);
+  await p.screenshot({path:`${artifacts}/${label}.png`});
+  if(w===855){await p.evaluate(()=>showBreakChoice());for(const id of ['choiceA','choiceB']){const r=await p.locator('#'+id).boundingBox();assert(r.y>=0&&r.y+r.height<=h&&r.height>=44);}await p.locator('#choiceA').tap();assert.equal(await p.evaluate(()=>pendingChoice),null);}assert.deepEqual(errors,[]);console.log(`PASS ${label}: all essential targets unclipped, tappable; placement, four power buttons, groups, spin, details`);await p.close();
+ }
+ const school=await b.newPage({...devices['Pixel 7'],viewport:{width:844,height:390},screen:{width:844,height:390},deviceScaleFactor:1,serviceWorkers:'block'});const sc=await school.context().newCDPSession(school);await sc.send('Emulation.setDeviceMetricsOverride',{width:844,height:390,deviceScaleFactor:1,mobile:true,screenWidth:844,screenHeight:390,screenOrientation:{type:'landscapePrimary',angle:90}});await enter(school);await school.evaluate(()=>startSchoolLesson(1));await school.waitForTimeout(100);assert.equal(await school.locator('#schoolTipToggle').getAttribute('aria-expanded'),'true');await school.locator('#schoolTipToggle').tap();check(await controls(school));await school.evaluate(()=>{setAngleDeg(270);powerEl.value=35;});await school.locator('#shoot').tap();await school.waitForFunction(()=>!moving&&remaining('red')===1,{},{timeout:30000});assert.equal(await school.locator('#schoolTipToggle').getAttribute('aria-expanded'),'true');await school.locator('#schoolTipToggle').tap();check(await controls(school));await school.close();console.log('PASS mobile landscape optional Pool School: real first pot, expanded phase guidance, hide and usable controls');
+ // Device Toolbar without a mobile UA; switching it off restores the saved desktop choice.
+ const p=await b.newPage({viewport:{width:844,height:390},serviceWorkers:'block'});await enter(p);const cdp=await p.context().newCDPSession(p);
+ assert.equal(await p.evaluate(()=>document.documentElement.dataset.layoutDevice),'desktop');await cdp.send('Emulation.setDeviceMetricsOverride',{width:844,height:390,deviceScaleFactor:1,mobile:true,screenWidth:844,screenHeight:390,screenOrientation:{type:'landscapePrimary',angle:90}});await cdp.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:5});
+ await p.waitForFunction(()=>document.documentElement.dataset.layoutDevice==='mobile');assert.equal(await p.evaluate(()=>document.documentElement.dataset.gameplayLayout),'landscape');assert(await p.locator('#headerLayoutControl').isHidden());
+ await cdp.send('Emulation.setTouchEmulationEnabled',{enabled:false});await cdp.send('Emulation.clearDeviceMetricsOverride');await p.waitForFunction(()=>document.documentElement.dataset.layoutDevice==='desktop');assert.equal(await p.evaluate(()=>document.documentElement.dataset.gameplayLayout),'portrait');assert(await p.locator('#headerLayoutControl').isVisible());await p.close();console.log('PASS live Device Toolbar touch emulation / desktop restoration without UA override');
+ // Native bridge is exercised as browser integration only; this is not an Android APK test.
+ const native=await b.newPage();await native.addInitScript(()=>{window.Capacitor={isNativePlatform:()=>true};});await native.goto(url);assert.equal(await native.evaluate(()=>document.documentElement.dataset.layoutDevice),'mobile');await native.close();
+ // Old tutorial flags stay inert; a Dave match goes directly to actual cue placement.
+ for(const flag of [null,'0','1']){
+  const p=await b.newPage({serviceWorkers:'block'});await p.addInitScript(flag=>{if(flag!==null)localStorage.setItem('seamenTutorialSeen',flag);},flag);await enter(p);
+  await p.evaluate(()=>{showTitleScreen();pendingPirateStart={level:1,pirateId:'dave',playerName:'Pupil'};beginPendingPirateMatch(true);});await p.waitForTimeout(650);
+  assert.equal(await p.locator('#tutorialModal,#replayTutorial,#rulesHelpTutorial,#devResetTutorial').count(),0);assert.equal(await p.evaluate(()=>!!schoolSession),false);assert(await p.locator('#confirmCue').isVisible());await p.locator('#confirmCue').click();assert(await p.locator('#shoot').isEnabled());assert.equal(await p.evaluate(()=>localStorage.getItem('seamenTutorialSeen')),flag);
+  await p.reload({waitUntil:'networkidle'});assert.equal(await p.locator('#tutorialModal').count(),0);await p.close();
+ }
+ console.log('PASS native bridge classification; missing/false/true legacy flags cannot launch First Voyage, redirect, or force Pool School');
+}finally{await b.close();}})().catch(e=>{console.error(e);process.exitCode=1});

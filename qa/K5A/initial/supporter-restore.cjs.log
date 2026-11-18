@@ -1,0 +1,14 @@
+Command: node tests/supporter-restore.cjs
+TEST_URL=http://127.0.0.1:8030/
+AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert(copy.includes('starting with Chapter 4 and continuing beyond'))
+
+    at /workspace/seamen-pool-development/tests/supporter-restore.cjs:50:63 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

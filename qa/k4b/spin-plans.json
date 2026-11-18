@@ -1,0 +1,231 @@
+[
+  {
+    "spin": {
+      "x": 0,
+      "y": -0.75
+    },
+    "expected": {
+      "x": 0,
+      "y": -0.75
+    },
+    "physics": true,
+    "preserved": true,
+    "first": "red",
+    "forecastFirst": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": true,
+    "kind": "SAFETY",
+    "position": {
+      "x": 436.365146489299,
+      "y": 131.62501201252107
+    },
+    "forecastPosition": {
+      "x": 436.3651464892988,
+      "y": 131.62501201252115
+    }
+  },
+  {
+    "spin": {
+      "x": 0.7,
+      "y": 0
+    },
+    "expected": {
+      "x": 0.7,
+      "y": 0
+    },
+    "physics": true,
+    "preserved": true,
+    "first": "red",
+    "forecastFirst": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "kind": "DIRECT POT",
+    "position": {
+      "x": 174.58300827190567,
+      "y": 174.58300827190735
+    },
+    "forecastPosition": {
+      "x": 174.58300827190735,
+      "y": 174.58300827190567
+    },
+    "flair": "BALANCED position weighting"
+  },
+  {
+    "spin": {
+      "x": 0,
+      "y": 0.75
+    },
+    "expected": {
+      "x": 0,
+      "y": 0.75
+    },
+    "physics": true,
+    "preserved": true,
+    "first": "red",
+    "forecastFirst": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "kind": "DIRECT POT",
+    "position": {
+      "x": 379.9015859669949,
+      "y": 379.9015859669967
+    },
+    "forecastPosition": {
+      "x": 379.9015859669967,
+      "y": 379.9015859669949
+    },
+    "flair": "BALANCED position weighting"
+  },
+  {
+    "spin": {
+      "x": -0.7,
+      "y": 0
+    },
+    "expected": {
+      "x": -0.7,
+      "y": 0
+    },
+    "physics": true,
+    "preserved": true,
+    "first": "red",
+    "forecastFirst": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "kind": "DIRECT POT",
+    "position": {
+      "x": 174.58300827190567,
+      "y": 174.58300827190735
+    },
+    "forecastPosition": {
+      "x": 174.58300827190735,
+      "y": 174.58300827190567
+    },
+    "flair": "BALANCED position weighting"
+  },
+  {
+    "spin": {
+      "x": 0.5,
+      "y": -0.55
+    },
+    "expected": {
+      "x": 0.5,
+      "y": -0.55
+    },
+    "physics": true,
+    "preserved": true,
+    "first": "red",
+    "forecastFirst": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": true,
+    "kind": "SAFETY",
+    "position": {
+      "x": 381.9855691064299,
+      "y": 195.83625268110592
+    },
+    "forecastPosition": {
+      "x": 381.98556910642975,
+      "y": 195.8362526811053
+    }
+  },
+  {
+    "spin": {
+      "x": -0.5,
+      "y": 0.55
+    },
+    "expected": {
+      "x": -0.5,
+      "y": 0.55
+    },
+    "physics": true,
+    "preserved": true,
+    "first": "red",
+    "forecastFirst": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "kind": "DIRECT POT",
+    "position": {
+      "x": 323.19476394550026,
+      "y": 323.19476394550225
+    },
+    "forecastPosition": {
+      "x": 323.19476394550225,
+      "y": 323.19476394550026
+    },
+    "flair": "BALANCED position weighting"
+  },
+  {
+    "spin": {
+      "x": 0.5,
+      "y": 0.55
+    },
+    "expected": {
+      "x": 0.5,
+      "y": 0.55
+    },
+    "physics": true,
+    "preserved": true,
+    "first": "red",
+    "forecastFirst": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": false,
+    "kind": "DIRECT POT",
+    "position": {
+      "x": 323.19476394550026,
+      "y": 323.19476394550225
+    },
+    "forecastPosition": {
+      "x": 323.19476394550225,
+      "y": 323.19476394550026
+    },
+    "flair": "BALANCED position weighting"
+  },
+  {
+    "spin": {
+      "x": -0.5,
+      "y": -0.55
+    },
+    "expected": {
+      "x": -0.5,
+      "y": -0.55
+    },
+    "physics": true,
+    "preserved": true,
+    "first": "red",
+    "forecastFirst": "red",
+    "white": false,
+    "pots": [
+      "red"
+    ],
+    "cushion": true,
+    "kind": "SAFETY",
+    "position": {
+      "x": 378.5922445812033,
+      "y": 115.94131569180826
+    },
+    "forecastPosition": {
+      "x": 378.5922445812031,
+      "y": 115.94131569180826
+    }
+  }
+]

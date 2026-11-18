@@ -1,0 +1,8 @@
+{
+  "baseline": "ff5c1b9",
+  "reproduced": true,
+  "beforeMatchName": "Captain Rowan",
+  "persistentNameFields": [],
+  "afterReload": "Player 1",
+  "cause": "Story name exists only in DOM/runtime; no persistent name field or load restoration."
+}

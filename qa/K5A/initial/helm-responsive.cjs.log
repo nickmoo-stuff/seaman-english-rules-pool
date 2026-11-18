@@ -1,0 +1,6 @@
+Command: node tests/helm-responsive.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS mouse portrait: short ball/rail drag, deliberate double-tap, spin drag/preset, return to aim, no accidental shot
+PASS mouse landscape: short ball/rail drag, deliberate double-tap, spin drag/preset, return to aim, no accidental shot
+PASS touch portrait: short ball/rail drag, deliberate double-tap, spin drag/preset, return to aim, no accidental shot
+PASS touch landscape: short ball/rail drag, deliberate double-tap, spin drag/preset, return to aim, no accidental shot

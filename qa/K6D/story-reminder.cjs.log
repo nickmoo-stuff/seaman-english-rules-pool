@@ -1,0 +1,5 @@
+Command: node tests/story-reminder.cjs
+TEST_URL=http://127.0.0.1:8030/
+PASS 24 current/legacy progression fixtures, future catalogue/entitlement gates, priority and resolver save isolation
+PASS reload of five existing saves with missing chapter flags uses established migration and correct reminder
+PASS live Blackball/Chapter 2 entry/Mr Wiggles/Chapter 3 entry/Blockbeard updates, main-menu-only placement, persistent reload and unchanged saves; no future access, tutorials or runtime errors
