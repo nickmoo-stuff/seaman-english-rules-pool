@@ -6,10 +6,11 @@
     "version": "1.0.1",
     "build": 1596,
     "sourceRepository": "nickmoo-stuff/seamen-pool-development",
-    "sourceCommit": "9d9ab3155db5d286c4f01ca7572a0c48e0ff7fc2",
+    "sourceCommit": "8f0a367c551a7fb085992a130f7c1832c9f71a6d",
     "sourcePath": "www",
     "previousBrowserRelease": "v1.0.0-b1595",
-    "release": "v1.0.1-b1596"
+    "release": "v1.0.1-b1596",
+    "preservedCreditsCommit": "3ebb59d9e5200951dda2c383638cf2eff0d43089"
   },
   "nativeBillingAvailable": false,
   "deployed": false,
