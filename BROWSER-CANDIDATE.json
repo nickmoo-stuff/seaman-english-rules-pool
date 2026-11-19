@@ -1,0 +1,17 @@
+{
+  "version": "1.0.1",
+  "build": 1596,
+  "branch": "maintenance-v1.0.1",
+  "source": {
+    "version": "1.0.1",
+    "build": 1596,
+    "sourceRepository": "nickmoo-stuff/seamen-pool-development",
+    "sourceCommit": "cbb552b3d1bcf2aa4d2848cda03e63dd58c0ee6f",
+    "sourcePath": "www",
+    "previousBrowserRelease": "v1.0.0-b1595",
+    "release": "v1.0.1-b1596"
+  },
+  "nativeBillingAvailable": false,
+  "deployed": false,
+  "report": "docs/MAINTENANCE-v1.0.1-REVIEW.md"
+}

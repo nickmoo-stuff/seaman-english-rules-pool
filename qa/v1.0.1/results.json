@@ -1,0 +1,80 @@
+{
+  "version": "1.0.1",
+  "build": 1596,
+  "checks": [
+    {
+      "name": "fresh verified v1.0.1/build1596; all offline entries and music load; single root worker; browser purchases/ownership unavailable",
+      "status": "PASS"
+    },
+    {
+      "name": "installed PWA root launches offline, saved state remains, real local frame shot works offline",
+      "status": "PASS"
+    },
+    {
+      "name": "real v1.0.0 upgrade: active frame unchanged, explicit restart reaches v1, saves/trophies/cosmetics/settings retained; old caches retained",
+      "status": "PASS"
+    },
+    {
+      "name": "corrupt update rejected; old version works offline without clearing data; retry recovers v1",
+      "status": "PASS"
+    },
+    {
+      "name": "missing update rejected; old version works offline without clearing data; retry recovers v1",
+      "status": "PASS"
+    },
+    {
+      "name": "interrupt update rejected; old version works offline without clearing data; retry recovers v1",
+      "status": "PASS"
+    },
+    {
+      "name": "fresh integrity failure remains blocked; retry succeeds after complete deployment",
+      "status": "PASS"
+    },
+    {
+      "name": "exact maintenance source projection; 102 source files; all public v1.0.0/previous release and Android/native trees unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "93 offline hashes, release checksums, preserved PWA identity and all release/root JavaScript syntax",
+      "status": "PASS"
+    },
+    {
+      "name": "Chromium iOS-profile simulation: iPhone portrait; touch/placement/power/spin, reload, synthetic safe areas and scroll containment",
+      "status": "PASS"
+    },
+    {
+      "name": "Chromium iOS-profile simulation: iPhone landscape; touch/placement/power/spin, reload, synthetic safe areas and scroll containment",
+      "status": "PASS"
+    },
+    {
+      "name": "Chromium iOS-profile simulation: iPad desktop-UA portrait; touch/placement/power/spin, reload, synthetic safe areas and scroll containment",
+      "status": "PASS"
+    },
+    {
+      "name": "Chromium iOS-profile simulation: iPad desktop-UA landscape; touch/placement/power/spin, reload, synthetic safe areas and scroll containment",
+      "status": "PASS"
+    },
+    {
+      "name": "media-policy simulation: no pre-gesture playback, initial trusted gesture, rejected play is non-blocking and retried on next gesture",
+      "status": "PASS"
+    },
+    {
+      "name": "media race fixture: stale playback rejection cannot pause or overwrite the newer gesture/track",
+      "status": "PASS"
+    },
+    {
+      "name": "standalone/metadata simulation: existing PWA identity, icon and manual iOS installation metadata; no unsupported install prompt",
+      "status": "PASS"
+    }
+  ],
+  "counts": {
+    "PASS": 16,
+    "FAIL": 0
+  },
+  "notVerified": [
+    "Physical Safari/iOS/Android, Home Screen/WebView lifecycle",
+    "Live deployment and Pages configuration API",
+    "Android Gradle/signing/AAB or Google Play transactions"
+  ],
+  "deployed": false
+}
