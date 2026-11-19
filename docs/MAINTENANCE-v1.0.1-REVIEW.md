@@ -1,7 +1,7 @@
 # v1.0.1 / build 1596 browser maintenance candidate
 
 Branch `maintenance-v1.0.1`, based on published browser v1.0.0 merge `a3ce560`.
-Approved maintenance game source: development commit `8f0a367c551a7fb085992a130f7c1832c9f71a6d`, `www` tree, retaining the latest approved About credits from `3ebb59d`. Full findings/device QA: [development report](https://github.com/nickmoo-stuff/seamen-pool-development/blob/maintenance-v1.0.1/docs/v1.0.1/REPORT.md).
+Approved maintenance game source: development commit `fd40fc89cf8ce5f38407d7e52be027c695aef225`, `www` tree, retaining the latest approved About credits from `3ebb59d`. Full findings/device QA: [development report](https://github.com/nickmoo-stuff/seamen-pool-development/blob/maintenance-v1.0.1/docs/v1.0.1/REPORT.md).
 
 The new immutable `releases/v1.0.1-b1596/` contains all 102 maintenance source files, using the existing explicit browser audio/advisory/metadata projection and one verified root worker. The copied root `www` and both published previous release directories remain unchanged. No v1.0.0 immutable asset/hash is edited. The active launcher/worker consistently select v1.0.1/build 1596; 93 offline SHA-256 entries, release checksums and cache fingerprint are regenerated. Installed identity, scope/start URL, save origin and all storage keys remain unchanged. Previous-cache recovery prefers the newest available complete cached game.
 

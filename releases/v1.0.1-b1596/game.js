@@ -1067,7 +1067,8 @@ function drawSouronionShotEmbers(now){
   ctx.restore();
 }
 function executionPowerPercent(){
- if(pendingAIPlan?.power==null)return Number(powerEl.value);
+ const aiTurn=gameMode==='aivai'||(gameMode==='pirate'&&aiPlayer===state?.player);
+ if(!aiTurn||pendingAIPlan?.power==null)return Number(powerEl.value);
  // Preserve the old range input's clamping/step sanitisation without touching
  // the human preference or UI (including fractional AI calculations).
  const range=powerEl.cloneNode(false);range.value=pendingAIPlan.power;return Number(range.value);

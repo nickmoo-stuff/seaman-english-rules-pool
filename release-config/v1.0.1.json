@@ -2,7 +2,7 @@
   "version": "1.0.1",
   "build": 1596,
   "sourceRepository": "nickmoo-stuff/seamen-pool-development",
-  "sourceCommit": "8f0a367c551a7fb085992a130f7c1832c9f71a6d",
+  "sourceCommit": "fd40fc89cf8ce5f38407d7e52be027c695aef225",
   "sourcePath": "www",
   "previousBrowserRelease": "v1.0.0-b1595",
   "release": "v1.0.1-b1596",
