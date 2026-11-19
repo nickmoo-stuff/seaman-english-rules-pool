@@ -17,7 +17,7 @@
     expiryTimer=setTimeout(()=>{verifiedUntil=0;emit({status:'verification_unavailable',reason:'verification_expired'});},ttl);
     // Refresh while the existing native verification is still valid. A timeout
     // never extends that bounded lease and cannot become confirmed non-ownership.
-    if(ttl>10000)refreshTimer=setTimeout(()=>run('check'),ttl-5000);
+    if(ttl>10000)refreshTimer=setTimeout(()=>run('check'),ttl-Math.min(45000,ttl/2));
    }else if(!['not_owned','pending','verification_unavailable'].includes(status)||result.source!=='google_play'||result.productId!==PRODUCT){return emit({status:'verification_unavailable',reason:'invalid_response'});}
    if(status!=='verification_unavailable')propagationUntil=0;
    if(status==='not_owned'||status==='pending'){verifiedUntil=0;clearTimeout(expiryTimer);clearTimeout(refreshTimer);}
