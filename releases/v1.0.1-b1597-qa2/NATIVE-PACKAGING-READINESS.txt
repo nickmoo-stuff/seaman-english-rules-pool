@@ -1,0 +1,10 @@
+v1.0.1 / build 1597 — maintenance release candidate
+
+Web-source update only. Copy this complete www into the existing Capacitor 8.5.2
+wrapper, run the established sync script, and set Android versionName 1.0.1 /
+versionCode 1597 using the normal workflow. Confirm 1597 is unused in Play Console.
+Preserve package ID, signing, installed app and save data. Do not uninstall.
+No new native billing patch, gate change or Android project is required.
+Retain the currently approved local native billing configuration. Historical native
+patch sources are included as reference only; do not reapply them for this update.
+No Android SDK/wrapper/signing/device is available here; an APK/AAB has NOT been built.

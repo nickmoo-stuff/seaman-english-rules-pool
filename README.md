@@ -1,6 +1,6 @@
-# Browser deployment candidate: v1.0.1 / build 1596
+# Browser deployment candidate: v1.0.1 / build 1597
 
-This review branch selects `releases/v1.0.1-b1596-qa2/`, with a verified root worker. See [deployment correction, tests and review checklist](docs/MAINTENANCE-v1.0.1-REVIEW.md). The copied Android `www` remains unchanged; do not deploy it directly over this launcher. Rebuild browser inventories with `python tools/prepare-maintenance-browser.py` after any relevant change.
+This review branch selects `releases/v1.0.1-b1597-qa2/`, with a verified root worker. See [deployment correction, tests and review checklist](docs/MAINTENANCE-v1.0.1-REVIEW.md). The copied Android `www` remains unchanged; do not deploy it directly over this launcher. Rebuild browser inventories with `python tools/prepare-maintenance-browser.py` after any relevant change.
 
 ---
 

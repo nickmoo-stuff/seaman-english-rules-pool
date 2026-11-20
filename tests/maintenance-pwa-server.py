@@ -5,7 +5,7 @@ from urllib.parse import urlsplit,parse_qs
 import subprocess,json,socket
 ROOT=Path(__file__).resolve().parents[1]
 SNAP={}
-for build,commit in [('old','fb2f8b4'),('qa1','9d1ebd5')]:
+for build,commit in [('old','fb2f8b4'),('qa1','9d1ebd5'),('qa2old','fd686a1')]:
  SNAP[build]={n:subprocess.check_output(['git','show',commit+':'+n],cwd=ROOT) for n in ['index.html','service-worker.js','sw.js','manifest.webmanifest','icon-192.png','icon-512.png']}
 state={'build':'new','fault':'','kind':'corrupt'}
 class Handler(SimpleHTTPRequestHandler):
@@ -32,4 +32,4 @@ class Handler(SimpleHTTPRequestHandler):
   self.path='/'+relative+('?' + urlsplit(self.path).query if urlsplit(self.path).query else '')
   super().do_GET()
  def __init__(self,*a,**kw):super().__init__(*a,directory=str(ROOT),**kw)
-ThreadingHTTPServer(('127.0.0.1',8053),Handler).serve_forever()
+ThreadingHTTPServer(('127.0.0.1',8056),Handler).serve_forever()

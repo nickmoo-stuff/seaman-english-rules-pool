@@ -1,0 +1,98 @@
+/* v1.0.1 maintenance panels reuse the existing artwork, dialogue and log. */
+.match-panel{position:relative;margin:5px 0;border:1px solid #80613c;border-radius:9px;background:#241a12;color:#f5ead5;min-width:0}
+.match-panel[hidden]{display:none!important}
+.match-panel>summary{display:flex;align-items:center;gap:8px;min-height:44px;padding:4px 8px;cursor:pointer;font-size:12px;list-style:none;touch-action:pan-y}
+.match-panel>summary::-webkit-details-marker{display:none}
+.match-panel>summary:focus-visible{outline:3px solid #efd08e;outline-offset:-3px}
+.match-panel>summary img{width:32px;height:32px;object-fit:contain;flex:none;border-radius:5px}
+.match-panel>summary b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.panel-toggle-label{margin-left:auto;color:#efd08e;font-weight:700;white-space:nowrap}
+.match-panel-body{padding:6px;max-height:240px;overflow:auto;overscroll-behavior:contain;touch-action:pan-y}
+.match-panel-body .pirate-dialogue{margin:0}
+.ownership-waiting{border-style:dashed!important;filter:none!important}
+html[data-layout-device='mobile'] .match-panel[open]>.match-panel-body{position:fixed;z-index:25;left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));top:var(--portrait-panel-top,70px);max-height:var(--portrait-panel-max,30dvh);border:1px solid #bd955b;border-radius:8px;background:#241a12;box-shadow:0 4px 16px #0009}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] .match-panel[open]>.match-panel-body{left:var(--mobile-table-x,180px);right:auto;top:var(--mobile-table-y,54px);width:var(--mobile-table-w,300px);max-height:calc(var(--mobile-table-h,200px) * .7)}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] body:has(#gameApp:not([hidden])){overflow:hidden;height:100dvh}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp:not([hidden]){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto minmax(90px,auto) auto auto auto auto;align-content:start;gap:4px;width:100%;height:var(--maintenance-vh,100dvh);max-height:var(--maintenance-vh,100dvh);padding:max(4px,env(safe-area-inset-top)) max(6px,env(safe-area-inset-right)) max(4px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left));overflow:hidden!important}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp>.mobile-scroll-zone{display:contents!important}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp>header{grid-column:1/-1;grid-row:1;padding:3px 5px;margin:0;position:static!important}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp>header h1{font-size:24px}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp .j3-compact-status{grid-column:1/-1;grid-row:2;margin:0;padding:3px 6px;max-height:none;overflow:visible}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp>.table-wrap{grid-column:1/-1;grid-row:3;align-self:center;width:var(--portrait-table-w,100%)!important;margin:0 auto;height:auto}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #cuePlacementControls{grid-column:1/-1;grid-row:4;margin:0;padding:0}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #cuePlacementControls p{display:none}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] .cue-nudge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:0}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] .cue-nudge-grid button{min-height:44px;height:44px}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #confirmCue{min-height:44px;height:44px;margin:2px 0 0;font-size:13px}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #opponentPanel{grid-column:1/-1;grid-row:7;margin:0}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] .cue-helm-wrap{grid-column:1/-1;grid-row:5;margin:0!important;padding:4px 6px}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp .controls{grid-column:1/-1;grid-row:6;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px;margin:0;padding:5px}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp .controls>label{margin:0!important;font-size:11px}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #angleText{white-space:nowrap}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp .controls>label:has(#angleText){grid-column:1;grid-row:1}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp .controls>label:has(#powerText){grid-column:2;grid-row:1}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp .angle-buttons{grid-column:1;grid-row:2;display:grid;grid-template-columns:1fr 1fr;margin:0;gap:4px}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp .power-buttons{grid-column:2;grid-row:2;display:grid;grid-template-columns:1fr 1fr;margin:0;gap:4px}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp .controls button{min-height:44px;padding:2px;font-size:13px}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp #shoot{grid-column:1/-1;grid-row:3;margin:0;min-height:44px}
+
+
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp .controls>.hint,html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp .rules-hud,html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp .mobile-scroll-zone>footer,html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp .mobile-scroll-zone>details:not(.match-panel),html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #breakHelp{display:none}
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #choice:not([hidden]){position:fixed;z-index:30;left:8px;right:8px;top:var(--portrait-panel-top,80px);max-height:40dvh;overflow:auto}
+@media(max-height:600px) and (orientation:portrait){html[data-layout-device='mobile'][data-gameplay-layout='portrait'] body:has(#gameApp:not([hidden])){overflow:auto}html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp:not([hidden]){min-height:620px;max-height:none;overflow:visible!important}}
+
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp>header #opponentPanel{grid-column:2;grid-row:1;justify-self:center;align-self:center;width:min(100%,270px);max-width:100%;margin:0}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp>header #opponentPanel>summary{min-height:44px;padding:2px 5px;font-size:11px;gap:5px}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #opponentPanel>summary img{width:30px;height:30px}
+
+html[data-layout-device='mobile'][data-gameplay-layout='portrait'] #gameApp .mobile-scroll-zone>details:has(.dev)[open]{display:block;position:fixed;z-index:50;top:80px;left:8px;right:8px;max-height:60dvh;overflow:auto;background:#241a12}
+#opponentPanelInfo{margin:5px;font-size:12px;line-height:1.4}
+/* Wide desktop portrait keeps its established table/control geometry. */
+@media(min-width:1120px){
+ html[data-layout-device='desktop'][data-gameplay-layout='portrait'] #gameApp .match-panel{position:fixed;right:max(12px,calc((100vw - 620px)/2 - 252px));width:240px;z-index:18}
+ html[data-layout-device='desktop'][data-gameplay-layout='portrait'] #opponentPanel{top:88px}
+ html[data-layout-device='desktop'][data-gameplay-layout='portrait'] .match-panel-body{max-height:45vh}
+}
+
+/* QA round 2: the old static main ornament created an implicit grid row.
+   It has no DOM state/listener, progress value or animation; gameplay alone omits it. */
+main#gameApp::before{content:none;display:none}
+/* Explicit row placement overrides the inherited column-auto-flow rule. */
+#gameApp .fine-aim.angle-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(44px,auto));grid-auto-flow:row;gap:4px}
+#gameApp #angleMinus{grid-column:1;grid-row:1}#gameApp #anglePlus{grid-column:2;grid-row:1}
+#gameApp #angleMinus5{grid-column:1;grid-row:2}#gameApp #anglePlus5{grid-column:2;grid-row:2}
+#gameApp .fine-aim.angle-buttons button{aspect-ratio:auto;min-height:44px;height:44px}
+#gameApp .power-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(44px,auto));grid-auto-flow:row;gap:4px}
+#gameApp #powerMinus5{grid-column:1;grid-row:1}#gameApp #powerPlus5{grid-column:2;grid-row:1}
+#gameApp #powerMinus45{grid-column:1;grid-row:2}#gameApp #powerPlus45{grid-column:2;grid-row:2}
+.power-slider-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,.7fr);align-items:center;gap:6px;min-width:0}
+.power-slider-row:not(:has(#power:not([hidden]))){display:none}
+#gameApp .power-slider-row #power{min-width:0;width:100%;height:44px;margin:0}
+#gameApp .power-slider-row #powerTouchLock{min-height:44px;width:100%;margin:0;font-size:11px}
+html[data-gameplay-layout='portrait'] .controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+html[data-gameplay-layout='portrait'] .controls>label:has(#angleText){grid-column:1;grid-row:1}
+html[data-gameplay-layout='portrait'] .controls>label:has(#powerText){grid-column:2;grid-row:1}
+html[data-gameplay-layout='portrait'] .controls>.angle-buttons{grid-column:1;grid-row:2;margin:0}
+html[data-gameplay-layout='portrait'] .controls>.power-buttons{grid-column:2;grid-row:2;margin:0}
+html[data-gameplay-layout='portrait'] .controls>.power-slider-row{grid-column:1/-1;grid-row:3}
+html[data-gameplay-layout='portrait'] #gameApp .controls #shoot{grid-column:1/-1;grid-row:3;width:100%;margin:0;min-height:44px}
+html[data-gameplay-layout='portrait'] #gameApp .controls:has(#power:not([hidden])) #shoot{grid-row:4}
+html[data-gameplay-layout='portrait'] .controls>.hint{grid-column:1/-1;grid-row:5}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp #mobileSpinPresets{grid-column:1/-1;grid-row:2}
+#gameApp #landscapePower .power-buttons{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(44px,1fr));min-height:92px}
+.power-slider-row:has(#powerTouchLock[hidden]){grid-template-columns:minmax(0,1fr)}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'][data-mobile-helm-spin='false'] #gameApp #mobileSpinPresets{display:none}
+
+/* The landscape angle readout shares the existing helm heading, allowing two
+   full-size aim rows without adding a separate label row to the bottom dock. */
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] main#gameApp:not([hidden]){grid-template-rows:auto minmax(80px,1fr) 92px}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp #landscapeBottom{height:92px;align-items:center}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp #landscapeFine{padding:0 2px}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp .fine-aim.angle-buttons{gap:2px}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] .cue-helm-heading>label{display:flex;grid-column:3;grid-row:1;justify-self:end;align-items:center;gap:3px;margin:0;font-size:0;line-height:12px}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] .cue-helm-heading>label::before{content:'AIM';font-size:9px}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] .cue-helm-heading #angleText{font-size:10px;line-height:12px}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp #mobileSpinPresets{position:fixed;z-index:30;left:var(--mobile-table-x);top:var(--mobile-table-y);width:var(--mobile-table-w);padding:3px;border-radius:8px;background:#241a12;border:1px solid #80613c}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'][data-mobile-helm-spin='true'] #opponentPanel .match-panel-body{padding-top:54px}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #landscapePlayer{grid-template-rows:minmax(52px,1.15fr) repeat(2,minmax(44px,1fr));overflow:auto}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #landscapePlayer .rules-hud>div{padding:1px 3px}
