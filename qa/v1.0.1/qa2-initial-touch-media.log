@@ -1,0 +1,10 @@
+PASS Chromium iOS-profile simulation: iPhone portrait; touch/placement/power/spin, reload, synthetic safe areas and scroll containment
+AssertionError [ERR_ASSERTION]: vertical power slider responds to touch
+    at /workspace/seaman-english-rules-pool/tests/ios-profile.cjs:22:113 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: '70',
+  expected: '70',
+  operator: 'notStrictEqual',
+  diff: 'simple'
+}

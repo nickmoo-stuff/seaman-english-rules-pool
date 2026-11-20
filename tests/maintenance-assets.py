@@ -13,8 +13,8 @@ assert "APP_VERSION='1.0.1'" in (bundle/'game.js').read_text() and 'APP_BUILD_NU
 assert "BUILD_MODE='release'" in (bundle/'game.js').read_text()
 for name in subprocess.check_output(['git','ls-tree','-r','--name-only','a3ce560','releases/v1.0.0-b1595','releases/v0.17.52-b1582','www','native-patches'],cwd=r,text=True).splitlines():assert (r/name).read_bytes()==subprocess.check_output(['git','show','a3ce560:'+name],cwd=r),name
 print('PASS exact maintenance source projection;',len(files),'source files; all public v1.0.0/previous release and Android/native trees unchanged')
-payload=json.loads((bundle/'pwa-manifest.js').read_text()[18:].rstrip(';\n'));assert payload['id']=='v1.0.1-b1596'
-assert payload['cache'].startswith('seamen-browser-v1.0.1-b1596-')
+payload=json.loads((bundle/'pwa-manifest.js').read_text()[18:].rstrip(';\n'));assert payload['id']=='v1.0.1-b1596-qa2'
+assert payload['cache'].startswith('seamen-browser-v1.0.1-b1596-qa2-')
 for name,h in payload['files']:assert digest((r/('index.html' if name=='./' else name)).read_bytes())==h,name
 for line in (bundle/'SHA256SUMS.txt').read_text().splitlines():
  h,name=line.split('  ',1);assert digest((bundle/name).read_bytes())==h,name
@@ -22,3 +22,6 @@ assert (r/'manifest.webmanifest').read_bytes()==subprocess.check_output(['git','
 for path in bundle.glob('*.js'):subprocess.run(['node','--check',str(path)],check=True)
 for name in ['service-worker.js','sw.js']:subprocess.run(['node','--check',str(r/name)],check=True)
 print('PASS',len(payload['files']),'offline hashes, release checksums, preserved PWA identity and all release/root JavaScript syntax')
+
+for name in subprocess.check_output(['git','ls-tree','-r','--name-only','9d1ebd5','releases/v1.0.1-b1596'],cwd=r,text=True).splitlines():assert (r/name).read_bytes()==subprocess.check_output(['git','show','9d1ebd5:'+name],cwd=r),name
+print('PASS previous QA1 same-version release remains byte-identical')

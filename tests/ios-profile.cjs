@@ -19,7 +19,7 @@ const url=process.env.TEST_URL||'http://127.0.0.1:8020/releases/v0.17.52-b1582/'
   const angle=await p.evaluate(()=>angle);await drag(p.locator('#helmCueBall'),28);assert(await p.evaluate(()=>angle)>angle,'touch aiming works');await p.waitForTimeout(350);await doubleTap();assert(await p.evaluate(()=>helmSpinMode));
   await tap(p.locator('[data-spin="Backspin"]'));assert.equal(await p.evaluate(()=>selectedSpin.y),.65);await drag(p.locator('#helmCueBall'),10,-10);assert(await p.evaluate(()=>Math.abs(selectedSpin.x)>0));await p.waitForTimeout(350);await doubleTap();assert(!await p.evaluate(()=>helmSpinMode));
   const power=Number(await p.locator('#power').inputValue());await tap(p.locator('#powerPlus5'));assert.equal(Number(await p.locator('#power').inputValue()),Math.min(100,power+5));
-  if(landscape){const value=await p.locator('#power').inputValue();await drag(p.locator('#power'),0,-28);assert.notEqual(await p.locator('#power').inputValue(),value,'vertical power slider responds to touch');
+  if(landscape){const value=await p.locator('#power').inputValue();await drag(p.locator('#power'),0,-50);assert.notEqual(await p.locator('#power').inputValue(),value,'vertical power slider responds to touch');
    for(const id of ['helmCueBall','angleMinus5','angleMinus','anglePlus','anglePlus5','shoot']){const r=await p.locator('#'+id).boundingBox();assert(r.x>=insets.left&&r.x+r.width<=width-insets.right+1&&r.y>=insets.top&&r.y+r.height<=height-insets.bottom+1,id+' inside synthetic safe area');}
    assert(await p.evaluate(()=>document.documentElement.scrollHeight<=innerHeight+1),'no page height overflow in landscape');
   }

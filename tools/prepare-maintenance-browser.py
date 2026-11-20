@@ -7,7 +7,7 @@ from browser_projection import project
 ROOT=Path(__file__).resolve().parents[1]
 CONFIG=json.loads((ROOT/'release-config/v1.0.1.json').read_text())
 SOURCE=CONFIG['sourceCommit'];SOURCE_REPO=ROOT.parent/'seamen-pool-development'
-BUILD='v1.0.1-b1596';DEST=ROOT/'releases'/BUILD
+BUILD=CONFIG['release'];DEST=ROOT/'releases'/BUILD
 with tarfile.open(fileobj=io.BytesIO(subprocess.check_output(['git','archive',SOURCE,'www'],cwd=SOURCE_REPO))) as archive:
  for entry in archive:
   if not entry.isfile():continue

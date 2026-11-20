@@ -1,0 +1,204 @@
+/* K3C.1 controls share one preference; mobile uses actual orientation instead. */
+.desktop-layout-control[hidden],html[data-layout-device='mobile'] .desktop-layout-control{display:none!important}
+#gameApp>header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 8px;align-items:center}
+#gameApp>header>.header-actions{grid-column:2;grid-row:1;min-width:0}
+#headerLayoutControl{grid-column:1/-1;justify-self:end}
+.layout-selector{display:inline-flex;max-width:100%;border:1px solid #8a6a45;border-radius:9px;overflow:hidden;background:#21170f}
+.layout-selector button{min-height:44px;min-width:74px;padding:5px 9px;border:0;background:transparent;color:#e9ddc2;font:700 12px system-ui;cursor:pointer}
+.layout-selector button[aria-pressed='true']{background:#c69a4b;color:#17120d;box-shadow:inset 0 -3px #f2d286}
+.layout-selector button[aria-pressed='true']::before{content:'✓ ';font-weight:900}
+.layout-selector button:focus-visible{outline:3px solid #fff0b8;outline-offset:-3px}
+.layout-setting{display:grid;gap:8px;padding:10px 0 16px;border-bottom:1px solid #59432c;margin-bottom:12px}
+.layout-setting>small{font-size:12px;color:#d1c2a4}
+@media(min-width:700px){html[data-layout-device='desktop'] #gameApp>header{grid-template-columns:minmax(0,1fr) auto auto}html[data-layout-device='desktop'] #headerLayoutControl{grid-column:2;grid-row:1}html[data-layout-device='desktop'] #gameApp>header>.header-actions{grid-column:3}}
+/* Portrait retains its original components and scroll zone. Reserve controls
+   on short desktop windows without reinterpreting their selected layout. */
+html[data-gameplay-layout='portrait'] main#gameApp:not([hidden])>.table-wrap{width:min(100%,calc(max(80px,100dvh - var(--layout-header-h,90px) - 200px) * 1.81632653));margin-left:auto;margin-right:auto}
+.landscape-region[hidden],#landscapeTable[hidden],#landscapeHelm[hidden],#landscapeFine[hidden]{display:none!important}
+html[data-gameplay-layout='landscape'] main#gameApp:not([hidden]){display:grid;grid-template-columns:clamp(118px,15vw,230px) minmax(0,1fr) clamp(140px,17vw,250px);grid-template-rows:auto minmax(70px,1fr) auto;grid-template-areas:'header header header' 'player table right' 'bottom bottom bottom';gap:6px;width:100%;max-width:none;height:100dvh;max-height:100dvh;overflow:hidden!important;padding:max(5px,env(safe-area-inset-top)) max(6px,env(safe-area-inset-right)) max(5px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left));margin:0}
+html[data-gameplay-layout='landscape'] #gameApp>header{grid-area:header;position:relative!important;top:auto!important;margin:0;padding:4px 7px;min-width:0;width:100%}
+html[data-gameplay-layout='landscape'] #gameApp>.mobile-scroll-zone{display:contents!important}
+html[data-gameplay-layout='landscape'] #gameApp .controls{display:none}
+.landscape-region{min-width:0;min-height:0;border:1px solid #755936;border-radius:10px;background:linear-gradient(150deg,#302115,#1d160f);padding:7px;color:#ecdfc5;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#ae884b #21170f}
+#landscapePlayer{grid-area:player;font-size:12px;line-height:1.35}
+#landscapePlayer .j3-compact-status{margin:0 0 7px;padding:5px;width:100%;border-color:#9f7e45}
+#landscapePlayer .rules-hud{display:grid!important;grid-template-columns:minmax(0,1fr);gap:5px;margin:7px 0;text-align:left}
+#landscapePlayer .rules-hud>div{display:block;min-height:0;padding:6px;overflow-wrap:anywhere}
+#landscapePlayer .rules-hud b,#landscapePlayer .rules-hud small{white-space:pre-line;font-size:11px;line-height:1.4}
+#landscapePlayer #lastShot{display:none}
+#landscapePlayer #message{display:block;margin:9px 0;overflow-wrap:anywhere}
+#landscapePlayer .hint{display:block;margin:8px 0;line-height:1.4}
+#landscapePlayer .cue-placement-controls{padding:5px;margin:6px 0}
+#landscapePlayer .cue-placement-controls p{font-size:11px;line-height:1.35;margin:4px 0}
+#landscapePlayer .cue-nudge-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+#landscapePlayer .cue-nudge-grid button{min-height:44px;padding:0}
+#landscapePlayer .confirm-cue{font-size:11px;letter-spacing:0;min-height:44px;padding:4px;margin-top:4px}
+#landscapePlayer .choice{padding:5px;font-size:12px}
+#landscapePlayer .choice div{grid-template-columns:1fr}
+#landscapePlayer .choice button{min-height:44px}
+#landscapePlayer .pirate-dialogue{grid-template-columns:1fr;padding:5px;gap:4px}
+#landscapePlayer .pirate-dialogue[hidden]{display:none}
+#landscapePlayer .pirate-dialogue-text{font-size:11px}
+#landscapePlayer .dev{grid-template-columns:1fr}
+#landscapePlayer .break-help{width:100%;min-height:40px;font-size:11px}
+#landscapeRight{grid-area:right;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+#landscapeLast{flex:0 1 auto;min-height:32px;max-height:23%;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
+#landscapeLast h2{font:800 11px system-ui;letter-spacing:.05em;margin:0 0 5px;color:#e9cb8d}
+#landscapeLast #j3Last{display:block;font-size:12px;line-height:1.4;white-space:normal;overflow-wrap:anywhere}
+#landscapePower{flex:1;min-height:0;display:grid;grid-template-columns:44px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:6px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+#landscapePower label{grid-column:1/-1;display:flex;justify-content:space-between;gap:4px;font-size:11px;font-weight:800;letter-spacing:.03em}
+html[data-gameplay-layout='landscape'] #gameApp #landscapePower #power:not([hidden]){display:block!important;writing-mode:vertical-lr;direction:rtl;width:44px;height:100%;min-height:120px;max-height:none;margin:0;accent-color:#c9963c;touch-action:none;opacity:1}
+#landscapePower .power-buttons{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(4,minmax(44px,1fr));gap:5px;margin:0;align-self:stretch;min-height:191px}
+#landscapePower .power-buttons button{min-width:0;min-height:44px;font-size:12px;letter-spacing:0;padding:3px;background:#3a2a1c;color:#f5ead5;border:1px solid #6b5033;border-radius:8px;font-weight:800;cursor:pointer}
+#landscapeRight #shoot{flex:0 0 auto;width:100%;min-height:46px;background:#c9963c;color:#17120d;border:1px solid #dfbd75;border-radius:9px;font:900 14px system-ui;letter-spacing:.02em;cursor:pointer;box-shadow:inset 0 1px #ffffff30}
+#landscapeRight #shoot:disabled{opacity:.45}
+#landscapeTable{grid-area:table;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0;overflow:hidden}
+html[data-gameplay-layout='landscape'] #gameApp #landscapeTable .table-wrap{position:relative!important;top:auto!important;flex:none;margin:0!important;padding:0;max-width:100%;max-height:100%;min-width:0;min-height:0}
+html[data-gameplay-layout='landscape'] #gameApp #landscapeTable canvas{width:100%;height:auto;max-height:none;object-fit:contain;aspect-ratio:1780/980}
+#landscapeHelm{grid-area:helm;min-width:0;min-height:0;max-height:clamp(90px,28dvh,210px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+#landscapeHelm .cue-helm-wrap{margin:0!important;padding:6px}
+#landscapeHelm .cue-helm-heading{grid-template-columns:minmax(65px,1fr) minmax(0,2fr) minmax(65px,1fr);gap:4px}
+#landscapeHelm .cue-helm-heading>span{font-size:11px}
+#landscapeHelm #spinInstruction{grid-column:2;grid-row:1;font-size:9px}
+#landscapeHelm #helmAimInstruction{grid-column:3;grid-row:1;font-size:9px;white-space:normal}
+#landscapeFine{grid-area:fine;min-width:0;border:1px solid #755936;border-radius:9px;background:#241a12;padding:5px 6px}
+#landscapeFine label{display:flex;justify-content:space-between;font-size:11px;font-weight:800;line-height:1.2;margin-bottom:4px}
+#landscapeFine .fine-aim{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:0}
+#landscapeFine .fine-aim button{aspect-ratio:auto;width:100%;height:44px;min-height:44px;font-size:14px;cursor:pointer}
+html[data-gameplay-layout='landscape'] #gameApp #headerLayoutControl{grid-column:2;grid-row:1}
+html[data-gameplay-layout='landscape'][data-layout-device='desktop'] #gameApp>header{grid-template-columns:minmax(0,1fr) auto auto}
+html[data-gameplay-layout='landscape'][data-layout-device='desktop'] #gameApp>header>.header-actions{grid-column:3}
+html[data-gameplay-layout='landscape'] #gameApp .browser-warning{max-height:50px;overflow:auto;font-size:11px}
+@media(max-height:540px){html[data-gameplay-layout='landscape'] #gameApp>header{padding:2px 6px}html[data-gameplay-layout='landscape'] #gameApp h1{font-size:22px}html[data-gameplay-layout='landscape'] #gameApp header p{font-size:10px}html[data-gameplay-layout='landscape'] .landscape-region{padding:5px}#landscapeLast #j3Last{font-size:11px}#landscapeHelm .cue-helm-wrap{padding:4px 5px}#landscapeFine{padding:3px 5px}#landscapeFine .fine-aim button{height:44px;min-height:44px}}
+@media(max-width:700px){html[data-gameplay-layout='landscape'] main#gameApp:not([hidden]){grid-template-columns:106px minmax(0,1fr) 132px;gap:4px}html[data-gameplay-layout='landscape'][data-layout-device='desktop'] #gameApp>header{grid-template-columns:minmax(0,1fr) auto}html[data-gameplay-layout='landscape'][data-layout-device='desktop'] #gameApp>header>.header-actions{grid-column:2}html[data-gameplay-layout='landscape'][data-layout-device='desktop'] #headerLayoutControl{grid-column:1/-1;grid-row:2}#landscapeHelm .cue-helm-heading{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}#landscapeHelm #spinInstruction{grid-row:2;grid-column:1/-1}#landscapeHelm #helmAimInstruction{grid-column:2;grid-row:1}}
+
+/* In landscape, positive adjustments sit above negative adjustments, matching
+   the range's high-at-the-top direction. DOM order is untouched for portrait. */
+#landscapePower #powerPlus45{order:0}#landscapePower #powerPlus5{order:1}#landscapePower #powerMinus5{order:2}#landscapePower #powerMinus45{order:3}
+
+/* A shared bottom strip avoids spending two rows of a short landscape screen. */
+#landscapeBottom[hidden]{display:none!important}
+#landscapeBottom{grid-area:bottom;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);grid-template-areas:'helm fine';gap:6px;min-width:0;min-height:0;align-items:stretch}
+#landscapeFine{display:flex;flex-direction:column;justify-content:center}
+html[data-gameplay-layout='landscape'] #gameApp::before,html[data-gameplay-layout='landscape'] #gameApp::after{display:none}
+#landscapePlayer .j3-compact-status{position:sticky;top:-5px;z-index:2;background:#2c2014}
+@media(max-width:560px){html[data-gameplay-layout='landscape'] main#gameApp:not([hidden]){grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(90px,1fr) minmax(60px,.45fr) auto;grid-template-areas:'header header' 'table table' 'player right' 'bottom bottom'}#landscapeBottom{grid-template-columns:minmax(0,1fr);grid-template-areas:'helm' 'fine'}#landscapeRight{display:grid;grid-template-columns:minmax(0,1fr) minmax(90px,1fr);grid-template-rows:1fr auto}#landscapeLast{max-height:none;grid-column:1;grid-row:1}#landscapePower{grid-column:2;grid-row:1/3}#landscapeRight #shoot{grid-column:1;grid-row:2}#landscapePower .power-buttons{min-height:191px}#landscapeLast #j3Last{font-size:11px}}
+/* Placement actions stay at the start of the small side pane; the complete
+   existing instructions remain directly below them, rather than off-screen first. */
+#landscapePlayer .cue-placement-controls{display:flex;flex-direction:column}
+#landscapePlayer .cue-placement-controls[hidden]{display:none!important}
+#landscapePlayer .cue-nudge-grid{order:0;margin-bottom:3px}
+#landscapePlayer .confirm-cue{order:1}
+#landscapePlayer .cue-placement-controls p{order:2;margin-top:7px}
+html[data-gameplay-layout='landscape'] .turn-overlay{font-size:var(--landscape-turn-size,24px);padding:8px}
+@media(max-width:700px){html[data-gameplay-layout='landscape'][data-layout-device='desktop'] #gameApp #headerLayoutControl{grid-column:1/-1;grid-row:2}}
+/* Existing notices and lesson help use the information panes during play,
+   returning to their original document positions outside landscape matches. */
+#landscapeLast #pwaNotice{position:static;inset:auto;transform:none;width:100%;max-width:100%;margin:6px 0 0;padding:5px;font-size:11px;box-shadow:none}
+#landscapePlayer #schoolCoach{position:static;inset:auto;width:100%;max-width:100%;margin:6px 0;font-size:12px;box-shadow:none}
+#landscapePlayer #schoolTipBody{max-height:min(32dvh,220px);padding:0 5px 6px}
+#landscapePlayer #schoolTipToggle{padding:5px;flex-wrap:wrap;gap:3px}
+#landscapePlayer #schoolTipTitle{white-space:normal;overflow-wrap:anywhere;flex:1 1 100%;font-size:11px;line-height:1.3}
+#landscapePlayer .school-tip-actions{grid-template-columns:minmax(0,1fr)}
+/* Spin opens its real preset row, even at short heights. The table yields
+   space temporarily; normal aiming restores the larger table automatically. */
+#landscapeHelm{max-height:min(220px,48dvh)}
+/* Mobile browser chrome can make 100vh taller than the live game viewport.
+   Keep the active landscape page itself bounded; its information panes scroll. */
+html[data-gameplay-layout='landscape']:has(#gameApp:not([hidden])),html[data-gameplay-layout='landscape'] body:has(#gameApp:not([hidden])){height:100dvh;min-height:0;overflow:hidden}
+
+/* K3C.3: the phone table owns the central row. Optional information has its
+   own independent panels; aiming, power and the actual shot button never fold. */
+html[data-layout-device='desktop'] #landscapeDetails{border:0;padding:0;margin:0}
+html[data-layout-device='desktop'] #landscapeDetails>summary{display:none}
+#mobilePanelRail[hidden],#mobileShotDock[hidden],.mobile-panel-body[hidden]{display:none!important}
+#mobileSpinPresets{display:none}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] main#gameApp:not([hidden]){
+ grid-template-columns:var(--mobile-info-w,172px) minmax(0,1fr) 76px 72px;
+ grid-template-rows:auto minmax(140px,1fr) 72px;
+ grid-template-areas:'header header header header' 'player table right right' 'bottom bottom bottom shoot';
+ gap:4px;padding:max(4px,calc(env(safe-area-inset-top) + 2px)) max(6px,calc(env(safe-area-inset-right) + 4px)) max(6px,calc(env(safe-area-inset-bottom) + 4px)) max(6px,calc(env(safe-area-inset-left) + 4px));
+ -webkit-text-size-adjust:100%;text-size-adjust:100%;
+}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp>header{grid-template-columns:146px minmax(0,1fr) auto;gap:4px;padding:0 4px;min-height:46px}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp>header h1{font-size:15px;line-height:17px;letter-spacing:.1em}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp>header p{display:none}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp>header>.header-actions{grid-column:3;grid-row:1;gap:4px}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp>header button{min-height:44px}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp>header .header-icon-btn{width:44px;min-width:44px;height:44px;padding:0}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp>header #reset{min-width:80px;font-size:11px;padding:0 6px}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp header .j3-compact-status{position:static;display:block;margin:0;padding:0;border:0;background:none;min-height:0;width:100%;box-shadow:none}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp header .j3-compact-status strong{display:block;font:700 10px/13px system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp header #j3Turn{position:relative;padding-right:46px;font-size:0;line-height:0}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp header #j3Turn::before{content:attr(data-compact-name);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 10px/13px system-ui}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp header #j3Turn::after{content:attr(data-compact-group);position:absolute;right:0;top:0;font:800 10px/13px system-ui;color:#efd08e}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #mobileSpinPresets{display:block;grid-column:2;grid-row:1;min-width:0}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #mobileSpinPresets .spin-presets{display:none;transition:none}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'][data-mobile-helm-spin='true'] #mobileSpinPresets .spin-presets{display:grid;grid-template-rows:1fr;opacity:1;visibility:visible}
+html[data-layout-device='mobile'] #mobileSpinPresets .spin-presets-inner{grid-template-columns:repeat(5,minmax(44px,1fr));gap:4px}
+html[data-layout-device='mobile'] #mobileSpinPresets .spin-presets-inner>b{display:none}
+html[data-layout-device='mobile'] #mobileSpinPresets .spin-presets button{min-height:44px;padding:2px;font-size:10px;border-radius:8px}
+html[data-layout-device='mobile'] #landscapePlayer{display:grid;grid-template-columns:44px minmax(0,1fr);grid-template-rows:repeat(3,minmax(44px,1fr));gap:4px;overflow:hidden;padding:3px;font-size:10px;line-height:1.2}
+html[data-layout-device='mobile'] #mobilePanelRail{display:contents}
+.mobile-panel-toggle{grid-column:1;min-width:44px;min-height:44px;width:44px;height:44px;align-self:start;padding:2px;border:1px solid #93723c;border-radius:6px;background:#302115;color:#efd08e;font:700 9px/12px system-ui;cursor:pointer}
+.mobile-panel-toggle:focus-visible{outline:2px solid #fff0b8;outline-offset:-3px}
+.mobile-panel-body{grid-column:2;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.mobile-panel-toggle[data-panel='players'],#mobilePanelplayers{grid-row:1}
+.mobile-panel-toggle[data-panel='lastTurn'],#mobilePanellastTurn{grid-row:2}
+.mobile-panel-toggle[data-panel='details'],#mobilePaneldetails{grid-row:3}
+html[data-layout-device='mobile'] #landscapePlayer .rules-hud{display:grid!important;grid-template-columns:minmax(0,1fr);gap:3px;margin:0}
+html[data-layout-device='mobile'] #landscapePlayer .rules-hud>div{padding:2px 3px;border-radius:4px;min-height:0}
+html[data-layout-device='mobile'] #landscapePlayer .rules-hud>.centre{display:none}
+html[data-layout-device='mobile'] #landscapePlayer .rules-hud b{display:block;font:700 10px/11px system-ui;min-height:0;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-layout-device='mobile'] #landscapePlayer .rules-hud small{display:block;font-size:0;line-height:0;min-height:0;margin:0;text-align:left}
+html[data-layout-device='mobile'] #landscapePlayer .rules-hud small::after{content:attr(data-compact);display:block;font:400 10px/11px system-ui;white-space:nowrap}
+html[data-layout-device='mobile'] #landscapePlayer #landscapeLast{min-height:0;max-height:none;padding:0;overflow:visible}
+html[data-layout-device='mobile'] #landscapeLast h2{display:none}
+html[data-layout-device='mobile'] #landscapeLast #j3Last{font:400 10px/1.3 system-ui}
+html[data-layout-device='mobile'] #landscapeDetails{position:static;margin:0;padding:0;border:0;box-shadow:none;overflow:visible;font-size:10px}
+html[data-layout-device='mobile'] #landscapeDetails>summary{display:none}
+html[data-layout-device='mobile'] #landscapeDetails .cue-nudge-grid,html[data-layout-device='mobile'] #landscapeDetails>p{display:none}
+html[data-layout-device='mobile'] #gameApp:has(#cuePlacementControls:not([hidden])) #landscapeDetails .cue-nudge-grid{display:grid;grid-template-columns:repeat(2,minmax(44px,1fr))}
+html[data-layout-device='mobile'] #gameApp:has(#cuePlacementControls:not([hidden])) #landscapeDetails>p{display:block}
+html[data-layout-device='mobile'] #landscapeDetails .cue-nudge-grid button{min-height:44px;padding:0}
+html[data-layout-device='mobile'] #landscapeDetails #spinGuideNote{display:block;margin:6px 0;font-size:10px}
+html[data-layout-device='mobile'] #landscapeRight{display:flex;flex-direction:column;overflow:hidden;padding:5px;gap:4px}
+html[data-layout-device='mobile'] #landscapePower{flex:1;overflow:visible;grid-template-columns:44px minmax(0,1fr);grid-template-rows:auto minmax(48px,1fr);gap:4px}
+html[data-layout-device='mobile'] #landscapePower label{grid-column:1;grid-row:1;display:block;text-align:center;white-space:normal;font:800 9px/10px system-ui;letter-spacing:0}
+html[data-layout-device='mobile'] #landscapePower label strong{display:block;font-size:12px;line-height:14px}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp #landscapePower #power:not([hidden]){grid-column:1;grid-row:2;min-height:48px;width:44px}
+html[data-layout-device='mobile'] #landscapePower .power-buttons{grid-column:2;grid-row:1/3;grid-template-columns:repeat(2,minmax(44px,1fr));grid-template-rows:repeat(2,minmax(44px,1fr));min-height:92px;gap:4px}
+html[data-layout-device='mobile'] #landscapePower .power-buttons button{font-size:12px;padding:2px}
+html[data-layout-device='mobile'] #landscapeRight #cuePlacementControls{flex:none;display:block;margin:0;padding:0;border:0;background:none}
+html[data-layout-device='mobile'] #landscapeRight #cuePlacementControls[hidden]{display:none!important}
+html[data-layout-device='mobile'] #landscapeRight #confirmCue{margin:0;width:100%;min-height:44px;padding:2px;font-size:10px;letter-spacing:0}
+html[data-layout-device='mobile'] #landscapeBottom{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:4px;height:72px}
+html[data-layout-device='mobile'] #landscapeHelm{max-height:none;overflow:visible}
+html[data-layout-device='mobile'] #landscapeHelm .cue-helm-wrap{height:72px;padding:2px 5px}
+html[data-layout-device='mobile'] #landscapeHelm .cue-helm-heading{grid-template-columns:minmax(65px,1fr) minmax(0,2fr) minmax(65px,1fr);height:12px;margin:0;line-height:12px;gap:0}
+html[data-layout-device='mobile'] #landscapeHelm .cue-helm-heading>span{font-size:9px;letter-spacing:0;white-space:nowrap}
+html[data-layout-device='mobile'] #landscapeHelm #spinInstruction{grid-column:2;grid-row:1;white-space:nowrap;font-size:8px;line-height:12px}
+html[data-layout-device='mobile'] #landscapeHelm #helmAimInstruction{display:none}
+html[data-layout-device='mobile'] #landscapeFine{padding:2px 4px}
+html[data-layout-device='mobile'] #landscapeFine .fine-aim{gap:4px}
+html[data-layout-device='mobile'] #landscapeFine .fine-aim button{font-size:13px}
+#mobileShotDock{grid-area:shoot;min-width:0;min-height:0;display:flex;align-items:flex-end;justify-content:flex-end}
+#mobileShotDock #shoot{width:72px;height:72px;min-width:72px;min-height:72px;padding:6px;border:1px solid #dfbd75;border-radius:10px;background:#c9963c;color:#17120d;box-shadow:inset 0 1px #ffffff30;font:900 14px/19px system-ui;letter-spacing:0;cursor:pointer}
+#mobileShotDock #shoot:disabled{opacity:.45;cursor:default}
+html[data-layout-device='mobile'] #landscapePlayer .choice:not([hidden]),html[data-layout-device='mobile'] #landscapePlayer #schoolCoach{position:fixed;z-index:15;left:var(--mobile-table-x,180px);top:var(--mobile-table-y,54px);width:var(--mobile-table-w,300px);max-width:var(--mobile-table-w,300px);max-height:var(--mobile-table-h,220px);transform:none;inset-inline-end:auto;margin:0;overflow:auto;box-shadow:0 4px 20px #0009}
+html[data-layout-device='mobile'] #landscapePlayer #schoolCoach{width:min(310px,var(--mobile-table-w,300px));min-height:25px;font-size:11px}
+
+/* Placement is an action, not optional information: keep all four original
+   arrows directly visible until the player confirms the white. */
+#mobileCuePlacement[hidden]{display:none!important}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #landscapeTable{flex-direction:column;gap:4px}
+#mobileCuePlacement{order:1;flex:none;display:flex;justify-content:center;width:100%;height:44px}
+#mobileCuePlacement .cue-nudge-grid{display:grid;grid-template-columns:repeat(4,44px);gap:4px;margin:0}
+#mobileCuePlacement .cue-nudge-grid button{width:44px;height:44px;min-height:44px;min-width:44px;padding:0;border:1px solid #a4834b;border-radius:8px;background:#302115;color:#efd08e;font:900 20px/1 system-ui;touch-action:none}
+
+/* Landscape has no page scrolling to hand off: retain the full Helm gesture. */
+html[data-gameplay-layout='landscape'] #cueHelm{touch-action:none}
+
+/* Browser advisory stays non-modal and readable in the compact landscape header. */
+#gameApp>header #browserWarning:not([hidden]){display:block;grid-column:1/-1;grid-row:2;max-width:none;max-height:42px;overflow:auto;margin:2px 0;line-height:1.3}
+html[data-layout-device='mobile'][data-gameplay-layout='landscape'] #gameApp>header #browserWarning:not([hidden]){max-height:32px;font-size:10px;padding:3px 6px}
