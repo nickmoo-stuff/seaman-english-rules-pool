@@ -1,0 +1,97 @@
+{
+  "version": "1.0.1",
+  "build": 1597,
+  "qaRound": 2,
+  "checks": [
+    {
+      "name": "fresh verified v1.0.1/build1597; all offline entries and music load; single root worker; browser purchases/ownership unavailable",
+      "status": "PASS"
+    },
+    {
+      "name": "installed PWA root launches offline, saved state remains, real local frame shot works offline",
+      "status": "PASS"
+    },
+    {
+      "name": "real v1.0.0 upgrade: active frame unchanged, explicit restart reaches v1, saves/trophies/cosmetics/settings retained; old caches retained",
+      "status": "PASS"
+    },
+    {
+      "name": "QA2 build1596 to build1597 update retains saves and verifies new source",
+      "status": "PASS"
+    },
+    {
+      "name": "QA1 same-version update reaches distinct QA2 assets and preserves saves",
+      "status": "PASS"
+    },
+    {
+      "name": "corrupt update rejected; old version works offline without clearing data; retry recovers v1",
+      "status": "PASS"
+    },
+    {
+      "name": "missing update rejected; old version works offline without clearing data; retry recovers v1",
+      "status": "PASS"
+    },
+    {
+      "name": "interrupt update rejected; old version works offline without clearing data; retry recovers v1",
+      "status": "PASS"
+    },
+    {
+      "name": "fresh integrity failure remains blocked; retry succeeds after complete deployment",
+      "status": "PASS"
+    },
+    {
+      "name": "QA2 390x844: ordered 2x2 controls, shot width/placement, opponent/status, menu log, slider preference/lock, spin/rotation and deliberate shot",
+      "status": "PASS"
+    },
+    {
+      "name": "QA2 375x667: ordered 2x2 controls, shot width/placement, opponent/status, menu log, slider preference/lock, spin/rotation and deliberate shot",
+      "status": "PASS"
+    },
+    {
+      "name": "QA2 412x915: ordered 2x2 controls, shot width/placement, opponent/status, menu log, slider preference/lock, spin/rotation and deliberate shot",
+      "status": "PASS"
+    },
+    {
+      "name": "QA2 834x1194: ordered 2x2 controls, shot width/placement, opponent/status, menu log, slider preference/lock, spin/rotation and deliberate shot",
+      "status": "PASS"
+    },
+    {
+      "name": "QA2 855x384: ordered 2x2 controls, shot width/placement, opponent/status, menu log, slider preference/lock, spin/rotation and deliberate shot",
+      "status": "PASS"
+    },
+    {
+      "name": "QA2 740x360: ordered 2x2 controls, shot width/placement, opponent/status, menu log, slider preference/lock, spin/rotation and deliberate shot",
+      "status": "PASS"
+    },
+    {
+      "name": "QA2 640x320: ordered 2x2 controls, shot width/placement, opponent/status, menu log, slider preference/lock, spin/rotation and deliberate shot",
+      "status": "PASS"
+    },
+    {
+      "name": "exact maintenance source projection; 102 source files; all public v1.0.0/previous release and Android/native trees unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "93 offline hashes, release checksums, preserved PWA identity and all release/root JavaScript syntax",
+      "status": "PASS"
+    },
+    {
+      "name": "previous QA1 same-version release remains byte-identical",
+      "status": "PASS"
+    },
+    {
+      "name": "previous build1596 QA2 release remains byte-identical",
+      "status": "PASS"
+    }
+  ],
+  "counts": {
+    "PASS": 20,
+    "FAIL": 0
+  },
+  "deployed": false,
+  "limitations": [
+    "Linux Chromium fixtures; not physical Android/iOS Safari",
+    "No actual Android build, signing, install, transactions or Play versionCode availability check"
+  ],
+  "sourceCommit": "3856e3028480dfaa20497363831518f978cbf75f"
+}

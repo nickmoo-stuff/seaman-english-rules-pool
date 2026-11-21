@@ -1,5 +1,5 @@
 /* K3I.2: immutable, hash-verified browser bundle. No independently updated runtime files. */
-importScripts('./releases/v1.0.0-b1595/pwa-manifest.js');
+importScripts('./releases/v1.0.1-b1597-qa2/pwa-manifest.js');
 const BUILD=self.SEAMEN_BUILD,CACHE=BUILD.cache,ROOT=self.registration.scope;
 const urls=new Set(BUILD.files.map(([path])=>new URL(path,ROOT).href));
 async function verified(response,expected){

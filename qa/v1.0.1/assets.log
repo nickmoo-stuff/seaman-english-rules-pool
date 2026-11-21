@@ -1,0 +1,3 @@
+PASS exact maintenance source projection; 102 source files; all public v1.0.0/previous release and Android/native trees unchanged
+PASS 93 offline hashes, release checksums, preserved PWA identity and all release/root JavaScript syntax
+PASS previous QA1 same-version release remains byte-identical
